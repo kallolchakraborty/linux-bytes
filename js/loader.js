@@ -1,10 +1,7 @@
 // Dynamic Content Loader for Quick Reference Documentation Portal
 const routeMap = {
-  '#js-variables': 'content/frontend/javascript-variables.json',
   '#js-arrays': 'content/frontend/javascript-arrays.json',
-  '#css-flexbox': 'content/frontend/css-flexbox.json',
   '#git-commands': 'content/devops/git-commands.json',
-  '#docker-lifecycle': 'content/devops/docker-lifecycle.json',
   '#go-interfaces': 'content/backend/go-interfaces.json',
   '#python-context': 'content/backend/python-context.json',
   '#gil': 'content/python/gil.json',
@@ -13,7 +10,7 @@ const routeMap = {
 };
 
 async function loadContent(hash) {
-  const path = routeMap[hash] || routeMap['#js-variables'];
+  const path = routeMap[hash] || routeMap['#git-commands'];
   const contentArea = document.getElementById('docs-dynamic-content');
   if (!contentArea) return;
 
@@ -136,7 +133,7 @@ function escapeHtml(text) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  const initialHash = window.location.hash || '#js-variables';
+  const initialHash = window.location.hash || '#git-commands';
   loadContent(initialHash);
 });
 

@@ -1,9 +1,0 @@
-{
-  "id": "docker-lifecycle",
-  "title": "Docker Container Lifecycle",
-  "category": "DevOps",
-  "subcategory": "Docker",
-  "description": "Quick guides on Docker lifecycle controls, container volume bindings, network configs, and Docker Compose syntax.",
-  "codeBlock": "# Run an interactive container\ndocker run -it --name test-ubuntu ubuntu bash\n\n# Stop and clean up containers\ndocker stop test-ubuntu\ndocker rm test-ubuntu",
-  "details": "A Docker container goes through states like Created, Running, Paused, Stopped, and Deleted. Managing these lifecycle steps efficiently prevents orphaned resources."
-}

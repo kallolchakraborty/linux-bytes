@@ -1,7 +1,6 @@
 // Fuzzy Search & Modal Controller for Quick Reference Docs
 const searchIndex = [
   // Languages
-  { title: "JavaScript Variables & Scope", category: "Languages", url: "docs.html#js-variables", tags: ["javascript", "js", "let", "const", "var", "scope"] },
   { title: "JavaScript Array Methods", category: "Languages", url: "docs.html#js-arrays", tags: ["javascript", "js", "map", "filter", "reduce", "arrays"] },
   { title: "Go Interfaces & Structs", category: "Languages", url: "docs.html#go-interfaces", tags: ["go", "golang", "struct", "interface", "oop"] },
   { title: "Python Context Managers", category: "Languages", url: "docs.html#python-context", tags: ["python", "with", "context", "files", "resource"] },
@@ -13,8 +12,6 @@ const searchIndex = [
 
   // Developer Tools
   { title: "Common Git Commands", category: "Developer Tools", url: "docs.html#git-commands", tags: ["git", "commit", "push", "pull", "merge", "rebase"] },
-  { title: "Docker Container Lifecycle", category: "Developer Tools", url: "docs.html#docker-lifecycle", tags: ["docker", "container", "run", "stop", "exec"] },
-  { title: "CSS Flexbox Cheat Sheet", category: "Developer Tools", url: "docs.html#css-flexbox", tags: ["css", "flexbox", "layout", "align", "justify"] }
 ];
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -98,7 +95,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (items.length === 0) {
       searchResults.innerHTML = `
         <div class="p-8 text-center text-slate-500 dark:text-slate-400 font-mono text-sm">
-          No matches found. Try searching for "git", "python", or "docker".
+          No matches found. Try searching for "git", "python", or "go".
         </div>
       `;
       return;

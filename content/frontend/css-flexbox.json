@@ -1,9 +1,0 @@
-{
-  "id": "css-flexbox",
-  "title": "CSS Flexbox Layout",
-  "category": "Frontend",
-  "subcategory": "CSS",
-  "description": "Flexbox provides layout alignment and spacing distribution in a one-dimensional column/row layout.",
-  "codeBlock": ".container {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n}",
-  "details": "Flexbox is ideal for small-scale layouts, navigation headers, and components requiring single-axis alignments (either row or column directions)."
-}

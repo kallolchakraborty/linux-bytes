@@ -1,9 +1,0 @@
-{
-  "id": "js-variables",
-  "title": "JavaScript Scope & Variables",
-  "category": "Frontend",
-  "subcategory": "JavaScript",
-  "description": "JavaScript variables can be declared using let, const, and var. Understanding their lexical scope, hoisting, and re-assignment characteristics is critical for clean code.",
-  "codeBlock": "const pi = 3.14159;\nlet radius = 10;\n\n// Block-scoped mutation\nif (radius === 10) {\n  let radius = 20; // Block scope variable\n  console.log(radius); // Output: 20\n}",
-  "details": "Unlike 'var' which is function-scoped and hoisted to the top of its context, 'let' and 'const' are block-scoped and exist within the Temporal Dead Zone (TDZ) until their declaration is evaluated."
-}
