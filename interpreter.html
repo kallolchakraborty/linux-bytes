@@ -394,18 +394,21 @@
     function triggerSceneAnimation(index, state) {
       if (index === 1) {
         var innerDiv = document.querySelector('#vis-scene-1 > div');
-        if (innerDiv) {
-          var children = Array.from(innerDiv.children);
-          children.forEach(function(child, i) {
-            child.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
-            child.style.opacity = '0';
-            child.style.transform = 'translateY(10px)';
-            setTimeout(function() {
-              child.style.opacity = '1';
-              child.style.transform = 'translateY(0)';
-            }, 400 + i * 300);
+        if (!innerDiv) return;
+        var children = Array.from(innerDiv.children);
+        children.forEach(function(child) {
+          child.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+          child.style.opacity = '0';
+          child.style.transform = 'translateY(10px)';
+        });
+        var steps = [];
+        children.forEach(function(child, i) {
+          steps.push(function() {
+            child.style.opacity = '1';
+            child.style.transform = 'translateY(0)';
           });
-        }
+        });
+        state.setSteps(steps);
       }
 
       else if (index === 2) {
@@ -413,15 +416,18 @@
         codeElement.textContent = "";
         var codeString = data.codeString;
         var charIndex = 0;
+        var steps = [];
 
         function typeCode() {
-          if (charIndex < codeString.length && state.currentScene === 2) {
+          if (charIndex < codeString.length && state.currentScene === 2 && state.currentStep < 1) {
             codeElement.textContent += codeString.charAt(charIndex);
             charIndex++;
             setTimeout(typeCode, 30);
           }
         }
-        setTimeout(typeCode, 500);
+
+        steps.push(function() { setTimeout(typeCode, 500); });
+        state.setSteps(steps);
       }
 
       else if (index === 3) {
@@ -430,53 +436,42 @@
           var el = document.getElementById(id);
           el.className = "flex flex-col items-center gap-3 z-10 opacity-0 transform translate-y-4 transition-all duration-700";
         });
-
         var pulse = document.getElementById('pipeline-pulse');
         if (pulse) pulse.classList.add('opacity-0');
 
-        nodes.forEach(function(id, i) {
-          setTimeout(function() {
-            if (state.currentScene === 3) {
-              var el = document.getElementById(id);
-              el.classList.remove('opacity-0', 'translate-y-4');
-            }
-          }, 300 + (i * 300));
+        var steps = [];
+        nodes.forEach(function(id) {
+          steps.push(function() {
+            var el = document.getElementById(id);
+            el.classList.remove('opacity-0', 'translate-y-4');
+          });
         });
 
-        setTimeout(function() {
-          if (state.currentScene === 3) {
-            var annotation = document.getElementById('interpreter-cycles');
-            var box = document.querySelector('#node-interpreter div');
-            if (annotation) annotation.className = "absolute -bottom-12 flex gap-1.5 font-mono text-[9px] text-orange-600 dark:text-orange-400 transition-opacity duration-500 opacity-100";
-            if (box) box.classList.add('border-orange-600', 'dark:border-orange-400');
-          }
-        }, 1200);
+        steps.push(function() {
+          var annotation = document.getElementById('interpreter-cycles');
+          var box = document.querySelector('#node-interpreter div');
+          if (annotation) annotation.className = "absolute -bottom-12 flex gap-1.5 font-mono text-[9px] text-orange-600 dark:text-orange-400 transition-opacity duration-500 opacity-100";
+          if (box) box.classList.add('border-orange-600', 'dark:border-orange-400');
+        });
 
-        setTimeout(function() {
-          if (pulse && state.currentScene === 3) {
-            pulse.classList.remove('opacity-0');
-          }
-        }, 1500);
+        steps.push(function() {
+          if (pulse) pulse.classList.remove('opacity-0');
+        });
+        state.setSteps(steps);
       }
 
       else if (index === 4) {
         var block = document.getElementById('mem-item-x');
         block.className = "text-sm flex justify-between py-1 transition-all duration-700 transform translate-y-2 opacity-0";
-        setTimeout(function() {
-          if (state.currentScene === 4) {
-            block.classList.remove('opacity-0', 'translate-y-2');
-          }
-        }, 600);
+        var steps = [function() { block.classList.remove('opacity-0', 'translate-y-2'); }];
+        state.setSteps(steps);
       }
 
       else if (index === 5) {
         var block = document.getElementById('mem-item-y');
         block.className = "text-sm flex justify-between py-1 transition-all duration-700 transform translate-y-2 opacity-0";
-        setTimeout(function() {
-          if (state.currentScene === 5) {
-            block.classList.remove('opacity-0', 'translate-y-2');
-          }
-        }, 600);
+        var steps = [function() { block.classList.remove('opacity-0', 'translate-y-2'); }];
+        state.setSteps(steps);
       }
 
       else if (index === 6) {
@@ -492,35 +487,26 @@
         sum.className = "text-orange-700 dark:text-orange-300 font-bold opacity-0 transition-opacity duration-500";
         memResult.className = "text-sm flex justify-between py-1 text-orange-700 dark:text-orange-300 font-bold transition-all duration-700 opacity-0 transform translate-y-2";
 
-        setTimeout(function() {
-          if (state.currentScene === 6) {
-            valX.textContent = "2";
-            valY.textContent = "3";
-            valX.classList.add('text-orange-600', 'dark:text-orange-400');
-            valY.classList.add('text-orange-600', 'dark:text-orange-400');
-          }
-        }, 1000);
-
-        setTimeout(function() {
-          if (state.currentScene === 6) {
-            resolve.classList.remove('opacity-0');
-            resolve.classList.add('opacity-100');
-          }
-        }, 1800);
-
-        setTimeout(function() {
-          if (state.currentScene === 6) {
-            sum.classList.remove('opacity-0');
-            sum.classList.add('opacity-100');
-          }
-        }, 2600);
-
-        setTimeout(function() {
-          if (state.currentScene === 6) {
-            memResult.classList.remove('opacity-0', 'translate-y-2');
-            memResult.classList.add('opacity-100');
-          }
-        }, 3400);
+        var steps = [];
+        steps.push(function() {
+          valX.textContent = "2";
+          valY.textContent = "3";
+          valX.classList.add('text-orange-600', 'dark:text-orange-400');
+          valY.classList.add('text-orange-600', 'dark:text-orange-400');
+        });
+        steps.push(function() {
+          resolve.classList.remove('opacity-0');
+          resolve.classList.add('opacity-100');
+        });
+        steps.push(function() {
+          sum.classList.remove('opacity-0');
+          sum.classList.add('opacity-100');
+        });
+        steps.push(function() {
+          memResult.classList.remove('opacity-0', 'translate-y-2');
+          memResult.classList.add('opacity-100');
+        });
+        state.setSteps(steps);
       }
 
       else if (index === 7) {
@@ -529,21 +515,18 @@
         text.className = "opacity-0 transition-opacity duration-500";
         flash.className = "absolute inset-0 bg-orange-500/5 opacity-0 transition-opacity duration-300";
 
-        setTimeout(function() {
-          if (state.currentScene === 7) {
-            text.classList.remove('opacity-0');
-            text.classList.add('opacity-100');
-            flash.classList.remove('opacity-0');
-            flash.classList.add('opacity-100');
-          }
-        }, 800);
-
-        setTimeout(function() {
-          if (state.currentScene === 7) {
-            flash.classList.remove('opacity-100');
-            flash.classList.add('opacity-0');
-          }
-        }, 1300);
+        var steps = [];
+        steps.push(function() {
+          text.classList.remove('opacity-0');
+          text.classList.add('opacity-100');
+          flash.classList.remove('opacity-0');
+          flash.classList.add('opacity-100');
+        });
+        steps.push(function() {
+          flash.classList.remove('opacity-100');
+          flash.classList.add('opacity-0');
+        });
+        state.setSteps(steps);
       }
 
       else if (index === 8) {
@@ -556,18 +539,18 @@
           check.className = "material-symbols-outlined text-xs text-orange-600 dark:text-orange-400 opacity-0 transition-all duration-300 transform scale-50";
         }
 
-        var runTimes = [500, 1500, 2500, 3500];
-        runTimes.forEach(function(ms, idx) {
-          setTimeout(function() {
-            if (state.currentScene === 8) {
-              var lineIndex = idx + 1;
+        var steps = [];
+        for (var s = 0; s < 4; s++) {
+          steps.push(function(idx) {
+            return function() {
               cursor.style.top = (24 + (idx * 28)) + 'px';
-              var check = document.getElementById('prog-line-' + lineIndex).querySelector('span:last-child');
+              var check = document.getElementById('prog-line-' + (idx + 1)).querySelector('span:last-child');
               check.classList.remove('opacity-0', 'scale-50');
               check.classList.add('opacity-100', 'scale-100');
-            }
-          }, ms);
-        });
+            };
+          }(s));
+        }
+        state.setSteps(steps);
       }
 
       else if (index === 9) {
@@ -576,12 +559,11 @@
         subLine.style.opacity = "1";
         errConsole.className = "bg-white dark:bg-[#1A1D25] border-2 border-red-400 dark:border-red-500/50 rounded-xl w-72 text-left font-mono shadow-lg overflow-hidden opacity-0 transform translate-x-4 transition-all duration-700 delay-300";
 
-        setTimeout(function() {
-          if (state.currentScene === 9) {
-            subLine.style.opacity = "0.2";
-            errConsole.classList.remove('opacity-0', 'translate-x-4');
-          }
-        }, 1200);
+        var steps = [function() {
+          subLine.style.opacity = "0.2";
+          errConsole.classList.remove('opacity-0', 'translate-x-4');
+        }];
+        state.setSteps(steps);
       }
     }
 
@@ -591,6 +573,8 @@
         totalScenes: 10,
         sceneData: data.scenes,
         scene2HideClass: 'translate-x-10',
+        stepIntervalMs: 1500,
+        scenePauseMs: 1000,
         activeTagClass: ['bg-orange-600', 'text-white', 'border-orange-600', 'shadow-sm', 'font-semibold'],
         inactiveTagClass: ['bg-transparent', 'text-inkMuted', 'dark:text-gray-400', 'border-gray-200', 'dark:border-gray-600', 'hover:bg-orange-50', 'dark:hover:bg-white/5', 'hover:border-orange-300', 'dark:hover:border-orange-500', 'hover:text-orange-600', 'dark:hover:text-orange-400', 'font-medium'],
         onSceneAnimation: triggerSceneAnimation

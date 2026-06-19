@@ -535,35 +535,34 @@
           el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
         });
 
-        setTimeout(() => {
-          if (state.currentScene === 1) {
-            title.style.opacity = '1';
-            title.style.transform = 'translateY(0)';
-          }
-        }, 200);
-
-        setTimeout(() => {
-          if (state.currentScene === 1) {
-            subtitle.style.opacity = '1';
-            subtitle.style.transform = 'translateY(0)';
-          }
-        }, 500);
-
-        setTimeout(() => {
-          if (state.currentScene === 1) {
-            line.style.width = '16rem';
-          }
-        }, 900);
+        var steps = [];
+        steps.push(function() {
+          if (state.currentScene !== 1) return;
+          title.style.opacity = '1';
+          title.style.transform = 'translateY(0)';
+        });
+        steps.push(function() {
+          if (state.currentScene !== 1) return;
+          subtitle.style.opacity = '1';
+          subtitle.style.transform = 'translateY(0)';
+        });
+        steps.push(function() {
+          if (state.currentScene !== 1) return;
+          line.style.width = '16rem';
+        });
+        state.setSteps(steps);
       }
 
       else if (index === 2) {
         const ids = ['s2-code', 's2-thread-a', 's2-thread-b', 's2-interpreter', 's2-label'];
         ids.forEach(id => snapHidden(document.getElementById(id)));
-        ids.forEach((id, i) => {
-          setTimeout(() => {
-            if (state.currentScene === 2) revealEl(document.getElementById(id));
-          }, 300 + (i * 400));
+        var steps = ids.map(function(id) {
+          return function() {
+            if (state.currentScene !== 2) return;
+            revealEl(document.getElementById(id));
+          };
         });
+        state.setSteps(steps);
       }
 
       else if (index === 3) {
@@ -584,24 +583,21 @@
         threadB.style.transition = '';
         text.style.transition = '';
 
-        setTimeout(() => {
-          if (state.currentScene === 3) {
-            threadA.style.left = '50%';
-            threadA.style.transform = 'translate(-50%, -50%)';
-          }
-        }, 600);
-
-        setTimeout(() => {
-          if (state.currentScene === 3) {
-            threadB.style.right = '35%';
-          }
-        }, 1200);
-
-        setTimeout(() => {
-          if (state.currentScene === 3) {
-            text.style.opacity = '1';
-          }
-        }, 2000);
+        var steps = [];
+        steps.push(function() {
+          if (state.currentScene !== 3) return;
+          threadA.style.left = '50%';
+          threadA.style.transform = 'translate(-50%, -50%)';
+        });
+        steps.push(function() {
+          if (state.currentScene !== 3) return;
+          threadB.style.right = '35%';
+        });
+        steps.push(function() {
+          if (state.currentScene !== 3) return;
+          text.style.opacity = '1';
+        });
+        state.setSteps(steps);
       }
 
       else if (index === 4) {
@@ -612,7 +608,6 @@
         const t2Label = document.getElementById('s4-t2-label');
         const text = document.getElementById('s4-text');
 
-        // Reset all
         lines1.forEach(l => { l.style.transition = 'none'; l.classList.remove('bg-[#57D38C]/20', 'text-[#57D38C]'); });
         lines2.forEach(l => { l.style.transition = 'none'; l.classList.remove('bg-[#57D38C]/20', 'text-[#57D38C]'); });
         gilIcon.style.transition = 'none';
@@ -627,49 +622,40 @@
         gilIcon.style.transition = '';
         text.style.transition = '';
 
-        // Pulse through code1 lines
-        lines1.forEach((line, i) => {
-          setTimeout(() => {
-            if (state.currentScene === 4) {
-              line.classList.add('bg-[#57D38C]/20', 'text-[#57D38C]');
-              t1Label.classList.add('border-[#57D38C]/50', 'text-[#57D38C]');
-              t2Label.classList.remove('border-[#57D38C]/50', 'text-[#57D38C]');
-            }
-          }, 500 + (i * 500));
-
-          setTimeout(() => {
-            if (state.currentScene === 4) {
-              line.classList.remove('bg-[#57D38C]/20', 'text-[#57D38C]');
-            }
-          }, 500 + (i * 500) + 400);
+        var steps = [];
+        lines1.forEach(function(line) {
+          steps.push(function() {
+            if (state.currentScene !== 4) return;
+            line.classList.add('bg-[#57D38C]/20', 'text-[#57D38C]');
+            t1Label.classList.add('border-[#57D38C]/50', 'text-[#57D38C]');
+            t2Label.classList.remove('border-[#57D38C]/50', 'text-[#57D38C]');
+          });
+          steps.push(function() {
+            if (state.currentScene !== 4) return;
+            line.classList.remove('bg-[#57D38C]/20', 'text-[#57D38C]');
+          });
         });
-
-        // GIL handoff
-        setTimeout(() => {
-          if (state.currentScene === 4) {
-            gilIcon.style.transform = 'rotate(180deg)';
-            t1Label.classList.remove('border-[#57D38C]/50', 'text-[#57D38C]');
-            t2Label.classList.add('border-[#57D38C]/50', 'text-[#57D38C]');
-          }
-        }, 2200);
-
-        lines2.forEach((line, i) => {
-          setTimeout(() => {
-            if (state.currentScene === 4) {
-              line.classList.add('bg-[#57D38C]/20', 'text-[#57D38C]');
-            }
-          }, 2700 + (i * 500));
-
-          setTimeout(() => {
-            if (state.currentScene === 4) {
-              line.classList.remove('bg-[#57D38C]/20', 'text-[#57D38C]');
-            }
-          }, 2700 + (i * 500) + 400);
+        steps.push(function() {
+          if (state.currentScene !== 4) return;
+          gilIcon.style.transform = 'rotate(180deg)';
+          t1Label.classList.remove('border-[#57D38C]/50', 'text-[#57D38C]');
+          t2Label.classList.add('border-[#57D38C]/50', 'text-[#57D38C]');
         });
-
-        setTimeout(() => {
-          if (state.currentScene === 4) text.style.opacity = '1';
-        }, 4000);
+        lines2.forEach(function(line) {
+          steps.push(function() {
+            if (state.currentScene !== 4) return;
+            line.classList.add('bg-[#57D38C]/20', 'text-[#57D38C]');
+          });
+          steps.push(function() {
+            if (state.currentScene !== 4) return;
+            line.classList.remove('bg-[#57D38C]/20', 'text-[#57D38C]');
+          });
+        });
+        steps.push(function() {
+          if (state.currentScene !== 4) return;
+          text.style.opacity = '1';
+        });
+        state.setSteps(steps);
       }
 
       else if (index === 5) {
@@ -682,6 +668,7 @@
 
         snapHidden(code);
         [bar1, bar2].forEach(b => {
+          if (!b) return;
           b.style.transition = 'none';
           b.style.height = '0%';
           b.style.opacity = '1';
@@ -692,26 +679,31 @@
         text.style.opacity = '0';
         text.style.transition = '';
 
-        setTimeout(() => {
-          if (state.currentScene === 5) revealEl(code);
-        }, 300);
-
-        function coreCycle(cycle) {
+        var steps = [];
+        steps.push(function() {
           if (state.currentScene !== 5) return;
-          const isEven = cycle % 2 === 0;
-          bar1.style.height = isEven ? '80%' : '10%';
-          bar2.style.height = isEven ? '10%' : '80%';
-          pct1.textContent = isEven ? '80%' : '10%';
-          pct2.textContent = isEven ? '10%' : '80%';
-          if (cycle < 4) {
-            setTimeout(() => coreCycle(cycle + 1), 1400);
-          } else {
-            setTimeout(() => {
-              if (state.currentScene === 5) text.style.opacity = '1';
-            }, 600);
+          revealEl(code);
+        });
+        steps.push(function() {
+          if (state.currentScene !== 5) return;
+          var cycleCount = 0;
+          function coreCycle() {
+            if (state.currentScene !== 5 || state.currentStep < 1) return;
+            const isEven = cycleCount % 2 === 0;
+            bar1.style.height = isEven ? '80%' : '10%';
+            bar2.style.height = isEven ? '10%' : '80%';
+            pct1.textContent = isEven ? '80%' : '10%';
+            pct2.textContent = isEven ? '10%' : '80%';
+            cycleCount = (cycleCount + 1) % 6;
+            setTimeout(coreCycle, 1400);
           }
-        }
-        setTimeout(() => coreCycle(0), 800);
+          coreCycle();
+        });
+        steps.push(function() {
+          if (state.currentScene !== 5) return;
+          text.style.opacity = '1';
+        });
+        state.setSteps(steps);
       }
 
       else if (index === 6) {
@@ -721,7 +713,6 @@
         const text1 = document.getElementById('s6-text-1');
         const text2 = document.getElementById('s6-text-2');
 
-        // Reset
         threads.forEach(t => { t.style.transition = 'none'; t.style.transform = 'rotate(0deg)'; t.style.borderColor = '#B38CFF80'; });
         objects.forEach(o => { o.style.transition = 'none'; o.style.borderColor = '#FFB45480'; });
         gilBadge.style.transition = 'none';
@@ -737,27 +728,29 @@
         text1.style.transition = '';
         text2.style.transition = '';
 
-        // Chaotic state
-        threads.forEach((t, i) => {
-          setTimeout(() => {
-            if (state.currentScene === 6) {
-              t.style.transform = `rotate(${i % 2 === 0 ? '3' : '-3'}deg)`;
-              t.style.borderColor = '#FF6B6B80';
-            }
-          }, 200 + (i * 150));
+        var steps = [];
+        threads.forEach(function(t, i) {
+          steps.push(function() {
+            if (state.currentScene !== 6) return;
+            t.style.transform = 'rotate(' + (i % 2 === 0 ? '3' : '-3') + 'deg)';
+            t.style.borderColor = '#FF6B6B80';
+          });
         });
-
-        // Orderly with GIL
-        setTimeout(() => {
-          if (state.currentScene === 6) {
-            gilBadge.style.opacity = '1';
-            threads.forEach(t => { t.style.transform = 'rotate(0deg)'; t.style.borderColor = '#B38CFF80'; });
-            objects.forEach(o => o.style.borderColor = '#E9542080');
-          }
-        }, 1200);
-
-        setTimeout(() => { if (state.currentScene === 6) text1.style.opacity = '1'; }, 2000);
-        setTimeout(() => { if (state.currentScene === 6) text2.style.opacity = '1'; }, 2600);
+        steps.push(function() {
+          if (state.currentScene !== 6) return;
+          gilBadge.style.opacity = '1';
+          threads.forEach(t => { t.style.transform = 'rotate(0deg)'; t.style.borderColor = '#B38CFF80'; });
+          objects.forEach(o => o.style.borderColor = '#E9542080');
+        });
+        steps.push(function() {
+          if (state.currentScene !== 6) return;
+          text1.style.opacity = '1';
+        });
+        steps.push(function() {
+          if (state.currentScene !== 6) return;
+          text2.style.opacity = '1';
+        });
+        state.setSteps(steps);
       }
 
       else if (index === 7) {
@@ -772,6 +765,7 @@
 
         snapHidden(code);
         [aGreen, aOrange, bGreen, bOrange].forEach(b => {
+          if (!b) return;
           b.style.transition = 'none';
           b.style.width = '0%';
           void b.offsetHeight;
@@ -788,52 +782,51 @@
         gilText.style.transition = '';
         text.style.transition = '';
 
-        setTimeout(() => { if (state.currentScene === 7) revealEl(code); }, 300);
-
-        setTimeout(() => {
-          if (state.currentScene === 7) {
-            aGreen.style.width = '80%';
-            aOrange.style.width = '0%';
-            bGreen.style.width = '0%';
-            bOrange.style.width = '0%';
-            gilIcon.style.opacity = '1';
-            gilText.style.opacity = '1';
-            gilText.textContent = 'GIL Held';
-            gilIcon.style.color = '#57D38C';
-            gilText.style.color = '#57D38C';
-          }
-        }, 700);
-
-        setTimeout(() => {
-          if (state.currentScene === 7) {
-            aGreen.style.width = '20%';
-            aOrange.style.width = '60%';
-            gilText.textContent = 'GIL Released';
-            gilIcon.style.color = '#FFB454';
-            gilText.style.color = '#FFB454';
-          }
-        }, 1900);
-
-        setTimeout(() => {
-          if (state.currentScene === 7) {
-            bGreen.style.width = '80%';
-            bOrange.style.width = '0%';
-          }
-        }, 2600);
-
-        setTimeout(() => {
-          if (state.currentScene === 7) {
-            aOrange.style.width = '20%';
-            aGreen.style.width = '60%';
-            bGreen.style.width = '0%';
-            bOrange.style.width = '0%';
-            gilText.textContent = 'GIL Held';
-            gilIcon.style.color = '#57D38C';
-            gilText.style.color = '#57D38C';
-          }
-        }, 3400);
-
-        setTimeout(() => { if (state.currentScene === 7) text.style.opacity = '1'; }, 4200);
+        var steps = [];
+        steps.push(function() {
+          if (state.currentScene !== 7) return;
+          revealEl(code);
+        });
+        steps.push(function() {
+          if (state.currentScene !== 7) return;
+          aGreen.style.width = '80%';
+          aOrange.style.width = '0%';
+          bGreen.style.width = '0%';
+          bOrange.style.width = '0%';
+          gilIcon.style.opacity = '1';
+          gilText.style.opacity = '1';
+          gilText.textContent = 'GIL Held';
+          gilIcon.style.color = '#57D38C';
+          gilText.style.color = '#57D38C';
+        });
+        steps.push(function() {
+          if (state.currentScene !== 7) return;
+          aGreen.style.width = '20%';
+          aOrange.style.width = '60%';
+          gilText.textContent = 'GIL Released';
+          gilIcon.style.color = '#FFB454';
+          gilText.style.color = '#FFB454';
+        });
+        steps.push(function() {
+          if (state.currentScene !== 7) return;
+          bGreen.style.width = '80%';
+          bOrange.style.width = '0%';
+        });
+        steps.push(function() {
+          if (state.currentScene !== 7) return;
+          aOrange.style.width = '20%';
+          aGreen.style.width = '60%';
+          bGreen.style.width = '0%';
+          bOrange.style.width = '0%';
+          gilText.textContent = 'GIL Held';
+          gilIcon.style.color = '#57D38C';
+          gilText.style.color = '#57D38C';
+        });
+        steps.push(function() {
+          if (state.currentScene !== 7) return;
+          text.style.opacity = '1';
+        });
+        state.setSteps(steps);
       }
 
       else if (index === 8) {
@@ -842,7 +835,7 @@
 
         bars.forEach(id => {
           ['run', 'wait'].forEach(part => {
-            const el = document.getElementById(`s8-${id}-${part}`);
+            const el = document.getElementById('s8-' + id + '-' + part);
             if (el) { el.style.transition = 'none'; el.style.width = '0%'; void el.offsetHeight; el.style.transition = ''; }
           });
         });
@@ -856,8 +849,9 @@
           { a: [0, 60], b: [60, 0], c: [60, 0] }
         ];
 
-        states.forEach(function(st, si) {
-          setTimeout(function() {
+        var steps = [];
+        states.forEach(function(st) {
+          steps.push(function() {
             if (state.currentScene !== 8) return;
             bars.forEach(function(id) {
               var run = document.getElementById('s8-' + id + '-run');
@@ -865,17 +859,20 @@
               if (run) run.style.width = st[id][0] + '%';
               if (wait) wait.style.width = st[id][1] + '%';
             });
-          }, 400 + si * 1100);
+          });
         });
-
-        setTimeout(() => { if (state.currentScene === 8) text.style.opacity = '1'; }, 3800);
+        steps.push(function() {
+          if (state.currentScene !== 8) return;
+          text.style.opacity = '1';
+        });
+        state.setSteps(steps);
       }
 
       else if (index === 9) {
         const before = document.getElementById('s9-before');
         const arrow = document.getElementById('s9-arrow');
         const after = document.getElementById('s9-after');
-        const cores = ['a', 'b', 'c'].map(id => document.getElementById(`s9-core-${id}`));
+        const cores = ['a', 'b', 'c'].map(function(id) { return document.getElementById('s9-core-' + id); });
         const text = document.getElementById('s9-text');
 
         [before, arrow, after].forEach(el => {
@@ -885,42 +882,50 @@
           void el.offsetHeight;
           el.style.transition = '';
         });
-        cores.forEach(c => { if (c) { c.style.transition = 'none'; c.style.height = '0%'; void c.offsetHeight; c.style.transition = ''; } });
+        cores.forEach(function(c) { if (c) { c.style.transition = 'none'; c.style.height = '0%'; void c.offsetHeight; c.style.transition = ''; } });
         text.style.transition = 'none';
         text.style.opacity = '0';
         text.style.transition = '';
 
-        setTimeout(() => { if (state.currentScene === 9) before.style.opacity = '1'; }, 300);
-        setTimeout(() => { if (state.currentScene === 9) arrow.style.opacity = '1'; }, 1000);
-        setTimeout(() => { if (state.currentScene === 9) after.style.opacity = '1'; }, 1700);
-
-        cores.forEach((core, i) => {
-          setTimeout(() => { if (state.currentScene === 9) core.style.height = '100%'; }, 2100 + i * 300);
+        var steps = [];
+        steps.push(function() { if (state.currentScene !== 9) return; before.style.opacity = '1'; });
+        steps.push(function() { if (state.currentScene !== 9) return; arrow.style.opacity = '1'; });
+        steps.push(function() { if (state.currentScene !== 9) return; after.style.opacity = '1'; });
+        cores.forEach(function(core) {
+          steps.push(function() { if (state.currentScene !== 9) return; if (core) core.style.height = '100%'; });
         });
-
-        setTimeout(() => { if (state.currentScene === 9) text.style.opacity = '1'; }, 3200);
+        steps.push(function() { if (state.currentScene !== 9) return; text.style.opacity = '1'; });
+        state.setSteps(steps);
       }
 
       else if (index === 10) {
-        const cards = ['s10-card-1', 's10-card-2', 's10-card-3'].map(id => document.getElementById(id));
+        const cards = ['s10-card-1', 's10-card-2', 's10-card-3'].map(function(id) { return document.getElementById(id); });
         const glowLine = document.getElementById('s10-glow-line');
         const quote = document.getElementById('s10-quote');
 
-        cards.forEach(c => snapHidden(c));
+        cards.forEach(function(c) { snapHidden(c); });
         snapWidth(glowLine);
         quote.style.transition = 'none';
         quote.style.opacity = '0';
         void quote.offsetHeight;
         quote.style.transition = '';
 
-        cards.forEach((card, i) => {
-          setTimeout(() => {
-            if (state.currentScene === 10) revealEl(card);
-          }, 300 + (i * 350));
+        var steps = [];
+        cards.forEach(function(card) {
+          steps.push(function() {
+            if (state.currentScene !== 10) return;
+            revealEl(card);
+          });
         });
-
-        setTimeout(() => { if (state.currentScene === 10) glowLine.style.width = '16rem'; }, 1600);
-        setTimeout(() => { if (state.currentScene === 10) quote.style.opacity = '1'; }, 2200);
+        steps.push(function() {
+          if (state.currentScene !== 10) return;
+          glowLine.style.width = '16rem';
+        });
+        steps.push(function() {
+          if (state.currentScene !== 10) return;
+          quote.style.opacity = '1';
+        });
+        state.setSteps(steps);
       }
     }
 
@@ -928,6 +933,8 @@
       initAnimationPlayer({
         totalScenes: 10,
         sceneData: json.scenes,
+        stepIntervalMs: 1500,
+        scenePauseMs: 1000,
         activeTagClass: ['bg-[#E95420]', 'text-white', 'border-[#E95420]', 'shadow-sm', 'font-semibold'],
         inactiveTagClass: ['bg-transparent', 'gil-muted', 'gil-border', 'hover:bg-white/5', 'hover:border-[#E95420]', 'hover:text-[#E95420]', 'font-medium'],
         onSceneAnimation: triggerSceneAnimation

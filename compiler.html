@@ -328,18 +328,21 @@
     function triggerSceneAnimation(index, state) {
       if (index === 1) {
         var innerDiv = document.querySelector('#vis-scene-1 > div');
-        if (innerDiv) {
-          var children = Array.from(innerDiv.children);
-          children.forEach(function(child, i) {
-            child.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
-            child.style.opacity = '0';
-            child.style.transform = 'translateY(10px)';
-            setTimeout(function() {
-              child.style.opacity = '1';
-              child.style.transform = 'translateY(0)';
-            }, 400 + i * 300);
+        if (!innerDiv) return;
+        var children = Array.from(innerDiv.children);
+        children.forEach(function(child) {
+          child.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+          child.style.opacity = '0';
+          child.style.transform = 'translateY(10px)';
+        });
+        var steps = [];
+        children.forEach(function(child, i) {
+          steps.push(function() {
+            child.style.opacity = '1';
+            child.style.transform = 'translateY(0)';
           });
-        }
+        });
+        state.setSteps(steps);
       }
 
       else if (index === 2) {
@@ -347,15 +350,18 @@
         codeElement.textContent = "";
         var codeString = data.codeString;
         var charIndex = 0;
+        var steps = [];
 
         function typeCode() {
-          if (charIndex < codeString.length && state.currentScene === 2) {
+          if (charIndex < codeString.length && state.currentScene === 2 && state.currentStep < 1) {
             codeElement.textContent += codeString.charAt(charIndex);
             charIndex++;
             setTimeout(typeCode, 25);
           }
         }
-        setTimeout(typeCode, 500);
+
+        steps.push(function() { setTimeout(typeCode, 500); });
+        state.setSteps(steps);
       }
 
       else if (index === 3) {
@@ -364,141 +370,121 @@
           node.classList.add('opacity-0', 'translate-y-4');
           node.classList.remove('opacity-100', 'translate-y-0');
         });
-
         var pulse = document.getElementById('pipeline-pulse');
         if (pulse) pulse.classList.add('opacity-0');
 
-        nodes.forEach(function(node, i) {
-          setTimeout(function() {
-            if (state.currentScene === 3) {
-              node.classList.remove('opacity-0', 'translate-y-4');
-              node.classList.add('opacity-100', 'translate-y-0');
-            }
-          }, 300 + (i * 250));
+        var steps = [];
+        nodes.forEach(function(node) {
+          steps.push(function() {
+            node.classList.remove('opacity-0', 'translate-y-4');
+            node.classList.add('opacity-100', 'translate-y-0');
+          });
         });
-
-        setTimeout(function() {
-          if (pulse && state.currentScene === 3) {
-            pulse.classList.remove('opacity-0');
-          }
-        }, 300 + (nodes.length * 250));
+        steps.push(function() {
+          if (pulse) pulse.classList.remove('opacity-0');
+        });
+        state.setSteps(steps);
       }
 
       else if (index === 4) {
         var container = document.getElementById('lexer-token-container');
         container.innerHTML = "";
         var tokens = data.tokens;
+        var steps = [];
 
-        tokens.forEach(function(t, i) {
+        tokens.forEach(function(t) {
           var el = document.createElement('div');
           el.className = 'px-3 py-1.5 border rounded-lg text-xs font-mono transition-all duration-500 transform translate-y-4 opacity-0 ease-spring ' + t.class;
           el.textContent = t.text;
           container.appendChild(el);
-          setTimeout(function() {
-            if (state.currentScene === 4) {
-              el.classList.remove('opacity-0', 'translate-y-4');
-            }
-          }, i * 150);
+          steps.push(function() {
+            el.classList.remove('opacity-0', 'translate-y-4');
+          });
         });
+        state.setSteps(steps);
       }
 
       else if (index === 5) {
         var nodeData = data.astNodes;
         var edges = data.astEdges;
-
         var svgLines = document.getElementById('ast-lines');
         var svgNodes = document.getElementById('ast-nodes');
         svgLines.innerHTML = "";
         svgNodes.innerHTML = "";
+        var steps = [];
 
-        nodeData.forEach(function(node, i) {
-          setTimeout(function() {
-            if (state.currentScene === 5) {
-              var g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-              g.setAttribute("class", "transition-all duration-700 ease-spring transform scale-0");
-              g.style.transformOrigin = node.x + 'px ' + node.y + 'px';
-
-              var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-              circle.setAttribute("cx", node.x);
-              circle.setAttribute("cy", node.y);
-              circle.setAttribute("r", 18);
-              circle.setAttribute("fill", node.fill);
-              circle.setAttribute("opacity", "0.9");
-
-              var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-              text.setAttribute("x", node.x);
-              text.setAttribute("y", node.y + 35);
-              text.setAttribute("text-anchor", "middle");
-              text.setAttribute("fill", "#1F2937");
-              text.setAttribute("font-size", "11");
-              text.setAttribute("font-family", "'Ubuntu', sans-serif");
-              text.textContent = node.label;
-
-              g.appendChild(circle);
-              g.appendChild(text);
-              svgNodes.appendChild(g);
-
-              requestAnimationFrame(function() {
-                g.style.transform = "scale(1)";
-              });
-            }
-          }, i * 300);
+        nodeData.forEach(function(node) {
+          steps.push(function() {
+            if (state.currentScene !== 5) return;
+            var g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            g.setAttribute("class", "transition-all duration-700 ease-spring transform scale-0");
+            g.style.transformOrigin = node.x + 'px ' + node.y + 'px';
+            var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("cx", node.x);
+            circle.setAttribute("cy", node.y);
+            circle.setAttribute("r", 18);
+            circle.setAttribute("fill", node.fill);
+            circle.setAttribute("opacity", "0.9");
+            var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute("x", node.x);
+            text.setAttribute("y", node.y + 35);
+            text.setAttribute("text-anchor", "middle");
+            text.setAttribute("fill", "#1F2937");
+            text.setAttribute("font-size", "11");
+            text.setAttribute("font-family", "'Ubuntu', sans-serif");
+            text.textContent = node.label;
+            g.appendChild(circle);
+            g.appendChild(text);
+            svgNodes.appendChild(g);
+            requestAnimationFrame(function() { g.style.transform = "scale(1)"; });
+          });
         });
 
-        edges.forEach(function(edge, i) {
-          setTimeout(function() {
-            if (state.currentScene === 5) {
-              var p = document.createElementNS("http://www.w3.org/2000/svg", "path");
-              var fromNode = nodeData[edge.from];
-              var toNode = nodeData[edge.to];
-              p.setAttribute("d", "M " + fromNode.x + " " + fromNode.y + " L " + toNode.x + " " + toNode.y);
-              p.setAttribute("stroke", "#E95420");
-              p.setAttribute("stroke-width", "1.5");
-              p.setAttribute("fill", "none");
-
-              var length = Math.hypot(toNode.x - fromNode.x, toNode.y - fromNode.y);
-              p.style.strokeDasharray = length;
-              p.style.strokeDashoffset = length;
-              p.style.transition = "stroke-dashoffset 0.6s ease-out";
-              svgLines.appendChild(p);
-
-              requestAnimationFrame(function() {
-                p.style.strokeDashoffset = "0";
-              });
-            }
-          }, 400 + i * 300);
+        edges.forEach(function(edge) {
+          steps.push(function() {
+            if (state.currentScene !== 5) return;
+            var p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            var fromNode = nodeData[edge.from];
+            var toNode = nodeData[edge.to];
+            p.setAttribute("d", "M " + fromNode.x + " " + fromNode.y + " L " + toNode.x + " " + toNode.y);
+            p.setAttribute("stroke", "#E95420");
+            p.setAttribute("stroke-width", "1.5");
+            p.setAttribute("fill", "none");
+            var length = Math.hypot(toNode.x - fromNode.x, toNode.y - fromNode.y);
+            p.style.strokeDasharray = length;
+            p.style.strokeDashoffset = length;
+            p.style.transition = "stroke-dashoffset 0.6s ease-out";
+            svgLines.appendChild(p);
+            requestAnimationFrame(function() { p.style.strokeDashoffset = "0"; });
+          });
         });
+        state.setSteps(steps);
       }
 
       else if (index === 6) {
         var checksArray = [1, 2, 3];
+        var errorPanel = document.getElementById('semantic-error-panel');
         checksArray.forEach(function(n) {
           var el = document.getElementById('semantic-check-' + n);
           el.className = "flex items-center gap-3 opacity-0 transform -translate-x-4 transition-all duration-500";
         });
-
-        var errorPanel = document.getElementById('semantic-error-panel');
         errorPanel.className = "bg-white dark:bg-[#1A1D25] border-2 border-red-400 dark:border-red-500/50 rounded-xl p-5 w-72 text-left font-mono shadow-lg opacity-0 transform translate-x-4 transition-all duration-700 delay-300";
 
-        checksArray.forEach(function(n, i) {
-          setTimeout(function() {
-            if (state.currentScene === 6) {
-              var el = document.getElementById('semantic-check-' + n);
-              el.classList.remove('opacity-0', '-translate-x-4');
-            }
-          }, i * 400);
+        var steps = [];
+        checksArray.forEach(function(n) {
+          steps.push(function() {
+            var el = document.getElementById('semantic-check-' + n);
+            el.classList.remove('opacity-0', '-translate-x-4');
+          });
         });
-
-        setTimeout(function() {
-          if (state.currentScene === 6) {
-            errorPanel.classList.remove('opacity-0', 'translate-x-4');
-          }
-        }, 1200);
+        steps.push(function() {
+          errorPanel.classList.remove('opacity-0', 'translate-x-4');
+        });
+        state.setSteps(steps);
       }
 
       else if (index === 7) {
         var optBefore = document.getElementById('opt-before');
-        var optArrow = document.getElementById('opt-arrow');
         var optAfter = document.getElementById('opt-after');
         var deadBranch = document.getElementById('dead-branch');
 
@@ -506,59 +492,50 @@
         optAfter.className = "opacity-0 scale-90 transition-all duration-1000 text-orange-700 dark:text-orange-300";
         deadBranch.className = "pl-4 text-inkMuted dark:text-gray-500 line-through";
 
-        setTimeout(function() {
-          if (state.currentScene === 7) {
-            optBefore.classList.add('opacity-0', 'scale-75');
-            optAfter.classList.remove('opacity-0', 'scale-90');
-            optAfter.classList.add('opacity-100', 'scale-100');
-          }
-        }, 1200);
-
-        setTimeout(function() {
-          if (state.currentScene === 7) {
-            deadBranch.classList.add('opacity-10', 'line-through');
-          }
-        }, 1800);
+        var steps = [];
+        steps.push(function() {
+          optBefore.classList.add('opacity-0', 'scale-75');
+          optAfter.classList.remove('opacity-0', 'scale-90');
+          optAfter.classList.add('opacity-100', 'scale-100');
+        });
+        steps.push(function() {
+          deadBranch.classList.add('opacity-10', 'line-through');
+        });
+        state.setSteps(steps);
       }
 
       else if (index === 8) {
-        var asmList = document.querySelectorAll('#asm-lines-container div');
+        var asmList = document.querySelectorAll('#asm-lines-container [data-asm]');
         asmList.forEach(function(line) {
           line.className = "opacity-0 translate-y-2 transition-all duration-500";
         });
-
-        asmList.forEach(function(line, i) {
-          setTimeout(function() {
-            if (state.currentScene === 8) {
-              line.classList.remove('opacity-0', 'translate-y-2');
-            }
-          }, i * 350);
-        });
-
         var binContainer = document.getElementById('binary-pulse-container');
         binContainer.innerHTML = "";
-        var pulseCount = 0;
 
+        var steps = [];
+        asmList.forEach(function(line) {
+          steps.push(function() {
+            line.classList.remove('opacity-0', 'translate-y-2');
+          });
+        });
+
+        var pulseCount = { val: 0 };
         function makePulse() {
-          if (state.currentScene === 8 && pulseCount < 20) {
+          if (pulseCount.val < 6 && state.currentScene === 8 && state.currentStep >= steps.length - 2) {
             var el = document.createElement('div');
             el.className = "opacity-0 translate-y-1 transition-all duration-700 text-orange-600 dark:text-orange-400 font-mono text-[9px]";
             el.textContent = Math.random() > 0.5 ? "10110100" : "01101010";
             binContainer.appendChild(el);
-
-            setTimeout(function() {
-              el.classList.remove('opacity-0', 'translate-y-1');
-            }, 50);
-
-            setTimeout(function() {
-              el.classList.add('opacity-0', '-translate-y-2');
-            }, 500);
-
-            pulseCount++;
+            setTimeout(function() { el.classList.remove('opacity-0', 'translate-y-1'); }, 50);
+            setTimeout(function() { el.classList.add('opacity-0', '-translate-y-2'); }, 500);
+            pulseCount.val++;
             setTimeout(makePulse, 300);
           }
         }
-        setTimeout(makePulse, 1000);
+
+        steps.push(function() { setTimeout(makePulse, 100); });
+        steps.push(function() { /* pulse continues */ });
+        state.setSteps(steps);
       }
     }
 
@@ -568,6 +545,8 @@
         totalScenes: 9,
         sceneData: data.scenes,
         scene2HideClass: 'translate-x-10',
+        stepIntervalMs: 1500,
+        scenePauseMs: 1000,
         activeTagClass: ['bg-orange-600', 'text-white', 'border-orange-600', 'shadow-sm', 'font-semibold'],
         inactiveTagClass: ['bg-transparent', 'text-inkMuted', 'dark:text-gray-400', 'border-gray-200', 'dark:border-gray-600', 'hover:bg-orange-50', 'dark:hover:bg-white/5', 'hover:border-orange-300', 'dark:hover:border-orange-500', 'hover:text-orange-600', 'dark:hover:text-orange-400', 'font-medium'],
         onSceneAnimation: triggerSceneAnimation
