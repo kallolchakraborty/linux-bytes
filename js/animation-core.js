@@ -352,7 +352,9 @@ function initAnimationPlayer(config) {
     var counterParent = document.getElementById('scene-counter');
     if (header) header.classList.add('hidden');
     if (footer) footer.classList.add('hidden');
-    if (counterParent) counterParent.parentElement.classList.add('hidden');
+    if (counterParent) {
+      // Keep the inline title/counter container visible as it is now compact and positioned nicely in the controls row.
+    }
     document.body.classList.remove('justify-between');
     document.body.classList.add('justify-center', 'p-0', 'overflow-hidden');
     var main = document.querySelector('main');
