@@ -98,16 +98,7 @@
   <!-- ==================== MAIN VIEWPORT ==================== -->
   <main id="main-content" class="flex-grow flex flex-col items-center justify-center px-6 py-6 md:py-10 max-w-6xl w-full mx-auto scene-container">
     
-    <!-- Info Overlay -->
-    <div class="w-full text-left mb-6 space-y-2">
-      <span id="scene-counter" class="inline-block text-[10px] font-mono font-bold tracking-wider text-[#E95420] bg-[#E95420]/10 px-2.5 py-0.5 rounded-full">Scene 1 / 10</span>
-      <h1 id="scene-title" class="text-2xl md:text-4xl font-bold tracking-tight gil-text transition-all duration-700 ease-physics transform translate-y-2 opacity-0">
-        How Python's GIL Works
-      </h1>
-      <p id="scene-subtitle" class="text-sm md:text-base gil-muted max-w-2xl leading-relaxed transition-all duration-700 ease-physics delay-100 transform translate-y-2 opacity-0">
-        Why Python threads don't always run in parallel.
-      </p>
-    </div>
+
 
     <!-- Central Sandbox/Canvas Screen -->
     <div id="fullscreen-canvas" class="w-full aspect-[16/9] border gil-border rounded-xl p-3 relative overflow-hidden flex items-center justify-center">
@@ -476,19 +467,28 @@
       </div>
 
       <div class="flex items-center justify-between gap-3">
-        <div class="flex items-center gap-1.5">
-          <button id="prev-btn" class="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center gil-muted hover:text-[#E95420] transition-all" aria-label="Previous scene" title="Previous scene">
-            <span class="material-symbols-outlined text-lg">navigate_before</span>
-          </button>
-          <button id="play-btn" class="w-9 h-9 rounded-lg bg-[#E95420] hover:bg-[#C34113] flex items-center justify-center text-white transition-all" aria-label="Play/Pause" title="Play/Pause">
-            <span class="material-symbols-outlined text-xl" id="play-icon">play_arrow</span>
-          </button>
-          <button id="next-btn" class="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center gil-muted hover:text-[#E95420] transition-all" aria-label="Next scene" title="Next scene">
-            <span class="material-symbols-outlined text-lg">navigate_next</span>
-          </button>
+        <!-- Title + player controls on the left -->
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button id="prev-btn" class="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center gil-muted hover:text-[#E95420] transition-all" aria-label="Previous scene" title="Previous scene">
+              <span class="material-symbols-outlined text-lg">navigate_before</span>
+            </button>
+            <button id="play-btn" class="w-9 h-9 rounded-lg bg-[#E95420] hover:bg-[#C34113] flex items-center justify-center text-white transition-all" aria-label="Play/Pause" title="Play/Pause">
+              <span class="material-symbols-outlined text-xl" id="play-icon">play_arrow</span>
+            </button>
+            <button id="next-btn" class="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center gil-muted hover:text-[#E95420] transition-all" aria-label="Next scene" title="Next scene">
+              <span class="material-symbols-outlined text-lg">navigate_next</span>
+            </button>
+          </div>
+          <!-- Scene title inline with controls -->
+          <div class="min-w-0 flex flex-col justify-center">
+            <span id="scene-counter" class="inline-block text-[10px] font-mono font-bold tracking-wider text-[#E95420] bg-[#E95420]/10 px-2 py-0.5 rounded-full w-fit">Scene 1 / 10</span>
+            <h1 id="scene-title" class="text-sm md:text-base font-bold tracking-tight gil-text truncate transition-all duration-700 ease-physics opacity-0">How Python's GIL Works</h1>
+            <p id="scene-subtitle" class="text-[11px] gil-muted truncate transition-all duration-700 ease-physics delay-100 opacity-0">Why Python threads don't always run in parallel.</p>
+          </div>
         </div>
 
-        <button id="fullscreen-btn" class="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center gil-muted hover:text-[#E95420] transition-all" aria-label="Toggle Fullscreen" title="Toggle Fullscreen">
+        <button id="fullscreen-btn" class="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center gil-muted hover:text-[#E95420] transition-all shrink-0" aria-label="Toggle Fullscreen" title="Toggle Fullscreen">
           <span class="material-symbols-outlined text-lg">fullscreen</span>
         </button>
       </div>
