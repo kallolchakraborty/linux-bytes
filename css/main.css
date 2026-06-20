@@ -200,6 +200,25 @@ html.dark .timeline-event {
   color: #D1D5DB;
 }
 
+/* ========== Syntax Highlighting (Prism overrides) ========== */
+.token.keyword { color: #E95420; }
+.token.string { color: #57D38C; }
+.token.number { color: #FFB454; }
+.token.comment { color: #6B7280; font-style: italic; }
+.token.function { color: #5DA9FF; }
+.token.builtin { color: #B38CFF; }
+.token.operator { color: #374151; }
+.token.punctuation { color: #6B7280; }
+.token.boolean { color: #E95420; }
+.token.none { color: #E95420; }
+pre[class*="language-"] { background: transparent !important; margin: 0 !important; padding: 0 !important; }
+code[class*="language-"] { text-shadow: none !important; color: inherit !important; }
+:not(pre) > code[class*="language-"] { background: transparent !important; padding: 0 !important; }
+
+html.dark .token.operator { color: #E8E8E8; }
+html.dark .token.punctuation { color: #A0A0A0; }
+html.dark .token.comment { color: #6B7280; }
+
 /* ========== Reduced Motion ========== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

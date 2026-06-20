@@ -1,5 +1,6 @@
 // Dynamic Content Loader for Quick Reference Documentation Portal
 const routeMap = {
+  '#python-basics': 'content/python/python-basics.json',
   '#python-history': 'content/python/python-history.json',
   '#git-commands': 'content/devops/git-commands.json',
   '#gil': 'content/python/gil.json',
@@ -28,6 +29,7 @@ async function loadContent(hash) {
     const data = await response.json();
 
     // Render content dynamically
+    var langClass = data.language ? 'language-' + data.language : 'text-slate-800 dark:text-slate-200';
     let embedCode = '';
     if (data.id === 'compiler' || data.id === 'interpreter' || data.id === 'gil') {
       var pageTitles = { compiler: 'How a Compiler Works', interpreter: 'How an Interpreter Works', gil: "How Python's GIL Works" };
@@ -50,14 +52,14 @@ async function loadContent(hash) {
       embedCode = '<div id="section-syntax" class="scroll-mt-24">' +
         '<div class="timeline-container">' + items + '</div>' +
         '<div class="mt-4 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-4 font-mono text-sm leading-relaxed overflow-x-auto">' +
-        '<pre><code class="text-slate-800 dark:text-slate-200">' + escapeHtml(data.codeBlock) + '</code></pre></div></div>';
+        '<pre><code class="' + langClass + '">' + escapeHtml(data.codeBlock) + '</code></pre></div></div>';
     } else {
       embedCode = `
         <div id="section-syntax" class="scroll-mt-24 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-5 font-mono text-sm leading-relaxed overflow-x-auto relative group">
           <button onclick="navigator.clipboard.writeText(\`${data.codeBlock.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)" class="absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 px-2.5 py-1.5 rounded-lg text-xs font-sans text-slate-500 transition-all flex items-center gap-1.5">
             <span class="material-symbols-outlined text-sm">content_copy</span> Copy
           </button>
-          <pre><code class="text-slate-800 dark:text-slate-200">${escapeHtml(data.codeBlock)}</code></pre>
+          <pre><code class="${langClass}">${escapeHtml(data.codeBlock)}</code></pre>
         </div>
       `;
     }
@@ -102,6 +104,8 @@ async function loadContent(hash) {
       `;
       setupOutlineSmoothScroll();
     }
+
+    if (typeof Prism !== 'undefined') Prism.highlightAll();
 
   } catch (error) {
     contentArea.innerHTML = `

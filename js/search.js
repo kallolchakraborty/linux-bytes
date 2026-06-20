@@ -1,6 +1,7 @@
 // Fuzzy Search & Modal Controller for Quick Reference Docs
 const searchIndex = [
   // Python
+  { title: "Python Basics", category: "Python", url: "docs.html#python-basics", tags: ["python", "basics", "variables", "functions", "lists", "dictionaries", "control", "flow"] },
   { title: "History of Python", category: "Python", url: "docs.html#python-history", tags: ["python", "history", "guido", "van", "rossum", "timeline", "evolution"] },
 
   // System Internals
@@ -93,7 +94,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (items.length === 0) {
       searchResults.innerHTML = `
         <div role="status" aria-live="polite" class="p-8 text-center text-slate-500 dark:text-slate-400 font-mono text-sm">
-          No matches found. Try searching for "python", "compiler", or "git".
+          No matches found. Try searching for "python", "basics", or "git".
         </div>
       `;
       return;
