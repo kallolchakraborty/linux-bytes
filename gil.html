@@ -949,15 +949,140 @@
       }
     }
 
-    fetch('content/interactive/gil.json').then(function(r) { return r.json(); }).then(function(json) {
-      initAnimationPlayer({
-        totalScenes: 10,
-        sceneData: json.scenes,
-        stepIntervalMs: 1500,
-        scenePauseMs: 1000,
-        scene2HideClass: 'translate-x-10',
-        onSceneAnimation: triggerSceneAnimation
-      });
+    const gilScenes = [
+      {
+        "title": "How Python's GIL Works",
+        "subtitle": "Why Python threads don't always run in parallel.",
+        "label": "Scene 1 / 10",
+        "stepSubtitles": [
+          "Python Global Interpreter Lock (GIL) Guide.",
+          "Understanding thread serialization and execution constraints.",
+          "Press play or next to start."
+        ]
+      },
+      {
+        "title": "The Intuition",
+        "subtitle": "Multiple threads compete for a single lock before executing Python code.",
+        "label": "Scene 2 / 10",
+        "stepSubtitles": [
+          "Defines a CPU-bound compute function task.",
+          "Thread A is instantiated to run the computation task.",
+          "Thread B is instantiated to run the computation task in parallel.",
+          "Both threads must compile and execute bytecode via the CPython interpreter.",
+          "However, the Global Interpreter Lock (GIL) acts as a single gateway."
+        ]
+      },
+      {
+        "title": "What Is the GIL?",
+        "subtitle": "A mutex that prevents multiple threads from executing Python bytecode at once.",
+        "label": "Scene 3 / 10",
+        "stepSubtitles": [
+          "Thread A attempts to acquire the GIL to execute bytecode.",
+          "Thread B is forced to wait as the GIL is already held by Thread A.",
+          "Result: Only one thread executes Python bytecode at any given moment."
+        ]
+      },
+      {
+        "title": "Thread Switching",
+        "subtitle": "The GIL is periodically released and re-acquired, allowing thread interleaving.",
+        "label": "Scene 4 / 10",
+        "stepSubtitles": [
+          "Thread 1 acquires the GIL and executes instruction: 'x += 1'.",
+          "Thread 1 finishes executing the first instruction.",
+          "Thread 1 continues execution with GIL: 'y += x'.",
+          "Thread 1 finishes executing the second instruction.",
+          "Thread 1 continues execution with GIL: 'z += y'.",
+          "Thread 1 finishes executing the third instruction.",
+          "CPython forces context switch: Thread 1 releases the GIL, Thread 2 acquires the lock.",
+          "Thread 2 begins bytecode execution under GIL: 'a += 1'.",
+          "Thread 2 finishes executing the first instruction.",
+          "Thread 2 continues execution with GIL: 'b += a'.",
+          "Thread 2 finishes executing the second instruction.",
+          "Execution cycles show that concurrency is achieved via time-slicing, not true parallelism."
+        ]
+      },
+      {
+        "title": "CPU-Bound Work",
+        "subtitle": "Compute-heavy threads waste time waiting for the GIL instead of running in parallel.",
+        "label": "Scene 5 / 10",
+        "stepSubtitles": [
+          "A CPU-heavy loop runs, keeping the CPU cores saturated.",
+          "Threads repeatedly preempt each other every 5ms (or 100 ticks), context-switching the GIL between cores.",
+          "Thread contention on the GIL leads to high CPU usage with poor performance gains."
+        ]
+      },
+      {
+        "title": "Why Does the GIL Exist?",
+        "subtitle": "It protects shared interpreter state and simplifies reference counting.",
+        "label": "Scene 6 / 10",
+        "stepSubtitles": [
+          "Thread 1 tries to access interpreter reference count tables.",
+          "Thread 2 concurrently tries to modify reference counts for garbage collection.",
+          "Thread 3 concurrently tries to access shared objects.",
+          "To prevent race conditions, the GIL is locked, serializing access to CPython internals.",
+          "This guarantees safe object reference counting and memory stability.",
+          "It also makes integrating C-extensions extremely straightforward and stable."
+        ]
+      },
+      {
+        "title": "I/O Changes Everything",
+        "subtitle": "The GIL is released during blocking I/O, allowing other threads to run.",
+        "label": "Scene 7 / 10",
+        "stepSubtitles": [
+          "A thread initiates a network request using the popular requests library.",
+          "While running CPU instructions, the thread holds the GIL.",
+          "When the network call blocks (waiting for response), the GIL is voluntarily released.",
+          "With the GIL released, Thread B immediately acquires the lock and starts running bytecode.",
+          "Thread B executes its computation until Thread A receives the network data response.",
+          "This cooperative yielding enables effective concurrency during I/O block periods."
+        ]
+      },
+      {
+        "title": "Why Threads Still Help",
+        "subtitle": "Threads improve throughput for I/O-bound workloads despite the GIL.",
+        "label": "Scene 8 / 10",
+        "stepSubtitles": [
+          "Multiple threads initiate downloading resources concurrently.",
+          "Threads release the GIL during network wait, utilizing idle time efficiently.",
+          "Execution segments show threads executing code while others wait for I/O packets.",
+          "Thus, threads significantly improve execution throughput for I/O-bound tasks."
+        ]
+      },
+      {
+        "title": "Multiprocessing",
+        "subtitle": "Each process gets its own interpreter and GIL, enabling true parallelism.",
+        "label": "Scene 9 / 10",
+        "stepSubtitles": [
+          "Before: A single OS process runs one CPython interpreter with one GIL.",
+          "Transitioning to a multi-process architecture.",
+          "After: Spawning multiple processes, each running its own CPython interpreter.",
+          "Process A executes bytecode on CPU Core 1 with its own local GIL.",
+          "Process B executes bytecode on CPU Core 2 with its own local GIL.",
+          "Process C executes bytecode on CPU Core 3 with its own local GIL.",
+          "This bypasses the single GIL limit, fully utilizing multiple CPU cores in parallel."
+        ]
+      },
+      {
+        "title": "Final Summary",
+        "subtitle": "The GIL is a design trade-off between simplicity and parallelism.",
+        "label": "Scene 10 / 10",
+        "stepSubtitles": [
+          "CPU-Bound tasks: Serialized execution due to a single GIL results in no speedup.",
+          "I/O-Bound tasks: GIL is released during wait times, enabling concurrency.",
+          "Multiprocessing: Spawns independent interpreters, enabling true hardware parallelism.",
+          "The CPython concurrency design matrix summary.",
+          "The GIL remains a fundamental pillar of CPython reference-counting internals."
+        ]
+      }
+    ];
+
+    initAnimationPlayer({
+      totalScenes: 10,
+      sceneData: gilScenes,
+      stepIntervalMs: 1500,
+      scenePauseMs: 1000,
+      scene2HideClass: 'translate-x-10',
+      onSceneAnimation: triggerSceneAnimation
     });
   </script>
 

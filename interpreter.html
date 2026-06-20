@@ -618,16 +618,110 @@
       }
     }
 
-    fetch('content/interactive/interpreter.json').then(function(r) { return r.json(); }).then(function(json) {
-      data = json;
-      initAnimationPlayer({
-        totalScenes: 10,
-        sceneData: data.scenes,
-        scene2HideClass: 'translate-x-10',
-        stepIntervalMs: 1500,
-        scenePauseMs: 1000,
-        onSceneAnimation: triggerSceneAnimation
-      });
+    data = {
+      "scenes": [
+        {
+          "title": "How an Interpreter Works",
+          "subtitle": "Reading, understanding, and executing code one step at a time.",
+          "label": "Scene 1 / 10",
+          "stepSubtitles": [
+            "Presenting the Quick Bytes Interactive Interpreter Visualizer.",
+            "Executing instructions step-by-step at runtime.",
+            "Press play or next to begin the walkthrough."
+          ]
+        },
+        {
+          "title": "Source Code",
+          "subtitle": "A high-level script is written in languages like Python, JavaScript, or Ruby.",
+          "label": "Scene 2 / 10",
+          "stepSubtitles": [
+            "A programmer writes a Python script initializing variables and printing the sum."
+          ]
+        },
+        {
+          "title": "The Big Idea",
+          "subtitle": "Unlike a compiler, execution happens immediately during interpretation.",
+          "label": "Scene 3 / 10",
+          "stepSubtitles": [
+            "Input: Source code is read directly by the interpreter.",
+            "Process: The interpreter dynamically reads, parses, and executes statement by statement.",
+            "Output: Program prints results instantly to stdout console.",
+            "Execution Loop: Consists of continuous Read → Parse → Execute cycles.",
+            "Interactive VM: Code runs directly inside the environment with no standalone binaries generated."
+          ]
+        },
+        {
+          "title": "Reading Line by Line",
+          "subtitle": "The interpreter fetches the first statement, understands it, and records it in memory.",
+          "label": "Scene 4 / 10",
+          "stepSubtitles": [
+            "Reads statement 'x = 2', parses it, and creates key 'x' with value 2 in stack memory."
+          ]
+        },
+        {
+          "title": "Continuing Execution",
+          "subtitle": "It progresses to the next line, dynamically updating runtime values.",
+          "label": "Scene 5 / 10",
+          "stepSubtitles": [
+            "Reads statement 'y = 3', parses it, and creates key 'y' with value 3 in stack memory."
+          ]
+        },
+        {
+          "title": "Evaluating Expressions",
+          "subtitle": "Expressions are resolved by retrieving variables from the environment and executing functions.",
+          "label": "Scene 6 / 10",
+          "stepSubtitles": [
+            "Reads 'result = x + y' and fetches variable values from the environment stack.",
+            "Evaluates addition expression node: '2 + 3'.",
+            "Computes expression result: 5.",
+            "Saves variable 'result' with computed value 5 back into environment stack."
+          ]
+        },
+        {
+          "title": "Producing Output",
+          "subtitle": "System commands (like print) produce output instantly during interpretation.",
+          "label": "Scene 7 / 10",
+          "stepSubtitles": [
+            "Reads 'print(result)', fetches value of 'result' (5), and outputs to console.",
+            "The console prints 5 instantly to standard output."
+          ]
+        },
+        {
+          "title": "How Execution Progresses",
+          "subtitle": "A continuous loop of Read → Parse → Execute travels step-by-step through the program.",
+          "label": "Scene 8 / 10",
+          "stepSubtitles": [
+            "Step 1: Execute variable assignment 'x = 2' (Instruction type: Assign).",
+            "Step 2: Execute variable assignment 'y = 3' (Instruction type: Assign).",
+            "Step 3: Execute expression addition 'result = x + y' (Instruction type: Arithmetic).",
+            "Step 4: Execute system print 'print(result)' (Instruction type: Print)."
+          ]
+        },
+        {
+          "title": "Error Handling",
+          "subtitle": "Interpreters stop execution immediately upon encountering the first runtime error.",
+          "label": "Scene 9 / 10",
+          "stepSubtitles": [
+            "Traceback error: Interpreter encounters undefined variable 'z' on line 3 and halts execution."
+          ]
+        },
+        {
+          "title": "Final Summary",
+          "subtitle": "An interpreter executes a program incrementally—reading, understanding, and running code one statement at a time.",
+          "label": "Scene 10 / 10",
+          "stepSubtitles": []
+        }
+      ],
+      "codeString": "x = 2\ny = 3\nresult = x + y\nprint(result)"
+    };
+
+    initAnimationPlayer({
+      totalScenes: 10,
+      sceneData: data.scenes,
+      scene2HideClass: 'translate-x-10',
+      stepIntervalMs: 1500,
+      scenePauseMs: 1000,
+      onSceneAnimation: triggerSceneAnimation
     });
   </script>
 
