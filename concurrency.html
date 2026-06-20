@@ -81,7 +81,7 @@
   <main id="main-content" class="flex-grow flex flex-col items-center justify-center px-6 py-4 md:py-8 max-w-5xl w-full mx-auto scene-container">
 
     <!-- Central Sandbox/Canvas Screen -->
-    <div id="fullscreen-canvas" class="w-full aspect-auto min-h-[500px] md:aspect-[16/9] md:min-h-0 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-[#0F1115] p-6 relative overflow-hidden flex flex-col items-center justify-center transition-colors duration-200">
+    <div id="fullscreen-canvas" class="w-full min-h-[380px] md:min-h-[480px] border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-[#0F1115] p-4 md:p-6 relative overflow-hidden flex flex-col items-center justify-center transition-colors duration-200">
       
       <!-- STEP 1: Thread Spawning -->
       <div id="scene-1" class="absolute inset-0 flex flex-col items-center justify-center gap-6 p-6 opacity-0 pointer-events-none transition-opacity duration-500">
@@ -273,25 +273,25 @@
       </div>
 
       <!-- STEP 7: Multiprocessing -->
-      <div id="scene-7" class="absolute inset-0 flex flex-col items-center justify-center gap-6 p-6 opacity-0 pointer-events-none transition-opacity duration-500">
-        <div class="grid grid-cols-2 gap-8 w-full max-w-3xl">
+      <div id="scene-7" class="absolute inset-0 flex flex-col items-center justify-center gap-4 md:gap-6 p-4 md:p-6 opacity-0 pointer-events-none transition-opacity duration-500">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8 w-full max-w-3xl">
           <!-- Process 1 -->
-          <div class="border-2 border-blue-500 bg-blue-500/5 rounded-2xl p-4 text-center flex flex-col items-center gap-3">
+          <div class="border-2 border-blue-500 bg-blue-500/5 rounded-2xl p-3 md:p-4 text-center flex flex-col items-center gap-2 md:gap-3">
             <span class="text-xs font-mono font-bold text-blue-600 dark:text-blue-400">Process-1 (Core 1)</span>
-            <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500 animate-spin">
-              <span class="material-symbols-outlined text-xl">settings</span>
+            <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500 animate-spin">
+              <span class="material-symbols-outlined text-lg md:text-xl">settings</span>
             </div>
             <div class="h-1.5 w-full bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mt-1">
               <div id="s7-p1-progress" class="h-full bg-blue-500 w-0 transition-all duration-1000"></div>
             </div>
             <span class="text-[9px] font-mono text-blue-500 font-bold uppercase">Executing (GIL 1 Active)</span>
           </div>
-
+ 
           <!-- Process 2 -->
-          <div class="border-2 border-green-500 bg-green-500/5 rounded-2xl p-4 text-center flex flex-col items-center gap-3">
+          <div class="border-2 border-green-500 bg-green-500/5 rounded-2xl p-3 md:p-4 text-center flex flex-col items-center gap-2 md:gap-3">
             <span class="text-xs font-mono font-bold text-green-600 dark:text-green-400">Process-2 (Core 2)</span>
-            <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-500 animate-spin">
-              <span class="material-symbols-outlined text-xl">settings</span>
+            <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-500 animate-spin">
+              <span class="material-symbols-outlined text-lg md:text-xl">settings</span>
             </div>
             <div class="h-1.5 w-full bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mt-1">
               <div id="s7-p2-progress" class="h-full bg-green-500 w-0 transition-all duration-1000"></div>
