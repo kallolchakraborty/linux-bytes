@@ -19,13 +19,7 @@
     {
       "title": "3. Asyncio (High-Concurrency Network sockets)",
       "description": "Uses single-threaded cooperative multitasking guided by an Event Loop. Coroutines yield execution back explicitly using the `await` keyword.",
-      "codeBlock": "import asyncio\n\nasync def fetch_async(service_id):\n    print(f\"[Async] Call start to service {service_id}\")\n    await asyncio.sleep(1.5)  # Cooperative sleep yields execution back to Event Loop\n    print(f\"[Async] Call finish for service {service_id}\")\n    return f\"result_{service_id}\"\n\nasync def main():\n    results = await asyncio.gather(\n        fetch_async(1),\n        fetch_async(2),\n        fetch_async(3)\n    )\n    print(\"All API calls finished successfully:\", results)\n\n# Running the coroutine
-try:
-    # Standard Python script execution
-    asyncio.run(main())
-except RuntimeError:
-    # Jupyter Notebook context (running inside an active event loop)
-    await main()"
+      "codeBlock": "import asyncio\n\nasync def fetch_async(service_id):\n    print(f\"[Async] Call start to service {service_id}\")\n    await asyncio.sleep(1.5)  # Cooperative sleep yields execution back to Event Loop\n    print(f\"[Async] Call finish for service {service_id}\")\n    return f\"result_{service_id}\"\n\nasync def main():\n    results = await asyncio.gather(\n        fetch_async(1),\n        fetch_async(2),\n        fetch_async(3)\n    )\n    print(\"All API calls finished successfully:\", results)\n\n# Running the coroutine\ntry:\n    # Standard Python script execution\n    asyncio.run(main())\nexcept RuntimeError:\n    # Jupyter Notebook context (running inside an active event loop)\n    await main()"
     }
   ],
   "diffTable": [
