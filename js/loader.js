@@ -40,7 +40,7 @@ async function loadContent(hash) {
       const pageTitles = { compiler: 'How a Compiler Works', interpreter: 'How an Interpreter Works', gil: "How Python's GIL Works", concurrency: 'Python Concurrency Visualizer' };
       embedCode = `
         <div class="w-full aspect-auto h-[530px] md:aspect-[16/12] md:h-auto border border-blue-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-lg bg-white dark:bg-[#0F1115]">
-          <iframe src="${data.id}.html" class="w-full h-full border-none" allowfullscreen aria-label="${pageTitles[data.id] || 'Interactive visualization'}"></iframe>
+          <iframe src="${data.id}.html?t=${new Date().getTime()}" class="w-full h-full border-none" allowfullscreen aria-label="${pageTitles[data.id] || 'Interactive visualization'}"></iframe>
         </div>
       `;
       if (data.sections) {

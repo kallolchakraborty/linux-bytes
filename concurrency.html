@@ -472,17 +472,12 @@
     const expTitle = document.getElementById("step-title");
     const expDesc = document.getElementById("step-desc");
 
-    // Initialize from local storage if present
-    const persistedStep = localStorage.getItem("quick-bytes-concurrency-step");
-    if (persistedStep !== null) {
-      currentStep = parseInt(persistedStep, 10);
-      if (currentStep < 0 || currentStep > 7) currentStep = 0;
-    }
+    // Initialize at step 0 (0%) on page load
+    currentStep = 0;
 
     // Render Step Frame
     function updateStepView() {
-      // Save current position
-      localStorage.setItem("quick-bytes-concurrency-step", currentStep);
+      // Save current position (kept for runtime state only or removed completely)
 
       // Hide all scenes
       for (let i = 1; i <= 8; i++) {
