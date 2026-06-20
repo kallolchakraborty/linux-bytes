@@ -61,7 +61,7 @@ async function loadContent(hash) {
     } else {
       embedCode = `
         <div id="section-syntax" class="scroll-mt-24 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-5 font-mono text-sm leading-relaxed overflow-x-auto relative group">
-          <button onclick='navigator.clipboard.writeText(\`${data.codeBlock.replace(/'/g, "\\'").replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)' class="absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 px-2.5 py-1.5 rounded-lg text-xs font-sans text-slate-500 transition-all flex items-center gap-1.5">
+          <button onclick="navigator.clipboard.writeText(this.parentElement.querySelector('code').textContent)" class="absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 px-2.5 py-1.5 rounded-lg text-xs font-sans text-slate-500 transition-all flex items-center gap-1.5">
             <span class="material-symbols-outlined text-sm">content_copy</span> Copy
           </button>
           <pre><code class="${langClass}">${escapeHtml(data.codeBlock)}</code></pre>
