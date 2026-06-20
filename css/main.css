@@ -211,7 +211,26 @@ html.dark .timeline-event {
 .token.punctuation { color: #6B7280; }
 .token.boolean { color: #E95420; }
 .token.none { color: #E95420; }
-pre[class*="language-"] { background: transparent !important; margin: 0 !important; padding: 0 !important; }
+pre[class*="language-"] {
+  background: #f8fafc !important;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 0.75rem;
+  padding: 1.25rem !important;
+  margin: 1.5rem 0 !important;
+  box-shadow: none !important;
+  overflow-x: auto;
+}
+html.dark pre[class*="language-"] {
+  background: #0E1115 !important;
+  border-color: rgba(255, 255, 255, 0.05);
+}
+#section-syntax pre[class*="language-"] {
+  background: transparent !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
 code[class*="language-"] { text-shadow: none !important; color: inherit !important; }
 :not(pre) > code[class*="language-"] { background: transparent !important; padding: 0 !important; }
 
