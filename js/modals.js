@@ -150,7 +150,7 @@
     { title: "Basics: Data Structures", category: "Python", url: "docs.html#py-basics-ds", tags: ["python", "basics", "list", "tuple", "set", "dict", "comprehension"] },
     { title: "Basics: File Handling", category: "Python", url: "docs.html#py-basics-files", tags: ["python", "basics", "file", "json", "csv", "pathlib", "io"] },
     { title: "Basics: API Handling", category: "Python", url: "docs.html#py-basics-api", tags: ["python", "basics", "api", "http", "json", "xml", "requests"] },
-    { title: "Basics: Multithreading & Concurrency", category: "Python", url: "docs.html#py-basics-concurrency", tags: ["python", "basics", "threading", "concurrency", "multiprocessing", "asyncio", "async", "parallel"] },
+    { title: "Multithreading & Concurrency", category: "Python", url: "docs.html#py-basics-concurrency", tags: ["python", "basics", "threading", "concurrency", "multiprocessing", "asyncio", "async", "parallel"] },
     { title: "History of Python", category: "Python", url: "docs.html#python-history", tags: ["python", "history", "guido", "van", "rossum", "timeline", "evolution"] },
     { title: "How Python's GIL Works", category: "System Internals", url: "docs.html#gil", tags: ["python", "gil", "thread", "concurrency", "multiprocessing", "lock"] },
     { title: "How a Compiler Works", category: "System Internals", url: "docs.html#compiler", tags: ["compiler", "compile", "pipeline", "ast", "lexer", "parser"] },
