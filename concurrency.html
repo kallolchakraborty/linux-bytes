@@ -15,6 +15,8 @@
     body { background-color: #F8F9FA; color: #374151; }
     .loop-spin { animation: spin 4s linear infinite; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
+    .code-line { transition: background-color 0.3s ease; padding: 0.125rem 0.25rem; border-radius: 0.25rem; }
+    .code-line-active { background-color: rgba(233, 84, 32, 0.25); color: #FFB454 !important; font-weight: 500; }
   </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col justify-between overflow-x-hidden">
@@ -58,104 +60,144 @@
       </div>
 
       <!-- ==================== SCENE 2: SYNCHRONOUS EXECUTION ==================== -->
-      <div id="vis-scene-2" class="absolute inset-0 flex flex-col items-center justify-center gap-6 opacity-0 pointer-events-none transition-all duration-1000 transform translate-x-10">
-        <div class="flex items-center gap-3 bg-gray-50 dark:bg-slate-800/40 border border-gray-200 dark:border-gray-700 p-2.5 rounded-lg text-xs font-mono">
-          <span class="w-3 h-3 rounded-full bg-orange-600"></span>
-          <span class="text-inkLight dark:text-gray-300">Single Thread Context</span>
-        </div>
-        <div class="flex flex-col gap-3 w-72">
-          <!-- Task 1 block -->
-          <div class="bg-white dark:bg-[#1A1D25] border-2 border-gray-200 dark:border-gray-700 p-4 rounded-xl text-left relative overflow-hidden transition-all duration-500" id="sync-task1">
-            <div class="font-bold text-xs uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-1">Task 1 (Calculate)</div>
-            <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full mt-2 overflow-hidden">
-              <div class="h-full bg-orange-500 w-0 transition-all duration-700" id="sync-task1-progress"></div>
-            </div>
+      <div id="vis-scene-2" class="absolute inset-0 grid grid-cols-1 md:grid-cols-2 gap-6 p-4 opacity-0 pointer-events-none transition-all duration-1000 transform translate-x-10">
+        <!-- Code Column -->
+        <div class="bg-[#0E1115] text-[#e2e8f0] border border-gray-800 rounded-xl overflow-hidden shadow-lg flex flex-col h-full font-mono text-[10px] sm:text-xs text-left">
+          <div class="bg-[#1A1D25] px-4 py-1.5 border-b border-gray-800 flex items-center justify-between text-[9px] uppercase tracking-wider text-orange-400">
+            <span>sync.py</span>
           </div>
-          <!-- Task 2 block -->
-          <div class="bg-white dark:bg-[#1A1D25] border-2 border-gray-200 dark:border-gray-700 p-4 rounded-xl text-left relative overflow-hidden transition-all duration-500" id="sync-task2">
-            <div class="font-bold text-xs uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-1">Task 2 (Write File)</div>
-            <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full mt-2 overflow-hidden">
-              <div class="h-full bg-orange-500 w-0 transition-all duration-700" id="sync-task2-progress"></div>
+          <pre class="p-4 overflow-x-auto leading-relaxed flex-grow font-mono text-[#b5ced2]"><code id="sync-code" class="block"><div class="code-line" data-line="0">def task1():</div><div class="code-line" data-line="1">    compute()  # blocks thread</div><div class="code-line" data-line="2"></div><div class="code-line" data-line="3">def task2():</div><div class="code-line" data-line="4">    write_file()</div><div class="code-line" data-line="5"></div><div class="code-line" data-line="6">task1()</div><div class="code-line" data-line="7">task2()</div></code></pre>
+        </div>
+        <!-- Animation Column -->
+        <div class="flex flex-col items-center justify-center gap-4">
+          <div class="flex items-center gap-3 bg-gray-50 dark:bg-slate-800/40 border border-gray-200 dark:border-gray-700 p-2.5 rounded-lg text-xs font-mono">
+            <span class="w-3 h-3 rounded-full bg-orange-600"></span>
+            <span class="text-inkLight dark:text-gray-300">Single Thread Context</span>
+          </div>
+          <div class="flex flex-col gap-3 w-64">
+            <!-- Task 1 block -->
+            <div class="bg-white dark:bg-[#1A1D25] border-2 border-gray-200 dark:border-gray-700 p-4 rounded-xl text-left relative overflow-hidden transition-all duration-500" id="sync-task1">
+              <div class="font-bold text-xs uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-1">Task 1 (Calculate)</div>
+              <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full mt-2 overflow-hidden">
+                <div class="h-full bg-orange-500 w-0 transition-all duration-700" id="sync-task1-progress"></div>
+              </div>
+            </div>
+            <!-- Task 2 block -->
+            <div class="bg-white dark:bg-[#1A1D25] border-2 border-gray-200 dark:border-gray-700 p-4 rounded-xl text-left relative overflow-hidden transition-all duration-500" id="sync-task2">
+              <div class="font-bold text-xs uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-1">Task 2 (Write File)</div>
+              <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full mt-2 overflow-hidden">
+                <div class="h-full bg-orange-500 w-0 transition-all duration-700" id="sync-task2-progress"></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- ==================== SCENE 3: MULTITHREADING ==================== -->
-      <div id="vis-scene-3" class="absolute inset-0 flex flex-col items-center justify-center gap-6 opacity-0 pointer-events-none transition-all duration-1000">
-        <div class="flex items-center gap-8">
-          <div class="flex flex-col items-center gap-2">
-            <span class="text-xs font-mono font-bold text-inkLight dark:text-gray-300">Core 1 (CPU)</span>
-            <div class="w-16 h-16 rounded-2xl border-2 border-orange-600 dark:border-orange-400 flex items-center justify-center relative bg-orange-500/5">
-              <span class="material-symbols-outlined text-orange-600 dark:text-orange-400 text-3xl">developer_board</span>
-              <div class="absolute -top-1.5 -right-1.5 bg-orange-600 text-white text-[8px] font-mono font-bold px-1.5 py-0.5 rounded border border-orange-700" id="t-gil-badge">GIL</div>
-            </div>
+      <div id="vis-scene-3" class="absolute inset-0 grid grid-cols-1 md:grid-cols-2 gap-6 p-4 opacity-0 pointer-events-none transition-all duration-1000">
+        <!-- Code Column -->
+        <div class="bg-[#0E1115] text-[#e2e8f0] border border-gray-800 rounded-xl overflow-hidden shadow-lg flex flex-col h-full font-mono text-[10px] sm:text-xs text-left">
+          <div class="bg-[#1A1D25] px-4 py-1.5 border-b border-gray-800 flex items-center justify-between text-[9px] uppercase tracking-wider text-orange-400">
+            <span>threading_run.py</span>
           </div>
-
-          <div class="flex flex-col gap-3 w-64">
-            <div class="bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 p-3 rounded-lg flex items-center justify-between text-xs transition-all duration-500" id="t-thread-a">
-              <span class="font-bold font-mono text-[#B38CFF]">Thread A</span>
-              <span class="material-symbols-outlined text-[#B38CFF] text-base" id="t-thread-a-state">pause_circle</span>
+          <pre class="p-4 overflow-x-auto leading-relaxed flex-grow font-mono text-[#b5ced2]"><code id="thread-code" class="block"><div class="code-line" data-line="0">import threading</div><div class="code-line" data-line="1"></div><div class="code-line" data-line="2"># Runs concurrently on one GIL</div><div class="code-line" data-line="3">t1 = threading.Thread(target=task1)</div><div class="code-line" data-line="4">t2 = threading.Thread(target=task2)</div><div class="code-line" data-line="5"></div><div class="code-line" data-line="6">t1.start()</div><div class="code-line" data-line="7">t2.start()</div></code></pre>
+        </div>
+        <!-- Animation Column -->
+        <div class="flex flex-col items-center justify-center gap-4">
+          <div class="flex items-center gap-6">
+            <div class="flex flex-col items-center gap-2">
+              <span class="text-xs font-mono font-bold text-inkLight dark:text-gray-300">Core 1 (CPU)</span>
+              <div class="w-16 h-16 rounded-2xl border-2 border-orange-600 dark:border-orange-400 flex items-center justify-center relative bg-orange-500/5">
+                <span class="material-symbols-outlined text-orange-600 dark:text-orange-400 text-3xl">developer_board</span>
+                <div class="absolute -top-1.5 -right-1.5 bg-orange-600 text-white text-[8px] font-mono font-bold px-1.5 py-0.5 rounded border border-orange-700" id="t-gil-badge">GIL</div>
+              </div>
             </div>
-            <div class="bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 p-3 rounded-lg flex items-center justify-between text-xs transition-all duration-500" id="t-thread-b">
-              <span class="font-bold font-mono text-[#57D38C]">Thread B</span>
-              <span class="material-symbols-outlined text-[#57D38C] text-base" id="t-thread-b-state">pause_circle</span>
+
+            <div class="flex flex-col gap-3 w-48">
+              <div class="bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 p-2.5 rounded-lg flex items-center justify-between text-xs transition-all duration-500" id="t-thread-a">
+                <span class="font-bold font-mono text-[#B38CFF]">Thread A</span>
+                <span class="material-symbols-outlined text-[#B38CFF] text-base" id="t-thread-a-state">pause_circle</span>
+              </div>
+              <div class="bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 p-2.5 rounded-lg flex items-center justify-between text-xs transition-all duration-500" id="t-thread-b">
+                <span class="font-bold font-mono text-[#57D38C]">Thread B</span>
+                <span class="material-symbols-outlined text-[#57D38C] text-base" id="t-thread-b-state">pause_circle</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- ==================== SCENE 4: ASYNCHRONOUS ==================== -->
-      <div id="vis-scene-4" class="absolute inset-0 flex flex-col md:flex-row items-center justify-center gap-10 opacity-0 pointer-events-none transition-all duration-1000">
-        <!-- Event loop cycle -->
-        <div class="flex flex-col items-center gap-2">
-          <span class="text-xs font-mono font-bold text-inkLight dark:text-gray-300">Event Loop</span>
-          <div class="w-20 h-20 rounded-full border-4 border-dashed border-orange-500 flex items-center justify-center loop-spin" id="async-loop-wheel">
-            <span class="material-symbols-outlined text-orange-500 text-3xl">sync</span>
+      <div id="vis-scene-4" class="absolute inset-0 grid grid-cols-1 md:grid-cols-2 gap-6 p-4 opacity-0 pointer-events-none transition-all duration-1000">
+        <!-- Code Column -->
+        <div class="bg-[#0E1115] text-[#e2e8f0] border border-gray-800 rounded-xl overflow-hidden shadow-lg flex flex-col h-full font-mono text-[10px] sm:text-xs text-left">
+          <div class="bg-[#1A1D25] px-4 py-1.5 border-b border-gray-800 flex items-center justify-between text-[9px] uppercase tracking-wider text-orange-400">
+            <span>async_loop.py</span>
           </div>
+          <pre class="p-4 overflow-x-auto leading-relaxed flex-grow font-mono text-[#b5ced2]"><code id="async-code" class="block"><div class="code-line" data-line="0">async def task():</div><div class="code-line" data-line="1">    await asyncio.sleep(1) # yields</div><div class="code-line" data-line="2"></div><div class="code-line" data-line="3">async def main():</div><div class="code-line" data-line="4">    await asyncio.gather(</div><div class="code-line" data-line="5">        task(), task()</div><div class="code-line" data-line="6">    )</div></code></pre>
         </div>
-
-        <div class="flex flex-col gap-3 w-64 font-mono text-xs text-left">
-          <div class="bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 p-3 rounded-lg relative overflow-hidden" id="async-task1">
-            <div class="flex justify-between font-bold text-orange-600 dark:text-orange-400">
-              <span>task_one()</span>
-              <span id="async-t1-status">pending</span>
+        <!-- Animation Column -->
+        <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+          <!-- Event loop cycle -->
+          <div class="flex flex-col items-center gap-2">
+            <span class="text-xs font-mono font-bold text-inkLight dark:text-gray-300">Event Loop</span>
+            <div class="w-16 h-16 rounded-full border-4 border-dashed border-orange-500 flex items-center justify-center loop-spin" id="async-loop-wheel">
+              <span class="material-symbols-outlined text-orange-500 text-2xl">sync</span>
             </div>
-            <div class="text-[10px] text-inkMuted dark:text-gray-400 mt-1">await asyncio.sleep()</div>
           </div>
-          <div class="bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 p-3 rounded-lg relative overflow-hidden" id="async-task2">
-            <div class="flex justify-between font-bold text-orange-600 dark:text-orange-400">
-              <span>task_two()</span>
-              <span id="async-t2-status">pending</span>
+
+          <div class="flex flex-col gap-3 w-48 font-mono text-xs text-left">
+            <div class="bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 p-2.5 rounded-lg relative overflow-hidden" id="async-task1">
+              <div class="flex justify-between font-bold text-orange-600 dark:text-orange-400">
+                <span>task_one()</span>
+                <span id="async-t1-status">pending</span>
+              </div>
+              <div class="text-[9px] text-inkMuted dark:text-gray-400 mt-1">await asyncio.sleep()</div>
             </div>
-            <div class="text-[10px] text-inkMuted dark:text-gray-400 mt-1">await asyncio.sleep()</div>
+            <div class="bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 p-2.5 rounded-lg relative overflow-hidden" id="async-task2">
+              <div class="flex justify-between font-bold text-orange-600 dark:text-orange-400">
+                <span>task_two()</span>
+                <span id="async-t2-status">pending</span>
+              </div>
+              <div class="text-[9px] text-inkMuted dark:text-gray-400 mt-1">await asyncio.sleep()</div>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- ==================== SCENE 5: MULTIPROCESSING ==================== -->
-      <div id="vis-scene-5" class="absolute inset-0 flex flex-col items-center justify-center gap-6 opacity-0 pointer-events-none transition-all duration-1000">
-        <div class="flex gap-12">
-          <div class="flex flex-col items-center gap-3 p-4 bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 rounded-xl w-48 transition-all duration-700" id="mp-proc-a">
-            <span class="text-xs font-mono font-bold text-orange-600 dark:text-orange-400">Process A (Core 1)</span>
-            <div class="w-12 h-12 rounded-xl accent-node-fill flex items-center justify-center">
-              <span class="material-symbols-outlined text-white text-xl">memory</span>
-            </div>
-            <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mt-1">
-              <div class="h-full bg-orange-600 w-0 transition-all duration-700" id="mp-a-progress"></div>
-            </div>
-            <span class="text-[9px] font-mono text-inkMuted dark:text-gray-500" id="mp-a-label">Waiting</span>
+      <div id="vis-scene-5" class="absolute inset-0 grid grid-cols-1 md:grid-cols-2 gap-6 p-4 opacity-0 pointer-events-none transition-all duration-1000">
+        <!-- Code Column -->
+        <div class="bg-[#0E1115] text-[#e2e8f0] border border-gray-800 rounded-xl overflow-hidden shadow-lg flex flex-col h-full font-mono text-[10px] sm:text-xs text-left">
+          <div class="bg-[#1A1D25] px-4 py-1.5 border-b border-gray-800 flex items-center justify-between text-[9px] uppercase tracking-wider text-orange-400">
+            <span>multi_process.py</span>
           </div>
+          <pre class="p-4 overflow-x-auto leading-relaxed flex-grow font-mono text-[#b5ced2]"><code id="mp-code" class="block"><div class="code-line" data-line="0">import multiprocessing</div><div class="code-line" data-line="1"></div><div class="code-line" data-line="2"># Bypasses the GIL entirely</div><div class="code-line" data-line="3">p1 = multiprocessing.Process(target=compute)</div><div class="code-line" data-line="4">p2 = multiprocessing.Process(target=compute)</div><div class="code-line" data-line="5"></div><div class="code-line" data-line="6">p1.start()</div><div class="code-line" data-line="7">p2.start()</div></code></pre>
+        </div>
+        <!-- Animation Column -->
+        <div class="flex flex-col items-center justify-center gap-3">
+          <div class="flex gap-4">
+            <div class="flex flex-col items-center gap-2.5 p-3 bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 rounded-xl w-36 transition-all duration-700" id="mp-proc-a">
+              <span class="text-[10px] font-mono font-bold text-orange-600 dark:text-orange-400">Process A (Core 1)</span>
+              <div class="w-10 h-10 rounded-xl accent-node-fill flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-lg">memory</span>
+              </div>
+              <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mt-1">
+                <div class="h-full bg-orange-600 w-0 transition-all duration-700" id="mp-a-progress"></div>
+              </div>
+              <span class="text-[8px] font-mono text-inkMuted dark:text-gray-500" id="mp-a-label">Waiting</span>
+            </div>
 
-          <div class="flex flex-col items-center gap-3 p-4 bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 rounded-xl w-48 transition-all duration-700" id="mp-proc-b">
-            <span class="text-xs font-mono font-bold text-orange-600 dark:text-orange-400">Process B (Core 2)</span>
-            <div class="w-12 h-12 rounded-xl accent-node-fill flex items-center justify-center">
-              <span class="material-symbols-outlined text-white text-xl">memory</span>
+            <div class="flex flex-col items-center gap-2.5 p-3 bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 rounded-xl w-36 transition-all duration-700" id="mp-proc-b">
+              <span class="text-[10px] font-mono font-bold text-orange-600 dark:text-orange-400">Process B (Core 2)</span>
+              <div class="w-10 h-10 rounded-xl accent-node-fill flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-lg">memory</span>
+              </div>
+              <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mt-1">
+                <div class="h-full bg-orange-600 w-0 transition-all duration-700" id="mp-b-progress"></div>
+              </div>
+              <span class="text-[8px] font-mono text-inkMuted dark:text-gray-500" id="mp-b-label">Waiting</span>
             </div>
-            <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mt-1">
-              <div class="h-full bg-orange-600 w-0 transition-all duration-700" id="mp-b-progress"></div>
-            </div>
-            <span class="text-[9px] font-mono text-inkMuted dark:text-gray-500" id="mp-b-label">Waiting</span>
           </div>
         </div>
       </div>
@@ -260,11 +302,21 @@
       el.style.transform = 'translateY(0)';
     }
 
+    function highlightLine(sceneId, lineIdx) {
+      var lines = document.querySelectorAll(sceneId + ' .code-line');
+      lines.forEach(function(l) {
+        l.classList.remove('code-line-active');
+      });
+      if (lineIdx !== null) {
+        var activeLine = document.querySelector(sceneId + ' [data-line="' + lineIdx + '"]');
+        if (activeLine) activeLine.classList.add('code-line-active');
+      }
+    }
+
     function triggerSceneAnimation(index, state) {
       if (index === 1) {
         var h1 = document.querySelector('#vis-scene-1 h1');
         var subtitle = document.querySelector('#vis-scene-1 span');
-        var path = document.querySelector('#vis-scene-1 svg path');
         
         [h1, subtitle].forEach(el => {
           if (!el) return;
@@ -284,9 +336,7 @@
           subtitle.style.opacity = '1';
           subtitle.style.transform = 'translateY(0)';
         });
-        steps.push(function() {
-          // simple marker animation placeholder
-        });
+        steps.push(function() {});
         state.setSteps(steps);
       }
 
@@ -300,20 +350,36 @@
         snapWidth(t2);
         card1.classList.remove('border-orange-500', 'dark:border-orange-500');
         card2.classList.remove('border-orange-500', 'dark:border-orange-500');
+        highlightLine('#vis-scene-2', null);
 
         var steps = [];
         steps.push(function() {
+          highlightLine('#vis-scene-2', 6);
           card1.classList.add('border-orange-500', 'dark:border-orange-500');
         });
-        steps.push(function() { t1.style.width = '50%'; });
-        steps.push(function() { t1.style.width = '100%'; });
         steps.push(function() {
+          highlightLine('#vis-scene-2', 0);
+          t1.style.width = '50%';
+        });
+        steps.push(function() {
+          highlightLine('#vis-scene-2', 1);
+          t1.style.width = '100%';
+        });
+        steps.push(function() {
+          highlightLine('#vis-scene-2', 7);
           card1.classList.remove('border-orange-500', 'dark:border-orange-500');
           card2.classList.add('border-orange-500', 'dark:border-orange-500');
         });
-        steps.push(function() { t2.style.width = '50%'; });
-        steps.push(function() { t2.style.width = '100%'; });
         steps.push(function() {
+          highlightLine('#vis-scene-2', 3);
+          t2.style.width = '50%';
+        });
+        steps.push(function() {
+          highlightLine('#vis-scene-2', 4);
+          t2.style.width = '100%';
+        });
+        steps.push(function() {
+          highlightLine('#vis-scene-2', null);
           card2.classList.remove('border-orange-500', 'dark:border-orange-500');
         });
         state.setSteps(steps);
@@ -330,45 +396,46 @@
         sa.textContent = 'pause_circle';
         sb.textContent = 'pause_circle';
         gil.style.transform = 'scale(1)';
+        highlightLine('#vis-scene-3', null);
 
         var steps = [];
         steps.push(function() {
-          // Concurrent init
+          highlightLine('#vis-scene-3', 3);
           sa.textContent = 'hourglass_empty';
           sb.textContent = 'hourglass_empty';
         });
         steps.push(function() {
-          // Thread A running
+          highlightLine('#vis-scene-3', 6);
           ta.classList.add('border-[#B38CFF]', 'scale-105');
           sa.textContent = 'play_circle';
-          gil.style.transform = 'translate(-40px, 40px)';
+          gil.style.transform = 'translate(-20px, 15px)';
         });
         steps.push(function() {
-          // Switch: Thread B running
+          highlightLine('#vis-scene-3', 7);
           ta.classList.remove('border-[#B38CFF]', 'scale-105');
           sa.textContent = 'pause_circle';
           tb.classList.add('border-[#57D38C]', 'scale-105');
           sb.textContent = 'play_circle';
-          gil.style.transform = 'translate(-40px, 80px)';
+          gil.style.transform = 'translate(-20px, 45px)';
         });
         steps.push(function() {
-          // Switch: Thread A running
+          highlightLine('#vis-scene-3', 3);
           tb.classList.remove('border-[#57D38C]', 'scale-105');
           sb.textContent = 'pause_circle';
           ta.classList.add('border-[#B38CFF]', 'scale-105');
           sa.textContent = 'play_circle';
-          gil.style.transform = 'translate(-40px, 40px)';
+          gil.style.transform = 'translate(-20px, 15px)';
         });
         steps.push(function() {
-          // Thread A complete
+          highlightLine('#vis-scene-3', 4);
           ta.classList.remove('border-[#B38CFF]', 'scale-105');
           sa.textContent = 'check_circle';
           tb.classList.add('border-[#57D38C]', 'scale-105');
           sb.textContent = 'play_circle';
-          gil.style.transform = 'translate(-40px, 80px)';
+          gil.style.transform = 'translate(-20px, 45px)';
         });
         steps.push(function() {
-          // Thread B complete
+          highlightLine('#vis-scene-3', null);
           tb.classList.remove('border-[#57D38C]', 'scale-105');
           sb.textContent = 'check_circle';
           gil.style.transform = 'scale(1)';
@@ -386,31 +453,38 @@
         [t1, t2].forEach(el => el.classList.remove('border-orange-500', 'dark:border-orange-500'));
         s1.textContent = 'pending';
         s2.textContent = 'pending';
+        highlightLine('#vis-scene-4', null);
 
         var steps = [];
         steps.push(function() {
+          highlightLine('#vis-scene-4', 4);
           s1.textContent = 'queued';
           s2.textContent = 'queued';
         });
         steps.push(function() {
+          highlightLine('#vis-scene-4', 0);
           t1.classList.add('border-orange-500', 'dark:border-orange-500');
           s1.textContent = 'running';
         });
         steps.push(function() {
+          highlightLine('#vis-scene-4', 1);
           t1.classList.remove('border-orange-500', 'dark:border-orange-500');
           s1.textContent = 'awaiting';
           t2.classList.add('border-orange-500', 'dark:border-orange-500');
           s2.textContent = 'running';
         });
         steps.push(function() {
+          highlightLine('#vis-scene-4', 1);
           t2.classList.remove('border-orange-500', 'dark:border-orange-500');
           s2.textContent = 'awaiting';
         });
         steps.push(function() {
+          highlightLine('#vis-scene-4', 6);
           t1.classList.add('border-orange-500', 'dark:border-orange-500');
           s1.textContent = 'done';
         });
         steps.push(function() {
+          highlightLine('#vis-scene-4', null);
           t1.classList.remove('border-orange-500', 'dark:border-orange-500');
           t2.classList.add('border-orange-500', 'dark:border-orange-500');
           s2.textContent = 'done';
@@ -428,19 +502,23 @@
         snapWidth(bp);
         al.textContent = 'Waiting';
         bl.textContent = 'Waiting';
+        highlightLine('#vis-scene-5', null);
 
         var steps = [];
         steps.push(function() {
+          highlightLine('#vis-scene-5', 3);
           al.textContent = 'Starting';
           bl.textContent = 'Starting';
         });
         steps.push(function() {
+          highlightLine('#vis-scene-5', 6);
           al.textContent = 'Running';
           bl.textContent = 'Running';
           ap.style.width = '33%';
           bp.style.width = '33%';
         });
         steps.push(function() {
+          highlightLine('#vis-scene-5', 7);
           ap.style.width = '66%';
           bp.style.width = '66%';
         });
@@ -453,7 +531,7 @@
           bl.textContent = 'Complete';
         });
         steps.push(function() {
-          // Parallel complete summary step
+          highlightLine('#vis-scene-5', null);
         });
         state.setSteps(steps);
       }
