@@ -27,7 +27,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
-  <style></style>
 </head>
 
 <body class="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans min-h-screen flex flex-col transition-colors duration-200">
@@ -48,19 +47,18 @@
       </a>
 
       <!-- Navigation & Controls -->
-      <div class="flex items-center gap-6">
-        <nav class="hidden md:flex items-center gap-6 font-semibold text-sm text-slate-700 dark:text-slate-300">
-          <a href="docs.html" class="hover:text-brand-500 dark:hover:text-brand-500 transition-colors">Docs</a>
-          <a href="docs.html#git-commands" class="hover:text-brand-500 dark:hover:text-brand-500 transition-colors">Guides</a>
-        </nav>
-
-        <div class="h-4 w-px bg-slate-200 dark:bg-slate-800 hidden md:block"></div>
+      <div class="flex items-center gap-3">
 
         <!-- Utility Buttons -->
         <div class="flex items-center gap-3">
           <!-- Theme toggle -->
           <button class="theme-toggle-btn w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Toggle theme">
             <span class="material-symbols-outlined text-lg">light_mode</span>
+          </button>
+
+          <!-- Share button -->
+          <button class="open-share-btn w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Share this page">
+            <span class="material-symbols-outlined text-lg">share</span>
           </button>
 
           <!-- Search trigger button -->
@@ -176,31 +174,6 @@
     </div>
   </footer>
 
-  <!-- ==================== INTERACTIVE SEARCH MODAL ==================== -->
-  <div id="search-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm p-4 sm:p-10 justify-center items-start" role="dialog" aria-modal="true" aria-label="Search documentation">
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col overflow-hidden mt-10">
-      <!-- Search Input Header -->
-      <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3 bg-slate-50/50 dark:bg-slate-900/50">
-        <span class="material-symbols-outlined text-slate-400">search</span>
-        <input id="modal-search-input" type="text" placeholder="Type to search study materials..." aria-label="Search query" class="w-full bg-transparent border-none focus:ring-0 text-slate-900 dark:text-white font-medium placeholder:text-slate-400" />
-        <button id="close-search-btn" class="text-xs text-slate-400 border border-slate-200 dark:border-slate-800 px-2.5 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-          ESC
-        </button>
-      </div>
-
-      <!-- Results Body -->
-      <div id="modal-search-results" class="p-4 max-h-[400px] overflow-y-auto flex flex-col gap-3" role="listbox" aria-label="Search results">
-        <!-- Rendered by search.js -->
-      </div>
-      
-      <!-- Footer Help -->
-      <div class="p-3 bg-slate-50 dark:bg-slate-800/20 border-t border-slate-200 dark:border-slate-800 flex justify-between text-xs text-slate-400 font-mono">
-        <span>↑↓ to navigate</span>
-        <span>Enter to select</span>
-      </div>
-    </div>
-  </div>
-
-  <script src="js/search.js" defer></script>
+  <script src="js/modals.js" defer></script>
 </body>
 </html>

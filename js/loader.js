@@ -34,21 +34,21 @@ async function loadContent(hash) {
     const data = await response.json();
 
     // Render content dynamically
-    var langClass = data.language ? 'language-' + data.language : 'text-slate-800 dark:text-slate-200';
+    const langClass = data.language ? 'language-' + data.language : 'text-slate-800 dark:text-slate-200';
     let embedCode = '';
     if (data.id === 'compiler' || data.id === 'interpreter' || data.id === 'gil') {
-      var pageTitles = { compiler: 'How a Compiler Works', interpreter: 'How an Interpreter Works', gil: "How Python's GIL Works" };
+      const pageTitles = { compiler: 'How a Compiler Works', interpreter: 'How an Interpreter Works', gil: "How Python's GIL Works" };
       embedCode = `
         <div class="w-full aspect-[16/12] border border-blue-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-lg bg-white dark:bg-[#0F1115]">
           <iframe src="${data.id}.html" class="w-full h-full border-none" allowfullscreen aria-label="${pageTitles[data.id] || 'Interactive visualization'}"></iframe>
         </div>
       `;
     } else if (data.timeline) {
-      var items = '';
-      for (var ti = 0; ti < data.timeline.length; ti++) {
-        var t = data.timeline[ti];
-        var cls = ti % 2 === 0 ? 'timeline-item' : 'timeline-item timeline-item-right';
-        var delay = ti * 120;
+      let items = '';
+      for (let ti = 0; ti < data.timeline.length; ti++) {
+        const t = data.timeline[ti];
+        const cls = ti % 2 === 0 ? 'timeline-item' : 'timeline-item timeline-item-right';
+        const delay = ti * 120;
         items += '<div class="' + cls + '" style="animation-delay:' + delay + 'ms">' +
           '<span class="timeline-year">' + t.year + '</span>' +
           '<span class="timeline-event">' + t.event + '</span>' +
@@ -98,11 +98,12 @@ async function loadContent(hash) {
         link.classList.remove('active-doc-link');
       }
     });
+    openActiveSidebarSection();
 
     // Populate right outline dynamically
     const outlineArea = document.getElementById('docs-right-outline');
     if (outlineArea) {
-      var syntaxLabel = data.id === 'python-history' ? 'Timeline' : 'Syntax Guide';
+      const syntaxLabel = data.id === 'python-history' ? 'Timeline' : 'Syntax Guide';
       outlineArea.innerHTML = `
         <a href="#section-syntax" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">${syntaxLabel}</a>
         <a href="#section-dive" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Deep Dive</a>
@@ -115,17 +116,16 @@ async function loadContent(hash) {
     // Trigger entrance animations
     requestAnimationFrame(function() {
       requestAnimationFrame(function() {
-        var section = contentArea.querySelector('section');
+        const section = contentArea.querySelector('section');
         if (section) section.classList.add('anim-ready');
-        var syntax = document.getElementById('section-syntax');
+        const syntax = document.getElementById('section-syntax');
         if (syntax) syntax.classList.add('anim-ready');
-        var dive = document.getElementById('section-dive');
+        const dive = document.getElementById('section-dive');
         if (dive) {
-          // Animate deep dive when it enters viewport
           if (dive.getBoundingClientRect().top < window.innerHeight) {
             dive.classList.add('anim-ready');
           } else {
-            var obs = new IntersectionObserver(function(entries) {
+            const obs = new IntersectionObserver(function(entries) {
               entries.forEach(function(entry) {
                 if (entry.isIntersecting) {
                   entry.target.classList.add('anim-ready');
@@ -171,6 +171,21 @@ function setupOutlineSmoothScroll() {
       }
     });
   });
+}
+
+function openActiveSidebarSection() {
+  const active = document.querySelector('.sidebar-link.active-doc-link');
+  if (!active) return;
+  const group = active.closest('.sidebar-group');
+  if (!group) return;
+  const btn = group.querySelector('.sidebar-toggle');
+  const collapse = group.querySelector('.sidebar-collapse');
+  const chevron = group.querySelector('.sidebar-chevron');
+  if (!btn || !collapse) return;
+  if (btn.getAttribute('aria-expanded') === 'true') return;
+  btn.setAttribute('aria-expanded', 'true');
+  collapse.style.maxHeight = collapse.scrollHeight + 'px';
+  if (chevron) chevron.style.transform = 'rotate(90deg)';
 }
 
 function escapeHtml(text) {

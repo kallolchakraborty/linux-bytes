@@ -126,6 +126,102 @@ html.dark .grid-bg {
   background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.02) 1px, transparent 0) !important;
 }
 
+/* ========== Player Pages: Canvas Base ========== */
+#fullscreen-canvas {
+  background-color: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+html.dark #fullscreen-canvas {
+  background-color: #0F1115;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ========== Player Pages: Scene Marker (shared) ========== */
+.scene-marker {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 3px;
+  border-radius: 9999px;
+  background-color: rgba(156,163,175,0.5);
+  z-index: 10;
+  pointer-events: none;
+}
+html.dark .scene-marker {
+  background-color: rgba(255,255,255,0.3);
+}
+
+/* ========== Player: Compiler Page ========== */
+#ast-svg text { fill: #374151; }
+#ast-svg line { stroke: #E95420; }
+html.dark #ast-svg text { fill: #E8E8E8; }
+.pipeline-node { transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
+
+.runner-glow { animation: runnerPulse 1.5s ease-in-out infinite; }
+@keyframes runnerPulse {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.4; }
+}
+
+.flow-arrow { animation: arrowDash 0.6s linear forwards; stroke-dasharray: 8; }
+@keyframes arrowDash { to { stroke-dashoffset: -16; } }
+
+.node-active .accent-node {
+  background-color: #FFF0E8;
+  box-shadow: 0 0 10px rgba(233, 84, 32, 0.25);
+}
+html.dark .node-active .accent-node {
+  background-color: rgba(233, 84, 32, 0.15);
+  box-shadow: 0 0 12px rgba(233, 84, 32, 0.35);
+}
+html.dark .node-active span:not(.material-symbols-outlined) {
+  color: #F5A389 !important;
+}
+
+.node-active .accent-node {
+  background-color: #FFF0E8;
+  box-shadow: 0 0 10px rgba(233, 84, 32, 0.25);
+}
+html.dark .node-active .accent-node {
+  background-color: rgba(233, 84, 32, 0.15);
+  box-shadow: 0 0 12px rgba(233, 84, 32, 0.35);
+}
+html.dark .node-active span:not(.material-symbols-outlined) {
+  color: #F5A389 !important;
+}
+
+/* ========== Player: Interpreter Page ========== */
+.flow-pulse { animation: flowPulse 0.5s ease-in-out 2; }
+@keyframes flowPulse {
+  0% { opacity: 0.3; transform: translateX(-2px); }
+  50% { opacity: 1; transform: translateX(3px); }
+  100% { opacity: 0.7; transform: translateX(0); }
+}
+
+/* ========== Player: GIL Page ========== */
+:root {
+  --gil-page-bg: #f8fafc;
+  --gil-card-bg: #ffffff;
+  --gil-text: #1e293b;
+  --gil-muted: #64748b;
+  --gil-border: #e2e8f0;
+}
+html.dark {
+  --gil-page-bg: #0F1115;
+  --gil-card-bg: #1A1D25;
+  --gil-text: #E8E8E8;
+  --gil-muted: #A0A0A0;
+  --gil-border: #374151;
+}
+
+.gil-text { color: var(--gil-text); }
+.gil-muted { color: var(--gil-muted); }
+.gil-page-bg { background-color: var(--gil-page-bg); }
+.gil-card-bg { background-color: var(--gil-card-bg); }
+.gil-border { border-color: var(--gil-border); }
+.gil-glow { box-shadow: 0 0 20px rgba(233, 84, 32, 0.3); }
+
 /* ========== Scene Container ========== */
 .scene-container {
   perspective: 1000px;

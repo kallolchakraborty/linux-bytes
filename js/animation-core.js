@@ -12,8 +12,6 @@ function initAnimationPlayer(config) {
 
   var TOTAL = config.totalScenes;
   var data = config.sceneData;
-  var active = config.activeTagClass || ['text-orange-600', 'dark:text-orange-400'];
-  var inactive = config.inactiveTagClass || ['text-inkMuted', 'dark:text-gray-400'];
   var stepInterval = config.stepIntervalMs || 1800;
   var scenePauseMs = config.scenePauseMs || 1200;
 
@@ -42,7 +40,6 @@ function initAnimationPlayer(config) {
     fullscreenBtn: document.getElementById('fullscreen-btn'),
     canvas: document.getElementById('fullscreen-canvas'),
     timelineBar: document.getElementById('timeline-bar'),
-    tags: document.querySelectorAll('#scene-tags button'),
     stepDots: null
   };
 
@@ -89,20 +86,6 @@ function initAnimationPlayer(config) {
 
     var percent = ((sceneIndex - 1) / (TOTAL - 1)) * 100;
     el.progress.style.width = percent + '%';
-
-    el.tags.forEach(function (tag) {
-      var isTarget = parseInt(tag.dataset.target) === sceneIndex;
-      if (isTarget) {
-        tag.classList.remove.apply(tag.classList, inactive);
-        tag.classList.add.apply(tag.classList, active);
-      } else {
-        tag.classList.remove.apply(tag.classList, active);
-        tag.classList.add.apply(tag.classList, inactive);
-      }
-      if (tag.getAttribute('role') === 'tab') {
-        tag.setAttribute('aria-selected', isTarget ? 'true' : 'false');
-      }
-    });
 
     if (el.subtitle) {
       el.subtitle.style.transition = 'none';
@@ -260,13 +243,6 @@ function initAnimationPlayer(config) {
       }
     });
   }
-
-  el.tags.forEach(function (tag) {
-    tag.addEventListener('click', function () {
-      stopAutoPlay();
-      showScene(parseInt(tag.dataset.target));
-    });
-  });
 
   el.timelineBar.addEventListener('click', function (e) {
     stopAutoPlay();

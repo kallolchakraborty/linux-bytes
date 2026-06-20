@@ -28,53 +28,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
   <style>
-    :root {
-      --gil-page-bg: #f8fafc;
-      --gil-card-bg: #ffffff;
-      --gil-text: #1e293b;
-      --gil-muted: #64748b;
-      --gil-border: #e2e8f0;
-    }
-    html.dark {
-      --gil-page-bg: #0F1115;
-      --gil-card-bg: #1A1D25;
-      --gil-text: #E8E8E8;
-      --gil-muted: #A0A0A0;
-      --gil-border: #374151;
-    }
     body { background-color: var(--gil-page-bg); color: var(--gil-text); }
-    #fullscreen-canvas { background-color: var(--gil-page-bg); border-color: var(--gil-border); }
     header.sticky { background-color: color-mix(in srgb, var(--gil-page-bg) 90%, transparent); }
-    .gil-text { color: var(--gil-text); }
-    .gil-muted { color: var(--gil-muted); }
-    .gil-page-bg { background-color: var(--gil-page-bg); }
-    .gil-card-bg { background-color: var(--gil-card-bg); }
-    .gil-border { border-color: var(--gil-border); }
-    .gil-btn:hover { color: var(--gil-text); }
-    .gil-glow { box-shadow: 0 0 20px rgba(233, 84, 32, 0.3); }
-    .gil-glow-green { box-shadow: 0 0 20px rgba(87, 211, 140, 0.3); }
-    .gil-glow-orange { box-shadow: 0 0 20px rgba(255, 180, 84, 0.3); }
-    @keyframes pulse-glow {
-      0%, 100% { opacity: 0.4; }
-      50% { opacity: 1; }
-    }
-    @keyframes rotate-lock {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
-    }
-    @keyframes pulse-bar {
-      0% { transform: scaleY(0.3); opacity: 0.6; }
-      50% { transform: scaleY(1); opacity: 1; }
-      100% { transform: scaleY(0.3); opacity: 0.6; }
-    }
-    .anim-float { animation: float 3s ease-in-out infinite; }
-    .anim-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-    .scene-marker { position: absolute; top: 50%; transform: translateY(-50%); width: 3px; height: 3px; border-radius: 9999px; background-color: rgba(156,163,175,0.5); z-index: 10; pointer-events: none; }
-    html.dark .scene-marker { background-color: rgba(255,255,255,0.3); }
   </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col justify-between overflow-x-hidden">
@@ -88,6 +43,9 @@
       <span class="font-semibold text-xs tracking-tight gil-text hover:text-[#E95420] transition-colors">Quick Reference</span>
     </a>
     <div class="flex items-center gap-4">
+      <button class="open-share-btn w-7 h-7 rounded-lg hover:bg-white/5 flex items-center justify-center gil-muted hover:text-[#E95420] transition-all" aria-label="Share this page">
+        <span class="material-symbols-outlined text-sm">share</span>
+      </button>
       <a href="docs.html" class="text-[10px] font-semibold gil-muted hover:text-[#E95420] transition-colors">Back to Docs</a>
       <button class="theme-toggle-btn w-7 h-7 rounded-lg hover:bg-white/5 flex items-center justify-center gil-muted hover:text-[#E95420] transition-all" aria-label="Toggle theme">
         <span class="material-symbols-outlined text-sm">light_mode</span>
@@ -989,12 +947,12 @@
         sceneData: json.scenes,
         stepIntervalMs: 1500,
         scenePauseMs: 1000,
-        activeTagClass: ['bg-[#E95420]', 'text-white', 'font-semibold'],
-        inactiveTagClass: ['gil-muted', 'hover:text-[#E95420]', 'hover:bg-white/5', 'font-medium'],
         scene2HideClass: 'translate-x-10',
         onSceneAnimation: triggerSceneAnimation
       });
     });
   </script>
+
+  <script src="js/modals.js" defer></script>
 </body>
 </html>

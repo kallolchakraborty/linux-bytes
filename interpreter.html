@@ -28,18 +28,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
   <style>
-    body {
-      background-color: #F8F9FA;
-      color: #374151;
-    }
-    #fullscreen-canvas { background-color: #FFFFFF; border-color: rgba(0, 0, 0, 0.08); }
-    html.dark #fullscreen-canvas { background-color: #0F1115; border-color: rgba(255, 255, 255, 0.08); }
-    .scene-marker { position: absolute; top: 50%; transform: translateY(-50%); width: 3px; height: 3px; border-radius: 9999px; background-color: rgba(156,163,175,0.5); z-index: 10; pointer-events: none; }
-    html.dark .scene-marker { background-color: rgba(255,255,255,0.3); }
-    .flow-pulse { animation: flowPulse 0.5s ease-in-out 2; }
-    @keyframes flowPulse { 0% { opacity: 0.3; transform: translateX(-2px); } 50% { opacity: 1; transform: translateX(3px); } 100% { opacity: 0.7; transform: translateX(0); } }
-    .step-bar { animation: fillBar 0.6s ease-out forwards; }
-    @keyframes fillBar { from { width: 0; } to { width: 100%; } }
+    body { background-color: #F8F9FA; color: #374151; }
   </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col justify-between overflow-x-hidden">
@@ -53,7 +42,10 @@
       <span class="font-semibold text-xs tracking-tight text-ink hover:text-orange-600 dark:text-gray-200 dark:hover:text-orange-400 transition-colors">Quick Reference</span>
     </a>
     <div class="flex items-center gap-4">
-      <button class="theme-toggle-btn w-7 h-7 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 flex items-center justify-center text-inkMuted hover:text-ink dark:text-gray-400 dark:hover:text-gray-200 transition-all" aria-label="Toggle theme">
+      <button class="open-share-btn w-7 h-7 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 flex items-center justify-center text-inkMuted hover:text-ink dark:hover:text-gray-200 transition-all" aria-label="Share this page">
+        <span class="material-symbols-outlined text-sm">share</span>
+      </button>
+      <button class="theme-toggle-btn w-7 h-7 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 flex items-center justify-center text-inkMuted hover:text-ink dark:hover:text-gray-200 transition-all" aria-label="Toggle theme">
         <span class="material-symbols-outlined text-sm">light_mode</span>
       </button>
       <a href="docs.html" class="text-[10px] font-semibold text-inkMuted hover:text-ink dark:text-gray-400 dark:hover:text-gray-200 transition-colors">Back to Docs</a>
@@ -392,10 +384,10 @@
   <!-- ==================== FOOTER ==================== -->
   <footer class="border-t border-gray-200 dark:border-gray-800 py-8 text-center text-xs text-inkMuted dark:text-gray-500">
     <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-      <span>Made with ❤️ by <a href="https://www.linkedin.com/in/kallol-chakraborty-9728a699/" target="_blank" rel="noopener noreferrer" class="text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 transition-colors">Kallol Chakraborty</a></span>
+      <span>Made with ❤️ by <a href="https://www.linkedin.com/in/kallol-chakraborty-9728a699/" target="_blank" rel="noopener noreferrer" class="text-brand-500 hover:text-brand-600 transition-colors">Kallol Chakraborty</a></span>
       <div class="flex gap-6 font-medium">
-        <a href="docs.html" class="hover:text-orange-600 dark:hover:text-orange-400 transition-colors">Documentation</a>
-        <a href="index.html" class="hover:text-orange-600 dark:hover:text-orange-400 transition-colors">Home Portal</a>
+        <a href="docs.html" class="hover:text-brand-500 transition-colors">Documentation</a>
+        <a href="index.html" class="hover:text-brand-500 transition-colors">Home Portal</a>
       </div>
     </div>
   </footer>
@@ -626,11 +618,11 @@
         scene2HideClass: 'translate-x-10',
         stepIntervalMs: 1500,
         scenePauseMs: 1000,
-        activeTagClass: ['bg-orange-600', 'text-white', 'font-semibold'],
-        inactiveTagClass: ['text-inkMuted', 'dark:text-gray-400', 'hover:text-orange-600', 'dark:hover:text-orange-400', 'hover:bg-orange-50', 'dark:hover:bg-white/5', 'font-medium'],
         onSceneAnimation: triggerSceneAnimation
       });
     });
   </script>
+
+  <script src="js/modals.js" defer></script>
 </body>
 </html>

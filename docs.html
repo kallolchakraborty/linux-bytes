@@ -30,7 +30,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
 
-  <style></style>
 </head>
 
 <body class="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans min-h-screen flex flex-col transition-colors duration-200">
@@ -51,19 +50,18 @@
       </a>
 
       <!-- Navigation & Controls -->
-      <div class="flex items-center gap-6">
-        <nav class="hidden md:flex items-center gap-6 font-semibold text-sm text-slate-700 dark:text-slate-300">
-          <a href="docs.html" class="text-brand-500 dark:text-brand-500">Docs</a>
-          <a href="#git-commands" class="hover:text-brand-500 dark:hover:text-brand-500 transition-colors">Guides</a>
-        </nav>
-
-        <div class="h-4 w-px bg-slate-200 dark:bg-slate-800 hidden md:block"></div>
+      <div class="flex items-center gap-3">
 
         <!-- Utility Buttons -->
         <div class="flex items-center gap-3">
           <!-- Theme toggle -->
           <button class="theme-toggle-btn w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Toggle theme">
             <span class="material-symbols-outlined text-lg">light_mode</span>
+          </button>
+
+          <!-- Share button -->
+          <button class="open-share-btn w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Share this page">
+            <span class="material-symbols-outlined text-lg">share</span>
           </button>
 
           <!-- Search trigger button -->
@@ -81,89 +79,102 @@
   <!-- ==================== THREE-COLUMN LAYOUT ==================== -->
   <div class="max-w-7xl mx-auto px-6 w-full flex-grow flex flex-col lg:flex-row gap-8 py-8">
     
-    <!-- LEFT SIDEBAR (Collapsible on mobile) -->
+    <!-- LEFT SIDEBAR (Collapsible sections) -->
     <aside id="left-sidebar" class="lg:w-64 lg:sticky lg:top-24 lg:h-[calc(100vh-120px)] overflow-y-auto shrink-0 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800 pb-8 lg:pb-0 pr-0 lg:pr-6">
-      <div class="space-y-6">
-        
-        <!-- Python -->
-        <div>
-          <h4 class="font-bold text-xs uppercase tracking-wider text-slate-400 mb-3">Python</h4>
-          <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400 border-l border-slate-200 dark:border-slate-800">
-            <li>
-              <a href="#python-history" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
-                History of Python
-              </a>
-            </li>
-          </ul>
+      <div class="space-y-2">
 
-          <h4 class="font-bold text-xs uppercase tracking-wider text-slate-400 mb-3 mt-4">Python Basics</h4>
-          <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400 border-l border-slate-200 dark:border-slate-800">
-            <li>
-              <a href="#py-basics-datatypes" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
-                Data Types &amp; Operations
-              </a>
-            </li>
-            <li>
-              <a href="#py-basics-loops" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
-                Loops &amp; Control Flow
-              </a>
-            </li>
-            <li>
-              <a href="#py-basics-io" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
-                Input &amp; Output
-              </a>
-            </li>
-            <li>
-              <a href="#py-basics-ds" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
-                Data Structures
-              </a>
-            </li>
-            <li>
-              <a href="#py-basics-files" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
-                File Handling
-              </a>
-            </li>
-            <li>
-              <a href="#py-basics-api" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
-                API Handling
-              </a>
-            </li>
-          </ul>
+        <!-- Python -->
+        <div class="sidebar-group">
+          <button class="sidebar-toggle w-full flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors px-1 py-2" aria-expanded="false">
+            <span class="material-symbols-outlined text-sm sidebar-chevron transition-transform duration-300">keyboard_arrow_right</span>
+            Python
+          </button>
+          <div class="sidebar-collapse overflow-hidden" style="max-height: 0; transition: max-height 0.3s cubic-bezier(0.25, 1, 0.5, 1);">
+            <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400 border-l border-slate-200 dark:border-slate-800 ml-1">
+              <li>
+                <a href="#python-history" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
+                  History of Python
+                </a>
+              </li>
+            </ul>
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 ml-5 mt-3 mb-1">Basics</h4>
+            <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400 border-l border-slate-200 dark:border-slate-800 ml-1">
+              <li>
+                <a href="#py-basics-datatypes" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
+                  Data Types &amp; Operations
+                </a>
+              </li>
+              <li>
+                <a href="#py-basics-loops" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
+                  Loops &amp; Control Flow
+                </a>
+              </li>
+              <li>
+                <a href="#py-basics-io" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
+                  Input &amp; Output
+                </a>
+              </li>
+              <li>
+                <a href="#py-basics-ds" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
+                  Data Structures
+                </a>
+              </li>
+              <li>
+                <a href="#py-basics-files" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
+                  File Handling
+                </a>
+              </li>
+              <li>
+                <a href="#py-basics-api" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
+                  API Handling
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <!-- System Internals -->
-        <div>
-          <h4 class="font-bold text-xs uppercase tracking-wider text-slate-400 mb-3">System Internals</h4>
-          <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400 border-l border-slate-200 dark:border-slate-800">
-            <li>
-              <a href="#gil" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
-                How the GIL Works
-              </a>
-            </li>
-            <li>
-              <a href="#compiler" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
-                How a Compiler Works
-              </a>
-            </li>
-            <li>
-              <a href="#interpreter" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
-                How an Interpreter Works
-              </a>
-            </li>
-          </ul>
+        <div class="sidebar-group">
+          <button class="sidebar-toggle w-full flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors px-1 py-2" aria-expanded="false">
+            <span class="material-symbols-outlined text-sm sidebar-chevron transition-transform duration-300">keyboard_arrow_right</span>
+            System Internals
+          </button>
+          <div class="sidebar-collapse overflow-hidden" style="max-height: 0; transition: max-height 0.3s cubic-bezier(0.25, 1, 0.5, 1);">
+            <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400 border-l border-slate-200 dark:border-slate-800 ml-1">
+              <li>
+                <a href="#gil" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
+                  How the GIL Works
+                </a>
+              </li>
+              <li>
+                <a href="#compiler" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
+                  How a Compiler Works
+                </a>
+              </li>
+              <li>
+                <a href="#interpreter" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
+                  How an Interpreter Works
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <!-- Developer Tools -->
-        <div>
-          <h4 class="font-bold text-xs uppercase tracking-wider text-slate-400 mb-3">Developer Tools</h4>
-          <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400 border-l border-slate-200 dark:border-slate-800">
-            <li>
-              <a href="#git-commands" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
-                Git Command Cheat Sheet
-              </a>
-            </li>
-
-          </ul>
+        <div class="sidebar-group">
+          <button class="sidebar-toggle w-full flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors px-1 py-2" aria-expanded="false">
+            <span class="material-symbols-outlined text-sm sidebar-chevron transition-transform duration-300">keyboard_arrow_right</span>
+            Developer Tools
+          </button>
+          <div class="sidebar-collapse overflow-hidden" style="max-height: 0; transition: max-height 0.3s cubic-bezier(0.25, 1, 0.5, 1);">
+            <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400 border-l border-slate-200 dark:border-slate-800 ml-1">
+              <li>
+                <a href="#git-commands" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-1">
+                  Git Command Cheat Sheet
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
 
       </div>
@@ -195,32 +206,7 @@
     </div>
   </footer>
 
-  <!-- ==================== INTERACTIVE SEARCH MODAL ==================== -->
-  <div id="search-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm p-4 sm:p-10 justify-center items-start" role="dialog" aria-modal="true" aria-label="Search documentation">
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col overflow-hidden mt-10">
-      <!-- Search Input Header -->
-      <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3 bg-slate-50/50 dark:bg-slate-900/50">
-        <span class="material-symbols-outlined text-slate-400">search</span>
-        <input id="modal-search-input" type="text" placeholder="Type to search study materials..." aria-label="Search query" class="w-full bg-transparent border-none focus:ring-0 text-slate-900 dark:text-white font-medium placeholder:text-slate-400" />
-        <button id="close-search-btn" class="text-xs text-slate-400 border border-slate-200 dark:border-slate-800 px-2.5 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-          ESC
-        </button>
-      </div>
-
-      <!-- Results Body -->
-      <div id="modal-search-results" class="p-4 max-h-[400px] overflow-y-auto flex flex-col gap-3" role="listbox" aria-label="Search results">
-        <!-- Rendered by search.js -->
-      </div>
-      
-      <!-- Footer Help -->
-      <div class="p-3 bg-slate-50 dark:bg-slate-800/20 border-t border-slate-200 dark:border-slate-800 flex justify-between text-xs text-slate-400 font-mono">
-        <span>↑↓ to navigate</span>
-        <span>Enter to select</span>
-      </div>
-    </div>
-  </div>
-
-  <script src="js/search.js" defer></script>
+  <script src="js/modals.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js" defer></script>
   <script src="js/loader.js" defer></script>

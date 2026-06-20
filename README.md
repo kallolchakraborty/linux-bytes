@@ -7,7 +7,9 @@ A modern, search-first documentation portal for developer study notes, cheat she
 - **Search-first** — Ctrl+K (or Cmd+K) opens a fuzzy search modal that indexes every page and guide. Results filter live as you type.
 - **Dark/light mode** — Persistent theme toggle with OS preference detection. Dark mode uses Tailwind's `class` strategy with `localStorage` persistence.
 - **Interactive animations** — Three visual guides (Compiler, Interpreter, GIL) with scene-based slides, auto-play, keyboard navigation, and fullscreen mode.
-- **Fully static** — No build step on the server. All pages are hand-crafted HTML + vanilla JS + pre-built CSS. Deploys directly to GitHub Pages.
+- **Dynamic content** — 6 Python Basics reference pages with Prism syntax highlighting, animated code blocks, and staggered entrance animations.
+- **Collapsible sidebar** — Navigation sections close by default; parent section auto-opens when navigating to a page.
+- **Share on every page** — Share button opens a modal with URL copy + Twitter/X, LinkedIn, WhatsApp, and Email share options.
 
 ## Pages
 
@@ -19,26 +21,12 @@ A modern, search-first documentation portal for developer study notes, cheat she
 | Interpreter | `interpreter.html` | 10-scene interactive on how interpreters work |
 | GIL | `gil.html` | 10-scene interactive on Python's Global Interpreter Lock |
 
-## Search
-
-The search modal (`Ctrl+K` / `Cmd+K`) performs live fuzzy filtering across a static JSON index defined in `js/search.js`.
-
-- Every result is an `<a>` element with `role="option"` inside a `role="listbox"` container.
-- The empty state uses `role="status"` with `aria-live="polite"` for screen-reader announcements.
-- Results show the category label + title with a hover arrow animation.
-- Clicking a result navigates to `docs.html#<anchor>` and closes the modal.
-
-The search index contains:
-- **Python** — History of Python
-- **System Internals** — GIL, Compiler, Interpreter
-- **Developer Tools** — Git Commands
-
 ## Keyboard Shortcuts
 
 | Key | Context | Action |
 |-----|---------|--------|
 | `Ctrl+K` / `Cmd+K` | Anywhere | Open/close search modal |
-| `Escape` | Search modal | Close search |
+| `Escape` | Modal | Close share or search modal |
 | `ArrowLeft` | Animation page | Previous scene |
 | `ArrowRight` | Animation page | Next scene |
 | `Space` | Animation page | Play/pause auto-advance |
@@ -76,10 +64,22 @@ Pressing `F` or clicking the fullscreen button requests fullscreen on the `#full
 
 - **HTML** — 5 static pages, semantic HTML5, ARIA roles
 - **CSS** — Tailwind CSS v3 (static build) + custom `css/main.css`
-- **JavaScript** — Vanilla ES5 for broad browser support (no transpilation step)
+- **JavaScript** — Vanilla JS (no transpilation step)
 - **Icons** — Material Symbols Outlined (Google Fonts CDN)
 - **Fonts** — Ubuntu (body) + JetBrains Mono (code) via Google Fonts
 - **Brand** — Ubuntu Orange (#E95420)
+
+## Architecture Optimizations
+
+The codebase follows several best practices for a static site without a build step:
+
+- **DRY modals** — Share and search modals are injected dynamically by `js/modals.js`, eliminating 5 identical copies of share modal HTML and 2 copies of search modal HTML across pages.
+- **Consolidated CSS** — All player-page inline styles (compiler, interpreter, GIL) moved into `css/main.css` with shared rules deduplicated. Only page-specific body colors remain inline.
+- **Event delegation** — `modals.js` uses delegated click handlers on `document` instead of binding to individual elements, reducing memory usage and ensuring dynamically added elements work.
+- **CSS variables for theming** — GIL page uses CSS custom properties (`--gil-*`) for light/dark mode, avoiding class-based overrides.
+- **10% global scale** — `html { font-size: 14.4px }` scales all rem-based Tailwind values proportionally with a single CSS line.
+- **Reduced motion respected** — `@media (prefers-reduced-motion: reduce)` disables all animations/transitions.
+- **Prism syntax highlighting** — CDN-loaded with custom token color overrides in main.css to match the brand palette.
 
 ## Project Structure
 
@@ -88,20 +88,20 @@ Pressing `F` or clicking the fullscreen button requests fullscreen on the `#full
 ├── docs.html               Documentation portal with dynamic loader
 ├── compiler.html           Compiler animation page
 ├── interpreter.html        Interpreter animation page
-├── gil.html                GIL animation page (always-dark)
+├── gil.html                GIL animation page
 ├── css/
-│   ├── main.css            Shared custom styles (scrollbar, theme, animation utils)
+│   ├── main.css            All custom styles (player animations, timeline, Prism overrides, GIL vars)
 │   ├── tailwind.css        Pre-built Tailwind CSS (43 KB, minified)
 │   └── input.css           Tailwind source with @tailwind directives
 ├── js/
 │   ├── theme.js            Dark/light mode toggle with localStorage
-│   ├── search.js           Search modal with fuzzy filtering
+│   ├── modals.js           Share + search modals (HTML injection and event handling)
 │   ├── loader.js           Dynamic content loader for docs.html
 │   └── animation-core.js   Shared animation player (scenes, fullscreen, keyboard)
 ├── content/
-│   ├── python/             Python content files
-│   ├── devops/             Developer tools content files
-│   ├── programming/        Programming concept content files
+│   ├── python/             Python content (history + 6 basics pages)
+│   ├── devops/             Developer tools content
+│   ├── programming/        Programming concept content
 │   └── interactive/        Animation scene data (JSON)
 ├── assets/
 │   └── logo.svg            Minified Circle of Knowledge logo (557 B)
@@ -138,6 +138,7 @@ Content pages are JSON files loaded dynamically by `js/loader.js`. Each file has
   "description": "A brief overview...",
   "codeBlock": "A code snippet...",
   "details": "Deep dive explanation...",
+  "language": "python",
   "timeline": [
     { "year": "1989", "event": "Work on Python begins" },
     { "year": "1991", "event": "Python 0.9.0 released" }
@@ -146,20 +147,37 @@ Content pages are JSON files loaded dynamically by `js/loader.js`. Each file has
 ```
 
 - `codeBlock` is rendered in a syntax block with a copy button.
-- `timeline` (optional) renders an animated alternating timeline with staggered fade-in instead of the code block. Each entry is displayed with a year badge and event text.
-- `details` is rendered in a "Deep Dive" info box.
+- `language` drives the Prism.js syntax highlighting class (e.g., `language-python`).
+- `timeline` (optional) renders an animated alternating timeline instead of a code block.
+- `details` is rendered in a "Deep Dive" info box with a left accent bar.
 
 Routes map hash anchors to JSON paths in `js/loader.js`. The default route (when no hash is present) falls back to `#git-commands`.
+
+## Search
+
+The search modal (`Ctrl+K` / `Cmd+K`) performs live fuzzy filtering across a static JSON index defined in `js/modals.js`.
+
+- Every result is an `<a>` element with `role="option"` inside a `role="listbox"` container.
+- The empty state uses `role="status"` with `aria-live="polite"` for screen-reader announcements.
+- Results show the category label + title with a hover arrow animation.
+- Clicking a result navigates to `docs.html#<anchor>` and closes the modal.
+
+The search index contains:
+- **Python** — History of Python
+- **Python Basics** — Data Types, Loops, I/O, Data Structures, File Handling, API Handling
+- **System Internals** — GIL, Compiler, Interpreter
+- **Developer Tools** — Git Commands
 
 ## Accessibility
 
 - **Skip-to-content** link is the first focusable element on every page (visually hidden until focused via Tab).
 - **`main`** elements have `id="main-content"` as skip targets.
 - **Scene tags** use `<button role="tab" aria-selected="">` with a parent `role="tablist"`.
-- **Search modal** uses `role="dialog"`, `aria-modal="true"`, `aria-label`. Results use `role="listbox"` / `role="option"`.
+- **Modals** use `role="dialog"`, `aria-modal="true"`, `aria-label`.
+- **Search results** use `role="listbox"` / `role="option"`.
 - **Empty search** uses `role="status"` with `aria-live="polite"`.
 - **Iframe** embeds have descriptive `title` attributes.
-- **Reduced motion** is respected via `prefers-reduced-motion` media query (disables all animations/transitions).
+- **Reduced motion** is respected via `prefers-reduced-motion` media query.
 
 ## SEO
 
@@ -169,7 +187,7 @@ Every page includes Open Graph (`og:title`, `og:description`, `og:image`, `og:ur
 
 1. Create a JSON file in `content/<category>/<guide-name>.json`.
 2. Add the hash route to `js/loader.js` (`routeMap`).
-3. Add a search entry to `js/search.js` (`searchIndex`).
+3. Add a search entry to `js/modals.js` (`searchIndex` array).
 4. Add a sidebar link in `docs.html`.
 5. Optionally add a feature card in `index.html`.
 6. Rebuild CSS if new Tailwind utility classes are used: `npm run build:css`.
