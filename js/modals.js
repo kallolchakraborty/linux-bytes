@@ -156,6 +156,8 @@
     { title: "How an Interpreter Works", category: "System Internals", url: "docs.html#interpreter", tags: ["interpreter", "interpret", "runtime", "execution", "repl"] },
   ];
 
+  var _selectedIndex = -1;
+
   function openSearchModal() {
     var modal = document.getElementById('search-modal');
     var input = document.getElementById('modal-search-input');
@@ -164,6 +166,8 @@
     modal.classList.add('flex');
     if (input) input.focus();
     document.body.style.overflow = 'hidden';
+    _selectedIndex = -1;
+    renderResults('');
   }
 
   function closeSearchModal() {
@@ -176,6 +180,7 @@
     document.body.style.overflow = '';
     if (input) input.value = '';
     if (results) results.innerHTML = '';
+    _selectedIndex = -1;
   }
 
   document.addEventListener('click', function(e) {
@@ -229,43 +234,118 @@
     }
   });
 
-  // Live search filtering
-  document.addEventListener('input', function(e) {
-    if (e.target.id !== 'modal-search-input') return;
+  // ---- Search suggestions + live filtering ----
+
+  function _escapeRe(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function _highlight(text, query) {
+    if (!query) return text;
+    var re = new RegExp('(' + _escapeRe(query) + ')', 'gi');
+    return text.replace(re, '<mark class="bg-brand-100 dark:bg-brand-500/30 text-inherit rounded-sm px-0.5">$1</mark>');
+  }
+
+  function renderResults(query) {
     var results = document.getElementById('modal-search-results');
     if (!results) return;
 
-    var query = e.target.value.toLowerCase().trim();
-    if (!query) {
-      results.innerHTML = '';
-      return;
+    var q = query.toLowerCase().trim();
+
+    var items;
+    if (!q) {
+      items = searchIndex.slice(0, 6);
+    } else {
+      items = searchIndex.filter(function(item) {
+        return item.title.toLowerCase().includes(q) ||
+               item.category.toLowerCase().includes(q) ||
+               item.tags.some(function(tag) { return tag.includes(q); });
+      });
     }
 
-    var filtered = searchIndex.filter(function(item) {
-      return item.title.toLowerCase().includes(query) ||
-             item.category.toLowerCase().includes(query) ||
-             item.tags.some(function(tag) { return tag.includes(query); });
-    });
+    _selectedIndex = -1;
 
-    if (filtered.length === 0) {
+    if (items.length === 0) {
       results.innerHTML = [
         '<div role="status" aria-live="polite" class="p-8 text-center text-slate-500 dark:text-slate-400 font-mono text-sm">',
-        'No matches found. Try searching for "python", "basics", or "git".',
+        'No matches found. Try searching for "python", "basics", or "compiler".',
         '</div>'
       ].join('\n');
       return;
     }
 
-    results.innerHTML = filtered.map(function(item, i) {
+    results.innerHTML = items.map(function(item, i) {
+      var titleHtml = q ? _highlight(item.title, q) : item.title;
+      var catHtml = q ? _highlight(item.category, q) : item.category;
       return [
-        '<a href="' + item.url + '" role="option" class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 hover:bg-brand-50 dark:hover:bg-brand-500/10 border border-slate-100 dark:border-slate-800 hover:border-brand-100 dark:hover:border-brand-500/30 rounded-lg transition-all group">',
+        '<a href="' + item.url + '" role="option" class="search-result flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 hover:bg-brand-50 dark:hover:bg-brand-500/10 border border-slate-100 dark:border-slate-800 hover:border-brand-100 dark:hover:border-brand-500/30 rounded-lg transition-all group" data-index="' + i + '">',
         '<div class="flex flex-col gap-1">',
-        '<span class="text-xs font-bold text-brand-500 uppercase tracking-wider">' + item.category + '</span>',
-        '<span class="font-bold text-slate-800 dark:text-slate-200 group-hover:text-brand-500 transition-colors">' + item.title + '</span>',
+        '<span class="text-xs font-bold text-brand-500 uppercase tracking-wider">' + catHtml + '</span>',
+        '<span class="font-bold text-slate-800 dark:text-slate-200 group-hover:text-brand-500 transition-colors">' + titleHtml + '</span>',
         '</div>',
         '<span class="material-symbols-outlined text-slate-400 group-hover:text-brand-500 transition-transform group-hover:translate-x-1">arrow_forward</span>',
         '</a>'
       ].join('');
     }).join('');
+
+    if (!q) {
+      results.innerHTML += [
+        '<div role="status" aria-live="polite" class="pt-2 pb-1 text-center text-xs text-slate-400 font-mono">',
+        'Type to filter all ' + searchIndex.length + ' pages',
+        '</div>'
+      ].join('\n');
+    }
+  }
+
+  function _navigateSearch(dir) {
+    var links = document.querySelectorAll('#modal-search-results .search-result');
+    if (links.length === 0) return;
+
+    if (_selectedIndex >= 0 && links[_selectedIndex]) {
+      links[_selectedIndex].classList.remove('bg-brand-50', 'dark:bg-brand-500/20', 'border-brand-100', 'dark:border-brand-500/30');
+    }
+
+    _selectedIndex = (_selectedIndex + dir + links.length) % links.length;
+
+    links[_selectedIndex].classList.add('bg-brand-50', 'dark:bg-brand-500/20', 'border-brand-100', 'dark:border-brand-500/30');
+    links[_selectedIndex].focus();
+  }
+
+  // Live search filtering
+  document.addEventListener('input', function(e) {
+    if (e.target.id !== 'modal-search-input') return;
+    renderResults(e.target.value);
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', function(e) {
+    var modal = document.getElementById('search-modal');
+    if (!modal || modal.classList.contains('hidden')) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      _navigateSearch(1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      _navigateSearch(-1);
+    } else if (e.key === 'Enter') {
+      var links = document.querySelectorAll('#modal-search-results .search-result');
+      if (_selectedIndex >= 0 && links[_selectedIndex]) {
+        e.preventDefault();
+        window.location.href = links[_selectedIndex].getAttribute('href');
+        closeSearchModal();
+      }
+    }
+  });
+
+  // Track selection on hover
+  document.addEventListener('mouseover', function(e) {
+    var result = e.target.closest('.search-result');
+    if (!result) return;
+    var links = document.querySelectorAll('#modal-search-results .search-result');
+    if (_selectedIndex >= 0 && links[_selectedIndex]) {
+      links[_selectedIndex].classList.remove('bg-brand-50', 'dark:bg-brand-500/20', 'border-brand-100', 'dark:border-brand-500/30');
+    }
+    _selectedIndex = Array.prototype.indexOf.call(links, result);
   });
 })();

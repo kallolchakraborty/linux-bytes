@@ -396,6 +396,11 @@ html.dark .token.comment { color: #6B7280; }
 #section-dive.anim-ready p:nth-child(5) { transition-delay: 0.95s; }
 #section-dive.anim-ready p:nth-child(6) { transition-delay: 1.1s; }
 
+/* ========== Search highlight ========== */
+mark { background: transparent; color: inherit; }
+.search-result mark { background-color: #FEE5D5; }
+html.dark .search-result mark { background-color: rgba(233, 84, 32, 0.25); }
+
 /* ========== Reduced Motion ========== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
