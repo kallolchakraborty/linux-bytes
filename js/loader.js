@@ -140,6 +140,32 @@ async function loadContent(hash) {
             </div>
           </div>
         ` : ''}
+
+        ${data.diffTable ? `
+          <div id="section-differences" class="scroll-mt-24">
+            <h4 class="text-xs font-mono font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-3 mt-6">Differences: Multithreading vs Concurrency</h4>
+            <div class="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-[#0E1115]">
+              <table class="w-full text-xs text-left border-collapse">
+                <thead class="bg-slate-50 dark:bg-slate-900/60 font-bold font-mono border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th class="p-3 text-slate-700 dark:text-slate-200 w-1/4">Dimension</th>
+                    <th class="p-3 text-slate-700 dark:text-slate-200 w-3/8">Concurrency</th>
+                    <th class="p-3 text-slate-700 dark:text-slate-200 w-3/8">Multithreading</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60">
+                  ${data.diffTable.map(row => `
+                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/20">
+                      <td class="p-3 font-mono font-semibold text-orange-600">${row.dimension}</td>
+                      <td class="p-3 text-slate-600 dark:text-slate-300 text-xs">${row.concurrency}</td>
+                      <td class="p-3 text-slate-600 dark:text-slate-300 text-xs">${row.multithreading}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ` : ''}
         
         <div id="section-dive" class="scroll-mt-24 p-5 bg-brand-50 border border-brand-100 dark:border-brand-500/20 rounded-xl text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
           <div>
@@ -171,6 +197,9 @@ async function loadContent(hash) {
         if (data.comparisonTable) {
           outlineHtml += `\n<a href="#section-comparison" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Comparison Matrix</a>`;
         }
+        if (data.diffTable) {
+          outlineHtml += `\n<a href="#section-differences" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Differences Matrix</a>`;
+        }
         outlineHtml += `\n<a href="#section-dive" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Deep Dive</a>`;
         outlineArea.innerHTML = outlineHtml;
       } else {
@@ -178,6 +207,9 @@ async function loadContent(hash) {
         let outlineHtml = `<a href="#section-syntax" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">${syntaxLabel}</a>`;
         if (data.comparisonTable) {
           outlineHtml += `\n<a href="#section-comparison" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Comparison Matrix</a>`;
+        }
+        if (data.diffTable) {
+          outlineHtml += `\n<a href="#section-differences" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Differences Matrix</a>`;
         }
         outlineHtml += `\n<a href="#section-dive" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Deep Dive</a>`;
         outlineArea.innerHTML = outlineHtml;

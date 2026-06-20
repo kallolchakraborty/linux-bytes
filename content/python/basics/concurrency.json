@@ -59,5 +59,32 @@
       "suitability": "CPU bound math, processing, ML"
     }
   ],
+  "diffTable": [
+    {
+      "dimension": "Definition",
+      "concurrency": "The broad conceptual design structure of managing and interleaving multiple execution tasks asynchronously or concurrently over overlapping periods of time.",
+      "multithreading": "A specific technical implementation paradigm of concurrency where a single process spawns multiple execution context threads to compute tasks."
+    },
+    {
+      "dimension": "Focus",
+      "concurrency": "Focuses on task structure, organization, responsiveness, and asynchronous cooperative yielding to maximize performance efficiency.",
+      "multithreading": "Focuses on overlapping system CPU thread time-slices, context-switching execution, and running threads within a single shared memory block."
+    },
+    {
+      "dimension": "Resource Sharing",
+      "concurrency": "Can manage tasks without sharing state (e.g. via message queues or isolated independent OS processes).",
+      "multithreading": "All spawned threads share the exact same process memory space, descriptors, heap, and static variables."
+    },
+    {
+      "dimension": "Implementation Models",
+      "concurrency": "Can be implemented via Multiprocessing, Asynchronous Event Loops (Asyncio), or Multithreading.",
+      "multithreading": "Utilizes preemptive OS-level kernel-managed thread allocations within the scheduler."
+    },
+    {
+      "dimension": "Safety & Integrity Risks",
+      "concurrency": "Depends on the underlying model (Multiprocessing is safe from shared-memory corruption; Asyncio is safe from thread race states).",
+      "multithreading": "Highly prone to concurrency corruption race conditions, deadlocks, and memory collision hazards if lock controls are missing."
+    }
+  ],
   "details": "<p class=\"mb-4\">Python provides multiple concurrency models to write responsive and high-throughput applications. Choosing the right concurrency mechanism depends primarily on whether your workload is <strong>I/O-Bound</strong> (network, database, file system wait times) or <strong>CPU-Bound</strong> (heavy numerical operations, calculations, image resizing).</p><h4 class=\"text-xs font-mono font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-2\">The Four Concurrency Paradigms</h4><ul class=\"list-disc list-inside mb-4 space-y-1.5 text-xs text-inkLight dark:text-gray-300\"><li><strong>Synchronous (Single-Thread):</strong> Executing one instruction after another. If an I/O blocking operation occurs, the entire program pauses and waits.</li><li><strong>Multithreading (`threading`):</strong> Running multiple threads within a single process. Due to CPython's Global Interpreter Lock (GIL), only one thread executes Python bytecode at a time, making it excellent for interleaving I/O-bound wait times but useless for parallel CPU scaling.</li><li><strong>Asynchronous (`asyncio`):</strong> Single-threaded cooperative multitasking utilizing an Event Loop. Tasks explicitly yield control back to the loop using the <code>await</code> keyword while waiting for I/O, avoiding OS thread context-switch overheads.</li><li><strong>Multiprocessing (`multiprocessing`):</strong> Spawning independent OS processes, each with its own CPython interpreter instance and GIL. This allows processes to run in parallel on separate physical CPU cores, making it the correct choice for CPU-bound computation.</li></ul><h4 class=\"text-xs font-mono font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-2\">CPython Concurrency & Evolution Reference Specs</h4><ul class=\"list-disc list-inside space-y-1.5 text-xs text-inkLight dark:text-gray-300\"><li><a href=\"https://docs.python.org/3/library/concurrency.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-brand-500 hover:text-brand-600 dark:text-orange-400 dark:hover:text-orange-500 transition-colors font-semibold underline\">Python Concurrency Documentation</a> — Official CPython libraries for threading, multiprocessing, and concurrent futures.</li><li><a href=\"https://docs.python.org/3/library/asyncio.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-brand-500 hover:text-brand-600 dark:text-orange-400 dark:hover:text-orange-500 transition-colors font-semibold underline\">Asyncio Event Loop Specifications</a> — Dynamic runtime documentation detailing asynchronous cooperative routines.</li></ul>"
 }
