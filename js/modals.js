@@ -349,4 +349,149 @@
     }
     _selectedIndex = Array.prototype.indexOf.call(links, result);
   });
+
+  // ---- Readme Modal Logic & Markup ----
+
+  var readmeHTML = [
+    '<div id="readme-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm p-4 sm:p-10 justify-center items-start" role="dialog" aria-modal="true" aria-label="Documentation">',
+    '<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col overflow-hidden mt-4 max-h-[85vh]">',
+    '<div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50 shadow-sm shrink-0">',
+    '<div class="flex items-center gap-2">',
+    '<span class="material-symbols-outlined text-brand-500">menu_book</span>',
+    '<h3 class="font-bold text-slate-900 dark:text-white">Quick Bytes Documentation</h3>',
+    '</div>',
+    '<button id="close-readme-btn" class="text-xs text-slate-400 border border-slate-200 dark:border-slate-800 px-2.5 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">ESC</button>',
+    '</div>',
+    '<div id="readme-content" class="p-6 overflow-y-auto text-sm leading-relaxed text-slate-700 dark:text-slate-300 font-sans prose dark:prose-invert max-w-none">',
+    '<div class="flex items-center justify-center py-12">',
+    '<span class="material-symbols-outlined animate-spin text-brand-500 text-3xl">sync</span>',
+    '</div>',
+    '</div>',
+    '</div>',
+    '</div>'
+  ].join('\n');
+
+  document.body.insertAdjacentHTML('beforeend', readmeHTML);
+
+  var readmeLoaded = false;
+
+  function openReadmeModal() {
+    var modal = document.getElementById('readme-modal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+
+    if (!readmeLoaded) {
+      if (typeof marked === 'undefined') {
+        var script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+        script.onload = function() {
+          loadAndRenderReadme();
+        };
+        script.onerror = function() {
+          var content = document.getElementById('readme-content');
+          if (content) content.innerHTML = '<p class="text-red-500 text-center font-semibold">Failed to load markdown parser library.</p>';
+        };
+        document.head.appendChild(script);
+      } else {
+        loadAndRenderReadme();
+      }
+    }
+  }
+
+  function loadAndRenderReadme() {
+    fetch('README.md')
+      .then(function(res) {
+        if (!res.ok) throw new Error('Failed to load README.md');
+        return res.text();
+      })
+      .then(function(text) {
+        var html = marked.parse(text);
+        var content = document.getElementById('readme-content');
+        if (content) {
+          content.innerHTML = html;
+          // Apply custom styles matching the rich aesthetic
+          content.querySelectorAll('h1, h2, h3, h4').forEach(function(h) {
+            h.classList.add('font-bold', 'text-slate-900', 'dark:text-white', 'mt-6', 'mb-3', 'tracking-tight');
+            if (h.tagName === 'H1') h.classList.add('text-2xl', 'border-b', 'border-slate-200', 'dark:border-slate-800', 'pb-2');
+            if (h.tagName === 'H2') h.classList.add('text-xl', 'border-b', 'border-slate-200', 'dark:border-slate-800', 'pb-1.5');
+            if (h.tagName === 'H3') h.classList.add('text-base');
+            if (h.tagName === 'H4') h.classList.add('text-sm');
+          });
+          content.querySelectorAll('table').forEach(function(t) {
+            t.className = 'w-full text-left border-collapse border border-slate-200 dark:border-slate-800 my-4 text-xs';
+          });
+          content.querySelectorAll('th').forEach(function(th) {
+            th.className = 'bg-slate-50 dark:bg-slate-800/40 p-2.5 font-semibold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800';
+          });
+          content.querySelectorAll('td').forEach(function(td) {
+            td.className = 'p-2.5 border-b border-slate-200 dark:border-slate-800';
+          });
+          content.querySelectorAll('a').forEach(function(a) {
+            a.className = 'text-brand-500 hover:text-brand-600 transition-colors font-semibold underline';
+          });
+          content.querySelectorAll('code').forEach(function(c) {
+            if (!c.parentNode || c.parentNode.tagName !== 'PRE') {
+              c.className = 'bg-slate-100 dark:bg-slate-800 text-brand-500 dark:text-orange-400 px-1 py-0.5 rounded font-mono text-xs';
+            }
+          });
+          content.querySelectorAll('pre').forEach(function(pre) {
+            pre.className = 'bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-850 p-4 rounded-xl font-mono text-xs overflow-x-auto my-4 text-slate-800 dark:text-slate-200';
+          });
+          readmeLoaded = true;
+        }
+      })
+      .catch(function(err) {
+        console.error(err);
+        var content = document.getElementById('readme-content');
+        if (content) {
+          content.innerHTML = '<p class="text-red-500 text-center font-semibold">Failed to load documentation content.</p>';
+        }
+      });
+  }
+
+  function closeReadmeModal() {
+    var modal = document.getElementById('readme-modal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.style.overflow = '';
+  }
+
+  // Intercept any docs-related link click
+  document.addEventListener('click', function(e) {
+    var link = e.target.closest('a');
+    if (!link) return;
+    
+    var href = link.getAttribute('href');
+    var text = link.textContent.trim().toLowerCase();
+    
+    if (href === 'docs.html' || href === '/docs.html' || text === 'docs' || text === 'documentation') {
+      e.preventDefault();
+      openReadmeModal();
+    }
+  });
+
+  document.addEventListener('click', function(e) {
+    if (e.target.id === 'close-readme-btn' || e.target.closest('#close-readme-btn')) {
+      closeReadmeModal();
+    }
+  });
+
+  document.addEventListener('click', function(e) {
+    var modal = document.getElementById('readme-modal');
+    if (!modal || modal.classList.contains('hidden')) return;
+    if (e.target === modal) {
+      closeReadmeModal();
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Escape') return;
+    var modal = document.getElementById('readme-modal');
+    if (modal && !modal.classList.contains('hidden')) {
+      closeReadmeModal();
+    }
+  });
 })();

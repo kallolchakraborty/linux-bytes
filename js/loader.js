@@ -35,7 +35,7 @@ async function loadContent(hash) {
   `;
 
   try {
-    const response = await fetch(path);
+    const response = await fetch(path + '?t=' + new Date().getTime());
     if (!response.ok) throw new Error('Failed to fetch content');
     const data = await response.json();
 
