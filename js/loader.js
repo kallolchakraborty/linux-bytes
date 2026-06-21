@@ -298,6 +298,11 @@ async function loadContent(hash) {
       });
     });
 
+    // Setup FAANG page enhancements
+    if (data.id === 'py-ds-faang') {
+      setupFaangPage();
+    }
+
   } catch (error) {
     console.error("Error in loadContent:", error);
     contentArea.innerHTML = `
@@ -509,7 +514,83 @@ function copyCode(btn) {
 }
 window.copyCode = copyCode;
 
-window.addEventListener('DOMContentLoaded', () => {
+// Setup FAANG page: search filter + progress tracker
+function setupFaangPage() {
+  var firstSection = document.getElementById('section-py-ds-faang-0');
+  if (!firstSection) return;
+
+  // Inject search filter
+  var filterHtml = [
+    '<div class="ds-filter-wrap mb-4">',
+    '<span class="material-symbols-outlined ds-filter-icon text-base">search</span>',
+    '<input type="text" class="ds-filter-input" id="ds-search-input" placeholder="Filter data structures (e.g., array, tree, heap, graph...)">',
+    '</div>'
+  ].join('\n');
+  firstSection.insertAdjacentHTML('afterend', filterHtml);
+
+  // Inject progress trackers before each section (except intro and master table)
+  var dsNames = [
+    { id: 1, items: ['Arrays', 'Linked Lists', 'Stack', 'Queue', 'Deque'] },
+    { id: 2, items: ['Dictionary', 'Set', 'Counter', 'defaultdict', 'OrderedDict'] },
+    { id: 3, items: ['Binary Tree', 'BST', 'Heap', 'Trie'] },
+    { id: 4, items: ['Graph (Adj List)', 'DFS', 'BFS', 'Dijkstra', 'Topological Sort'] },
+    { id: 5, items: ['DSU (Union-Find)', 'Segment Tree', 'Fenwick Tree'] }
+  ];
+
+  dsNames.forEach(function(group) {
+    var section = document.getElementById('section-py-ds-faang-' + group.id);
+    if (!section) return;
+    var label = section.querySelector('h3');
+    if (!label) return;
+
+    var progressHtml = '<div class="ds-progress-wrap">';
+    group.items.forEach(function(name) {
+      var key = 'qb-progress-' + name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+      var checked = localStorage.getItem(key) === 'done' ? ' checked' : '';
+      progressHtml += [
+        '<label class="ds-progress-item' + (checked ? ' done' : '') + '">',
+        '<input type="checkbox" class="ds-progress-cb" data-key="' + key + '"' + checked + '>',
+        name,
+        '</label>'
+      ].join('');
+    });
+    progressHtml += '</div>';
+    label.insertAdjacentHTML('afterend', progressHtml);
+  });
+
+  // Wire up progress checkbox clicks
+  document.addEventListener('change', function(e) {
+    var cb = e.target.closest('.ds-progress-cb');
+    if (!cb) return;
+    var label = cb.closest('.ds-progress-item');
+    if (cb.checked) {
+      label.classList.add('done');
+      localStorage.setItem(cb.getAttribute('data-key'), 'done');
+    } else {
+      label.classList.remove('done');
+      localStorage.removeItem(cb.getAttribute('data-key'));
+    }
+  });
+
+  // Wire up search filter
+  var searchInput = document.getElementById('ds-search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      var q = this.value.toLowerCase().trim();
+      document.querySelectorAll('.ds-card').forEach(function(card) {
+        if (!q) {
+          card.classList.remove('ds-hidden');
+          return;
+        }
+        var text = card.textContent.toLowerCase();
+        var match = text.indexOf(q) !== -1;
+        card.classList.toggle('ds-hidden', !match);
+      });
+    });
+  }
+}
+
+window.copyCode = copyCode;
   const initialHash = window.location.hash || '#python-history';
   loadContent(initialHash);
 });
