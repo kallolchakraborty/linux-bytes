@@ -89,6 +89,16 @@ async function loadContent(hash) {
     return;
   }
 
+  const left = document.getElementById('left-sidebar');
+  const outline = document.getElementById('docs-right-outline');
+  if (left) left.style.display = '';
+  if (outline) outline.parentElement.style.display = '';
+  const mainEl = document.querySelector('main');
+  if (mainEl) {
+    mainEl.classList.remove('max-w-4xl');
+    mainEl.classList.add('max-w-3xl');
+  }
+
   try {
     const response = await fetch(path + '?t=' + new Date().getTime());
     if (!response.ok) throw new Error('Failed to fetch content');
