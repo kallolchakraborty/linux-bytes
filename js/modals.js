@@ -144,10 +144,10 @@
   if (!hasSearch) return;
 
   var searchIndex = [
-    { title: "Basics: Data Types & Operations", category: "Python", url: "docs.html#py-basics-datatypes", tags: ["python", "basics", "data", "types", "int", "float", "str", "bool", "operators"] },
+    { title: "Basics: Bitwise Ops, Casting & Advanced", category: "Python", url: "docs.html#py-basics-datatypes", tags: ["python", "basics", "bitwise", "operators", "casting", "coercion", "masking", "flags", "overflow", "shift"] },
     { title: "Basics: Loops & Control Flow", category: "Python", url: "docs.html#py-basics-loops", tags: ["python", "basics", "loops", "for", "while", "control", "flow", "if"] },
     { title: "Basics: Input & Output", category: "Python", url: "docs.html#py-basics-io", tags: ["python", "basics", "input", "output", "print", "formatting", "fstring"] },
-    { title: "Basics: Data Structures", category: "Python", url: "docs.html#py-basics-ds", tags: ["python", "basics", "list", "tuple", "set", "dict", "comprehension"] },
+    { title: "Basics: Data Structures (Lists to Graphs)", category: "Python", url: "docs.html#py-basics-ds", tags: ["python", "basics", "list", "tuple", "set", "dict", "stack", "queue", "tree", "bst", "graph", "dfs", "bfs"] },
     { title: "Basics: File Handling", category: "Python", url: "docs.html#py-basics-files", tags: ["python", "basics", "file", "json", "csv", "pathlib", "io"] },
     { title: "Basics: API Handling", category: "Python", url: "docs.html#py-basics-api", tags: ["python", "basics", "api", "http", "json", "xml", "requests"] },
     { title: "Multithreading & Concurrency", category: "Python", url: "docs.html#py-basics-concurrency", tags: ["python", "basics", "threading", "concurrency", "multiprocessing", "asyncio", "async", "parallel"] },
