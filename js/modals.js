@@ -469,10 +469,9 @@
     var link = e.target.closest('a');
     if (!link) return;
     
-    var href = link.getAttribute('href');
     var text = link.textContent.trim().toLowerCase();
     
-    if (href === 'docs.html' || href === '/docs.html' || text === 'docs' || text === 'documentation') {
+    if (text === 'docs' || text === 'documentation' || text === 'back to docs') {
       e.preventDefault();
       openReadmeModal();
     }
