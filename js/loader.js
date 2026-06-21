@@ -14,8 +14,13 @@ const routeMap = {
   '#py-basics-api': 'content/python/basics/api.json',
   '#py-basics-concurrency': 'content/python/basics/concurrency.json',
   '#python-history': 'content/python/python-history.json',
+  '#py-complexity': 'content/python/basics/complexity.json',
+  '#py-algorithms': 'content/python/basics/algorithms.json',
+  '#py-oop': 'content/python/basics/oop.json',
   '#genai-what-is-llm': 'content/genai/what-is-llm.json',
-  '#genai-kvcache': 'content/genai/kv-cache.json'
+  '#genai-kvcache': 'content/genai/kv-cache.json',
+  '#genai-rag': 'content/genai/rag.json',
+  '#genai-finetuning': 'content/genai/fine-tuning.json'
 };
 
 let scrollSpyCleanup = null;
