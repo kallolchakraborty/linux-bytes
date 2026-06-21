@@ -38,6 +38,25 @@ async function loadContent(hash) {
     </div>
   `;
 
+  if (hash === '#readme') {
+    try {
+      const res = await fetch('README.md?t=' + Date.now());
+      const md = await res.text();
+      const left = document.getElementById('left-sidebar');
+      const outline = document.getElementById('docs-right-outline');
+      if (left) left.style.display = 'none';
+      if (outline) outline.parentElement.style.display = 'none';
+      document.querySelector('main').classList.remove('max-w-3xl');
+      document.querySelector('main').classList.add('max-w-4xl');
+      contentArea.innerHTML = '<div class="readme-content">' + marked.parse(md) + '</div>';
+    } catch (e) {
+      contentArea.innerHTML = '<p class="text-red-500">Failed to load README.md</p>';
+    }
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active-doc-link'));
+    if (document.getElementById('docs-right-outline')) document.getElementById('docs-right-outline').innerHTML = '';
+    return;
+  }
+
   try {
     const response = await fetch(path + '?t=' + new Date().getTime());
     if (!response.ok) throw new Error('Failed to fetch content');
