@@ -2,12 +2,14 @@
 
 A modern, search-first documentation portal for developer study notes, cheat sheets, and interactive visual guides — built as a static site for GitHub Pages.
 
+**Current stats:** 6 HTML pages, 21 JSON content files (6 python/basics, 2 python, 2 programming, 3 interactive, 8 genai), 16 search entries, 16 route map entries, ~1.8K JS lines, ~474 CSS lines.
+
 ## Features
 
 - **Search-first** — Ctrl+K (or Cmd+K) opens a fuzzy search modal that indexes every page and guide. Results filter live as you type.
 - **Dark/light mode** — Persistent theme toggle with OS preference detection. Dark mode uses Tailwind's `class` strategy with `localStorage` persistence.
 - **Interactive animations** — Three visual guides (Compiler, Interpreter, GIL) with scene-based slides, auto-play, keyboard navigation, and fullscreen mode.
-- **Dynamic content** — 6 Python Basics reference pages with Prism syntax highlighting, animated code blocks, and staggered entrance animations.
+- **Dynamic content** — 20+ reference pages (Python, Gen AI, System Internals) with Prism syntax highlighting, animated code blocks, and staggered entrance animations.
 - **Collapsible sidebar** — Navigation sections close by default; parent section auto-opens when navigating to a page.
 - **Share on every page** — Share button opens a modal with URL copy + Twitter/X, LinkedIn, WhatsApp, and Email share options.
 
@@ -20,6 +22,7 @@ A modern, search-first documentation portal for developer study notes, cheat she
 | Compiler | `compiler.html` | 9-scene interactive on how compilers work |
 | Interpreter | `interpreter.html` | 10-scene interactive on how interpreters work |
 | GIL | `gil.html` | 10-scene interactive on Python's Global Interpreter Lock |
+| Concurrency Visualizer | `concurrency.html` | Interactive Python concurrency model comparison |
 
 ## Keyboard Shortcuts
 
@@ -62,7 +65,7 @@ Pressing `F` or clicking the fullscreen button requests fullscreen on the `#full
 
 ## Tech Stack
 
-- **HTML** — 5 static pages, semantic HTML5, ARIA roles
+- **HTML** — 6 static pages (incl. Concurrency Visualizer), semantic HTML5, ARIA roles
 - **CSS** — Tailwind CSS v3 (static build) + custom `css/main.css`
 - **JavaScript** — Vanilla JS (no transpilation step)
 - **Icons** — Material Symbols Outlined (Google Fonts CDN)
@@ -101,6 +104,7 @@ The codebase follows several best practices for a static site without a build st
 ├── content/
 │   ├── python/             Python content (history + 6 basics pages)
 │   ├── programming/        Programming concept content
+│   ├── genai/              Gen AI study guides (8 pages: LLM, KV Cache, RAG, fine-tuning, prompt/context/harness/loop engineering)
 │   └── interactive/        Animation scene data (JSON)
 ├── assets/
 │   └── logo.svg            Minified Circle of Knowledge logo (557 B)
@@ -163,8 +167,9 @@ The search modal (`Ctrl+K` / `Cmd+K`) performs live fuzzy filtering across a sta
 
 The search index contains:
 - **Python** — History of Python
-- **Python Basics** — Data Types, Loops, I/O, Data Structures, File Handling, API Handling
+- **Python Basics** — Data Types, Loops, I/O, Data Structures, File Handling, API Handling, Time & Space Complexity, Algorithms & Patterns, OOP & Design Patterns
 - **System Internals** — GIL, Compiler, Interpreter
+- **Gen AI** — What is an LLM?, KV Cache, RAG, Fine-Tuning & PEFT, Prompt Engineering, Context Engineering, Harness Engineering, Loop Engineering
 
 ## Accessibility
 
