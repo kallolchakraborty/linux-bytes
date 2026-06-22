@@ -175,6 +175,7 @@
     { title: "Types of Artificial Neural Networks", category: "AI/ML", url: "docs.html#aiml-types-of-anns", tags: ["aiml", "ann", "types", "architectures", "mlp", "cnn", "rnn", "lstm", "gan", "autoencoder", "transformer", "attention", "diffusion", "ddpm"] },
     { title: "System Design Fundamentals", category: "System Design", url: "docs.html#sysdesign-fundamentals", tags: ["system", "design", "distributed", "cap", "consistent-hashing", "caching", "sharding", "consensus", "load-balancing", "cqrs"] },
     { title: "Database Fundamentals", category: "Databases", url: "docs.html#database-fundamentals", tags: ["database", "sql", "indexing", "btree", "transactions", "acid", "isolation", "normalization", "nosql", "query-optimization"] },
+    { title: "FAANG Engineering Facts", category: "FAANG", url: "docs.html#faang-facts", tags: ["faang", "meta", "amazon", "apple", "netflix", "google", "scale", "facts", "interview", "system", "design", "numbers", "dynamo", "spanner", "kubernetes", "tao", "borg", "latency", "throughput", "storage"] },
   ];
 
   var _selectedIndex = -1;

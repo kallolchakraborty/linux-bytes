@@ -30,7 +30,8 @@ const routeMap = {
   '#aiml-ann-history': 'content/aiml/ann-history.json',
   '#aiml-types-of-anns': 'content/aiml/types-of-anns.json',
   '#sysdesign-fundamentals': 'content/sysdesign/system-design.json',
-  '#database-fundamentals': 'content/databases/databases.json'
+  '#database-fundamentals': 'content/databases/databases.json',
+  '#faang-facts': 'content/faang/faang-facts.json'
 };
 
 let scrollSpyCleanup = null;
