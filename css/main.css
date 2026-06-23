@@ -648,21 +648,6 @@ html.dark .references-section ul a {
 .python-section > .sidebar-subheader {
   color: #f07642;
 }
-.python-section > .sidebar-link {
-  border-left-color: rgba(233, 84, 32, 0.15);
-  color: #c24318;
-}
-.python-section > .sidebar-link:hover {
-  color: #E95420;
-  background: rgba(233, 84, 32, 0.06);
-}
-html.dark .python-section > .sidebar-link {
-  color: #f5a884;
-  border-left-color: rgba(233, 84, 32, 0.25);
-}
-html.dark .python-section > .sidebar-link:hover {
-  color: #E95420;
-}
 
 /* ========== Sidebar section active state ========== */
 .section-active > .sidebar-label {

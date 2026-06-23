@@ -509,4 +509,83 @@
     _trapFocus(e, 'readme-modal');
     if (e.key === 'Escape') closeReadmeModal();
   });
+
+  // ---- Dynamic SVG Logo Inliner & Clock Animator ----
+  function initLogoInliner() {
+    let logoImgs = document.querySelectorAll('img[src*="logo.svg"]');
+    if (logoImgs.length === 0) return;
+
+    let svgCache = null;
+
+    function inlineSVG(imgEl) {
+      if (svgCache) {
+        replaceImgWithSVG(imgEl, svgCache.cloneNode(true));
+        return;
+      }
+
+      fetch('assets/logo.svg')
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch SVG');
+          return res.text();
+        })
+        .then(text => {
+          let parser = new DOMParser();
+          let doc = parser.parseFromString(text, 'image/svg+xml');
+          let svg = doc.querySelector('svg');
+          if (!svg) return;
+          svgCache = svg;
+          replaceImgWithSVG(imgEl, svg.cloneNode(true));
+        })
+        .catch(err => console.error('Error inlining logo SVG:', err));
+    }
+
+    function replaceImgWithSVG(imgEl, svgEl) {
+      if (imgEl.className) svgEl.setAttribute('class', imgEl.className);
+      if (imgEl.getAttribute('style')) svgEl.setAttribute('style', imgEl.getAttribute('style'));
+      if (imgEl.id) svgEl.id = imgEl.id;
+      
+      let alt = imgEl.getAttribute('alt');
+      if (alt) {
+        svgEl.setAttribute('role', 'img');
+        svgEl.setAttribute('aria-label', alt);
+      }
+
+      if (imgEl.parentNode) {
+        imgEl.parentNode.replaceChild(svgEl, imgEl);
+      }
+    }
+
+    logoImgs.forEach(inlineSVG);
+
+    function updateClocks() {
+      let now = new Date();
+      let h = now.getHours() % 12;
+      let m = now.getMinutes();
+      let s = now.getSeconds();
+      let ms = now.getMilliseconds();
+
+      let hDeg = (h * 30) + (m * 0.5);
+      let mDeg = (m * 6) + (s * 0.1);
+      let sDeg = (s * 6) + (ms * 0.006);
+
+      let svgClocks = document.querySelectorAll('svg#ai-bytes-logo');
+      svgClocks.forEach(svg => {
+        let hh = svg.querySelector('#hour-hand');
+        let mh = svg.querySelector('#minute-hand');
+        let sh = svg.querySelector('#second-hand');
+
+        if (hh) hh.setAttribute('transform', 'rotate(' + hDeg + ' 78 70)');
+        if (mh) mh.setAttribute('transform', 'rotate(' + mDeg + ' 78 70)');
+        if (sh) sh.setAttribute('transform', 'rotate(' + sDeg + ' 78 70)');
+      });
+    }
+
+    setInterval(updateClocks, 100);
+  }
+
+  if (document.readyState !== 'loading') {
+    initLogoInliner();
+  } else {
+    document.addEventListener('DOMContentLoaded', initLogoInliner);
+  }
 })();
