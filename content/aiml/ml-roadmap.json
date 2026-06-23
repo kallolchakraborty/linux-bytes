@@ -1,5 +1,5 @@
 {
-  "id": "ml-roadmap",
+  "id": "aiml-ml-roadmap",
   "title": "ML Study Roadmap",
   "category": "AI/ML",
   "subcategory": "Study Plan",
@@ -79,7 +79,7 @@
     }
   ],
   "codeBlock": "Study tracks:\n  C = 3-Month Crash  |  S = 6-Month Standard  |  D = 12-Month Deep\n\nPrerequisites by track:\n  Crash:  ML experience, solid coding, system design basics\n  Standard:  Some ML exposure, comfortable with Python\n  Deep:  No ML background assumed, beginner-friendly Python",
-  "details": "<p><strong>How to use this roadmap</strong></p><p>Each track is a complete study plan with weekly milestones. All linked resources are in the Quick Bytes documentation portal. Start with the track that matches your background and work through the phases sequentially. The timeline below shows the recommended order for each track \u2014 identified by the badge color.</p><p><strong>Track legend:</strong> C = 3-Month Crash (orange), S = 6-Month Standard (purple), D = 12-Month Deep (blue). Within each track, phases are ordered left-to-right, top-to-bottom.</p>",
+  "details": "<p><strong>How to use this roadmap</strong></p><p>Each track is a complete study plan with weekly milestones. All linked resources are in the ai bytes documentation portal. Start with the track that matches your background and work through the phases sequentially. The timeline below shows the recommended order for each track \u2014 identified by the badge color.</p><p><strong>Track legend:</strong> C = 3-Month Crash (orange), S = 6-Month Standard (purple), D = 12-Month Deep (blue). Within each track, phases are ordered left-to-right, top-to-bottom.</p>",
   "tags": [
     "FAANG",
     "study-plan",

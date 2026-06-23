@@ -1,5 +1,7 @@
 /* ========== Global: Scaled root ========== */
 html { font-size: 14.4px; }
+a { text-decoration: none; }
+button { border: none; outline: none; font-family: inherit; }
 
 /* ========== Shared: Scrollbar ========== */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -29,6 +31,15 @@ html.dark .glass-nav {
   text-transform: uppercase;
   color: #94A3B8;
   padding: 12px 0 3px 10px;
+}
+.sidebar-subheader {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #E95420;
+  padding: 10px 0 2px 10px;
+  margin-top: 4px;
 }
 .sidebar-link {
   display: block;
@@ -268,6 +279,14 @@ html.dark {
 .gil-border { border-color: var(--gil-border); }
 .gil-glow { box-shadow: 0 0 20px rgba(233, 84, 32, 0.3); }
 
+/* ========== Interactive Pages: Text Colors ========== */
+.text-ink { color: #1e293b; }
+html.dark .text-ink { color: #e2e8f0; }
+.text-inkMuted { color: #94a3b8; }
+html.dark .text-inkMuted { color: #94a3b8; }
+.text-inkLight { color: #64748b; }
+html.dark .text-inkLight { color: #94a3b8; }
+
 /* ========== Scene Container ========== */
 .scene-container {
   perspective: 1000px;
@@ -384,259 +403,9 @@ html.dark .timeline-tag {
 
 html.dark .timeline-event { color: #94a3b8; }
 
-/* ========== Home: Learning Path Timeline ========== */
-.lp-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 28px;
-  flex-wrap: wrap;
-}
-
-.lp-phase-badge {
-  display: inline-flex;
-  align-items: center;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #E95420;
-  background: rgba(233, 84, 32, 0.08);
-  border: 1px solid rgba(233, 84, 32, 0.2);
-  padding: 3px 10px;
-  border-radius: 20px;
-  white-space: nowrap;
-}
-
-/* Track: vertical stack of phases */
-.lp-track {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  position: relative;
-}
-
-/* Continuous vertical line behind all phases */
-.lp-track::before {
-  content: '';
-  position: absolute;
-  left: 15px;
-  top: 20px;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(
-    to bottom,
-    rgba(233,84,32,0.3) 0%,
-    rgba(233,84,32,0.15) 60%,
-    rgba(168,85,247,0.2) 85%,
-    transparent 100%
-  );
-  border-radius: 1px;
-  z-index: 0;
-}
-
-/* Each phase block */
-.lp-phase {
-  position: relative;
-  padding-bottom: 8px;
-}
-
-/* Phase header row: [●01] [Name] [────] */
-.lp-phase-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
-  padding: 10px 0 6px;
-}
-
-.lp-phase-num {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #E95420;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 800;
-  font-family: 'JetBrains Mono', monospace;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  letter-spacing: -0.02em;
-  flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(233,84,32,0.35);
-  position: relative;
-  z-index: 1;
-}
-.lp-phase-num--ai {
-  background: linear-gradient(135deg, #7c3aed, #a855f7);
-  box-shadow: 0 2px 8px rgba(124,58,237,0.35);
-}
-
-.lp-phase-name {
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #475569;
-  white-space: nowrap;
-}
-html.dark .lp-phase-name { color: #94a3b8; }
-
-/* Horizontal rule that fills remaining width */
-.lp-phase-rule {
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(to right, rgba(233,84,32,0.2), transparent);
-  border-radius: 1px;
-}
-.lp-phase-rule--ai {
-  background: linear-gradient(to right, rgba(168,85,247,0.25), transparent);
-}
-
-/* Items list: indented from the center line */
-.lp-items {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 0 0 16px 44px; /* indent past the vertical line + num badge */
-}
-
-/* Each topic row — a clickable link */
-.lp-item {
-  display: grid;
-  grid-template-columns: 8px 1fr auto auto auto;
-  grid-template-rows: auto auto;
-  column-gap: 10px;
-  row-gap: 0;
-  align-items: center;
-  padding: 10px 12px 10px 10px;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, transform 0.15s;
-  opacity: 0;
-  animation: lpItemIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  /* grid areas: dot | title | tag | arrow | (desc spans full row below) */
-}
-
-/* Item stagger by sibling index */
-.lp-items .lp-item:nth-child(1) { animation-delay: 0.04s; }
-.lp-items .lp-item:nth-child(2) { animation-delay: 0.09s; }
-.lp-items .lp-item:nth-child(3) { animation-delay: 0.14s; }
-.lp-items .lp-item:nth-child(4) { animation-delay: 0.19s; }
-.lp-items .lp-item:nth-child(5) { animation-delay: 0.24s; }
-.lp-items .lp-item:nth-child(6) { animation-delay: 0.29s; }
-
-@keyframes lpItemIn {
-  from { opacity: 0; transform: translateX(-6px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-.lp-item:hover {
-  background: rgba(233, 84, 32, 0.04);
-  border-color: rgba(233, 84, 32, 0.15);
-  transform: translateX(3px);
-}
-.lp-item--ai:hover {
-  background: rgba(168, 85, 247, 0.04);
-  border-color: rgba(168, 85, 247, 0.18);
-}
-
-/* Col 1: small dot marker */
-.lp-item-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: rgba(233, 84, 32, 0.4);
-  flex-shrink: 0;
-  align-self: center;
-  transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
-}
-.lp-item-dot--ai {
-  background: rgba(168,85,247,0.4);
-}
-.lp-item:hover .lp-item-dot {
-  background: #E95420;
-  transform: scale(1.5);
-  box-shadow: 0 0 6px rgba(233,84,32,0.4);
-}
-.lp-item--ai:hover .lp-item-dot {
-  background: #a855f7;
-  box-shadow: 0 0 6px rgba(168,85,247,0.4);
-}
-
-/* Col 2: topic title */
-.lp-title {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #1e293b;
-  line-height: 1.2;
-  transition: color 0.15s;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-html.dark .lp-title { color: #e2e8f0; }
-.lp-item:hover .lp-title { color: #E95420; }
-.lp-item--ai:hover .lp-title { color: #a855f7; }
-
-/* Col 3: category tag pill */
-.lp-tag {
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #94a3b8;
-  background: #f1f5f9;
-  padding: 1px 6px;
-  border-radius: 4px;
-  white-space: nowrap;
-  flex-shrink: 0;
-  align-self: center;
-}
-html.dark .lp-tag { background: rgba(148,163,184,0.1); color: #64748b; }
-.lp-tag--ai { color: #a855f7; background: rgba(168,85,247,0.1); }
-html.dark .lp-tag--ai { background: rgba(168,85,247,0.12); color: #c084fc; }
-
-/* Col 4: arrow affordance → */
-.lp-arrow {
-  font-size: 14px;
-  color: #cbd5e1;
-  align-self: center;
-  transition: color 0.15s, transform 0.15s;
-  flex-shrink: 0;
-}
-html.dark .lp-arrow { color: #334155; }
-.lp-item:hover .lp-arrow {
-  color: #E95420;
-  transform: translateX(2px);
-}
-.lp-item--ai:hover .lp-arrow { color: #a855f7; }
-
-/* Row 2: description — spans all columns */
-.lp-desc {
-  grid-column: 2 / -1;
-  font-size: 12px;
-  color: #94a3b8;
-  line-height: 1.5;
-  margin-top: 2px;
-}
-html.dark .lp-desc { color: #64748b; }
-.lp-desc code {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  background: rgba(0,0,0,0.04);
-  padding: 1px 4px;
-  border-radius: 3px;
-  color: #E95420;
-}
-html.dark .lp-desc code { background: rgba(255,255,255,0.06); color: #f97316; }
-
 /* ========== README Page ========== */
 .readme-content {
-  font-size: 15px;
+  font-size: 13.5px;
   line-height: 1.7;
   color: #334155;
 }
@@ -679,7 +448,9 @@ html.dark .readme-content pre {
   padding: 0 !important;
   color: inherit !important;
 }
-.readme-content a { color: #E95420; text-decoration: underline; }
+#docs-dynamic-content a { color: #E95420; font-weight: 600; }
+#docs-dynamic-content a:hover { color: #d94410; }
+.readme-content a { color: #E95420; }
 .readme-content a:hover { color: #d94410; }
 .readme-content blockquote {
   border-left: 3px solid #E95420;
@@ -825,222 +596,21 @@ html.dark .ann-diagram .ann-label { fill:#94a3b8 }
 html.dark .ann-diagram .ann-title { fill:#e2e8f0 }
 
 /* ========== Tag Badges ========== */
-/* Python domain tag colors */
-.tag-Python { background: rgba(69,133,232,0.12); color: #4585e8; }
-html.dark .tag-Python { background: rgba(69,133,232,0.18); }
-.tag-data-structures { background: rgba(52,211,153,0.1); color: #34d399; }
-html.dark .tag-data-structures { background: rgba(52,211,153,0.15); }
-.tag-algorithms { background: rgba(251,191,36,0.1); color: #fbbf24; }
-html.dark .tag-algorithms { background: rgba(251,191,36,0.15); }
-.tag-OOP { background: rgba(196,181,253,0.1); color: #c4b5fd; }
-html.dark .tag-OOP { background: rgba(196,181,253,0.15); }
-.tag-data-types { background: rgba(96,165,250,0.1); color: #60a5fa; }
-html.dark .tag-data-types { background: rgba(96,165,250,0.15); }
-.tag-control-flow { background: rgba(251,146,60,0.1); color: #fb923c; }
-html.dark .tag-control-flow { background: rgba(251,146,60,0.15); }
-.tag-I\/O { background: rgba(99,102,241,0.1); color: #6366f1; }
-html.dark .tag-I\/O { background: rgba(99,102,241,0.15); }
-.tag-file-handling { background: rgba(52,211,153,0.1); color: #34d399; }
-html.dark .tag-file-handling { background: rgba(52,211,153,0.15); }
-.tag-API { background: rgba(14,165,233,0.1); color: #0ea5e9; }
-html.dark .tag-API { background: rgba(14,165,233,0.15); }
-.tag-complexity { background: rgba(239,68,68,0.1); color: #ef4444; }
-html.dark .tag-complexity { background: rgba(239,68,68,0.15); }
-.tag-concurrency { background: rgba(168,85,247,0.1); color: #a855f7; }
-html.dark .tag-concurrency { background: rgba(168,85,247,0.15); }
-.tag-history { background: rgba(148,163,184,0.15); color: #64748b; }
-html.dark .tag-history { background: rgba(148,163,184,0.2); }
-.tag-reference { background: rgba(100,116,139,0.12); color: #64748b; }
-html.dark .tag-reference { background: rgba(100,116,139,0.18); }
-/* Graph/linked-list/tree/heap/stack-queue inherit from data-structures color via tree */
-.tag-linked-list { background: rgba(52,211,153,0.1); color: #34d399; }
-html.dark .tag-linked-list { background: rgba(52,211,153,0.15); }
-.tag-stack-queue { background: rgba(52,211,153,0.1); color: #34d399; }
-html.dark .tag-stack-queue { background: rgba(52,211,153,0.15); }
-.tag-heap { background: rgba(52,211,153,0.1); color: #34d399; }
-html.dark .tag-heap { background: rgba(52,211,153,0.15); }
-.tag-tree { background: rgba(52,211,153,0.1); color: #34d399; }
-html.dark .tag-tree { background: rgba(52,211,153,0.15); }
-.tag-graph { background: rgba(52,211,153,0.1); color: #34d399; }
-html.dark .tag-graph { background: rgba(52,211,153,0.15); }
-
-/* ========== Flashcard Mode ========== */
+/* ponytail: colors applied via JS (colorizeTags) using data-tag attribute + hash palette */
 .tag-badge { background: #f1f5f9; color: #64748b; }
 html.dark .tag-badge { background: rgba(148,163,184,0.1); color: #94a3b8; }
-.tag-interview { background: rgba(233,84,32,0.1); color: #E95420; }
-html.dark .tag-interview { background: rgba(233,84,32,0.15); }
-.tag-staffp { background: rgba(124,58,237,0.1); color: #7c3aed; }
-html.dark .tag-staffp { background: rgba(124,58,237,0.15); }
-.tag-core { background: rgba(14,165,233,0.1); color: #0ea5e9; }
-html.dark .tag-core { background: rgba(14,165,233,0.15); }
-.tag-deep-learning { background: rgba(16,185,129,0.1); color: #10b981; }
-html.dark .tag-deep-learning { background: rgba(16,185,129,0.15); }
-.tag-system-design { background: rgba(245,158,11,0.1); color: #f59e0b; }
-html.dark .tag-system-design { background: rgba(245,158,11,0.15); }
-.tag-advanced { background: rgba(236,72,153,0.1); color: #ec4899; }
-html.dark .tag-advanced { background: rgba(236,72,153,0.15); }
-.tag-research { background: rgba(99,102,241,0.1); color: #6366f1; }
-html.dark .tag-research { background: rgba(99,102,241,0.15); }
-.tag-coding { background: rgba(249,115,22,0.1); color: #f97316; }
-html.dark .tag-coding { background: rgba(249,115,22,0.15); }
-.tag-infrastructure { background: rgba(168,85,247,0.1); color: #a855f7; }
-html.dark .tag-infrastructure { background: rgba(168,85,247,0.15); }
-.tag-LLM { background: rgba(217,70,239,0.12); color: #d946ef; }
-html.dark .tag-LLM { background: rgba(217,70,239,0.2); }
-.tag-MLOps { background: rgba(34,197,94,0.1); color: #22c55e; }
-html.dark .tag-MLOps { background: rgba(34,197,94,0.15); }
-.tag-ethics { background: rgba(234,179,8,0.1); color: #eab308; }
-html.dark .tag-ethics { background: rgba(234,179,8,0.15); }
-.tag-leadership { background: rgba(148,163,184,0.15); color: #64748b; }
-html.dark .tag-leadership { background: rgba(148,163,184,0.2); color: #94a3b8; }
-.tag-QA { background: rgba(251,146,60,0.1); color: #fb923c; }
-html.dark .tag-QA { background: rgba(251,146,60,0.15); }
-.tag-experimentation { background: rgba(52,211,153,0.1); color: #34d399; }
-html.dark .tag-experimentation { background: rgba(52,211,153,0.15); }
-.tag-mathematics { background: rgba(96,165,250,0.1); color: #60a5fa; }
-html.dark .tag-mathematics { background: rgba(96,165,250,0.15); }
-.tag-reinforcement-learning { background: rgba(244,114,182,0.1); color: #f472b6; }
-html.dark .tag-reinforcement-learning { background: rgba(244,114,182,0.15); }
-.tag-computer-vision { background: rgba(167,139,250,0.1); color: #a78bfa; }
-html.dark .tag-computer-vision { background: rgba(167,139,250,0.15); }
-.tag-study-plan { background: rgba(251,146,60,0.12); color: #fb923c; }
-html.dark .tag-study-plan { background: rgba(251,146,60,0.18); }
-.tag-from-scratch { background: rgba(45,212,191,0.1); color: #2dd4bf; }
-html.dark .tag-from-scratch { background: rgba(45,212,191,0.15); }
-.tag-behavioral { background: rgba(251,191,36,0.1); color: #fbbf24; }
-html.dark .tag-behavioral { background: rgba(251,191,36,0.15); }
-.tag-training { background: rgba(52,211,153,0.1); color: #34d399; }
-html.dark .tag-training { background: rgba(52,211,153,0.15); }
-.tag-recommender { background: rgba(196,181,253,0.1); color: #c4b5fd; }
-html.dark .tag-recommender { background: rgba(196,181,253,0.15); }
-.tag-agent { background: rgba(236,72,153,0.1); color: #ec4899; }
-html.dark .tag-agent { background: rgba(236,72,153,0.15); }
-.tag-architecture { background: rgba(96,165,250,0.1); color: #60a5fa; }
-html.dark .tag-architecture { background: rgba(96,165,250,0.15); }
-.tag-company-strategy { background: rgba(249,115,22,0.1); color: #f97316; }
-html.dark .tag-company-strategy { background: rgba(249,115,22,0.15); }
-.tag-context-engineering { background: rgba(100,116,139,0.12); color: #64748b; }
-html.dark .tag-context-engineering { background: rgba(100,116,139,0.18); }
-.tag-databases { background: rgba(59,130,246,0.1); color: #3b82f6; }
-html.dark .tag-databases { background: rgba(59,130,246,0.15); }
-.tag-deployment { background: rgba(16,185,129,0.1); color: #10b981; }
-html.dark .tag-deployment { background: rgba(16,185,129,0.15); }
-.tag-distributed-systems { background: rgba(100,116,139,0.12); color: #64748b; }
-html.dark .tag-distributed-systems { background: rgba(100,116,139,0.18); }
-.tag-evaluation { background: rgba(234,179,8,0.1); color: #eab308; }
-html.dark .tag-evaluation { background: rgba(234,179,8,0.15); }
-.tag-fine-tuning { background: rgba(59,130,246,0.1); color: #3b82f6; }
-html.dark .tag-fine-tuning { background: rgba(59,130,246,0.15); }
-.tag-foundations { background: rgba(14,165,233,0.1); color: #0ea5e9; }
-html.dark .tag-foundations { background: rgba(14,165,233,0.15); }
-.tag-gen-ai { background: rgba(217,70,239,0.12); color: #d946ef; }
-html.dark .tag-gen-ai { background: rgba(217,70,239,0.2); }
-.tag-harness-engineering { background: rgba(245,158,11,0.1); color: #f59e0b; }
-html.dark .tag-harness-engineering { background: rgba(245,158,11,0.15); }
-.tag-inference { background: rgba(168,85,247,0.1); color: #a855f7; }
-html.dark .tag-inference { background: rgba(168,85,247,0.15); }
-.tag-llm { background: rgba(244,114,182,0.1); color: #f472b6; }
-html.dark .tag-llm { background: rgba(244,114,182,0.15); }
-.tag-llm-serving { background: rgba(34,197,94,0.1); color: #22c55e; }
-html.dark .tag-llm-serving { background: rgba(34,197,94,0.15); }
-.tag-loop-engineering { background: rgba(6,182,212,0.1); color: #06b6d4; }
-html.dark .tag-loop-engineering { background: rgba(6,182,212,0.15); }
-.tag-moe { background: rgba(124,58,237,0.1); color: #7c3aed; }
-html.dark .tag-moe { background: rgba(124,58,237,0.15); }
-.tag-nlp { background: rgba(99,102,241,0.1); color: #6366f1; }
-html.dark .tag-nlp { background: rgba(99,102,241,0.15); }
-.tag-peft { background: rgba(168,85,247,0.1); color: #a855f7; }
-html.dark .tag-peft { background: rgba(168,85,247,0.15); }
-.tag-performance { background: rgba(239,68,68,0.1); color: #ef4444; }
-html.dark .tag-performance { background: rgba(239,68,68,0.15); }
-.tag-prompt-engineering { background: rgba(251,146,60,0.1); color: #fb923c; }
-html.dark .tag-prompt-engineering { background: rgba(251,146,60,0.15); }
-.tag-rag { background: rgba(52,211,153,0.1); color: #34d399; }
-html.dark .tag-rag { background: rgba(52,211,153,0.15); }
-.tag-retrieval { background: rgba(45,212,191,0.1); color: #2dd4bf; }
-html.dark .tag-retrieval { background: rgba(45,212,191,0.15); }
-.tag-storage { background: rgba(52,211,153,0.1); color: #34d399; }
-html.dark .tag-storage { background: rgba(52,211,153,0.15); }
-.tag-workflow { background: rgba(148,163,184,0.15); color: #94a3b8; }
-html.dark .tag-workflow { background: rgba(148,163,184,0.2); }
-.tag-activation { background: rgba(251,146,60,0.1); color: #fb923c; }
-html.dark .tag-activation { background: rgba(251,146,60,0.15); }
-.tag-architectures { background: rgba(124,58,237,0.1); color: #7c3aed; }
-html.dark .tag-architectures { background: rgba(124,58,237,0.15); }
-.tag-basics { background: rgba(14,165,233,0.1); color: #0ea5e9; }
-html.dark .tag-basics { background: rgba(14,165,233,0.15); }
-.tag-cheat-sheet { background: rgba(245,158,11,0.1); color: #f59e0b; }
-html.dark .tag-cheat-sheet { background: rgba(245,158,11,0.15); }
-.tag-curriculum { background: rgba(100,116,139,0.12); color: #64748b; }
-html.dark .tag-curriculum { background: rgba(100,116,139,0.18); }
-.tag-data { background: rgba(96,165,250,0.1); color: #60a5fa; }
-html.dark .tag-data { background: rgba(96,165,250,0.15); }
-.tag-GPU { background: rgba(168,85,247,0.1); color: #a855f7; }
-html.dark .tag-GPU { background: rgba(168,85,247,0.15); }
-.tag-GenAI { background: rgba(217,70,239,0.12); color: #d946ef; }
-html.dark .tag-GenAI { background: rgba(217,70,239,0.2); }
-.tag-implementation { background: rgba(45,212,191,0.1); color: #2dd4bf; }
-html.dark .tag-implementation { background: rgba(45,212,191,0.15); }
-.tag-mock { background: rgba(249,115,22,0.1); color: #f97316; }
-html.dark .tag-mock { background: rgba(249,115,22,0.15); }
-.tag-NLP { background: rgba(99,102,241,0.1); color: #6366f1; }
-html.dark .tag-NLP { background: rgba(99,102,241,0.15); }
-.tag-papers { background: rgba(99,102,241,0.1); color: #6366f1; }
-html.dark .tag-papers { background: rgba(99,102,241,0.15); }
-.tag-patterns { background: rgba(251,191,36,0.1); color: #fbbf24; }
-html.dark .tag-patterns { background: rgba(251,191,36,0.15); }
-.tag-rubric { background: rgba(148,163,184,0.15); color: #94a3b8; }
-html.dark .tag-rubric { background: rgba(148,163,184,0.2); }
-.tag-STAR { background: rgba(16,185,129,0.1); color: #10b981; }
-html.dark .tag-STAR { background: rgba(16,185,129,0.15); }
-.tag-supervised { background: rgba(56,189,248,0.1); color: #38bdf8; }
-html.dark .tag-supervised { background: rgba(56,189,248,0.15); }
-.tag-unsupervised { background: rgba(244,114,182,0.1); color: #f472b6; }
-html.dark .tag-unsupervised { background: rgba(244,114,182,0.15); }
-
-/* ========== Flashcard Mode ========== */
-body.flashcard-mode p[data-qa="answer"]:not(.qa-answer--revealed) {
-  filter: blur(8px);
-  user-select: none;
-  cursor: pointer;
-  transition: filter 0.2s;
-}
-body.flashcard-mode p[data-qa="answer"].qa-answer--revealed {
-  filter: none;
-  user-select: auto;
-}
-#flashcard-toggle {
-  cursor: pointer;
-  font-size: 0.8rem;
-  padding: 0.25rem 0.6rem;
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
-  background: #f8fafc;
-  color: #475569;
-  transition: all 0.15s;
-}
-html.dark #flashcard-toggle {
-  border-color: #334155;
-  background: #1e293b;
-  color: #94a3b8;
-}
-#flashcard-toggle.active {
-  background: #E95420;
-  color: #fff;
-  border-color: #E95420;
-}
 
 /* ========== Print Styles ========== */
 @media print {
   body { font-size: 11pt; color: #000; background: #fff; }
-  nav, .glass-nav, .sidebar, .footer, #flashcard-toggle, .no-print,
+  nav, .glass-nav, .sidebar, .footer, .no-print,
   .lp-header, .lp-track, .back-to-top, .scroll-progress-bar,
   aside, .sidebar-section, #sidebar, .sidebar-toggle,
   .copy-btn, button, [role="navigation"] { display: none !important; }
   .content-area, #content, main, .doc-content, section {
     margin: 0 !important; padding: 0 !important; max-width: 100% !important;
   }
-  a { color: #000 !important; text-decoration: underline; }
+  a { color: #000 !important; }
   pre, code { font-size: 9pt; border: 1px solid #ccc; page-break-inside: avoid; }
   h1 { font-size: 18pt; margin-top: 0; }
   h2 { font-size: 14pt; }

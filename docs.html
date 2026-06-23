@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <title>Quick Bytes — Documentation & Study Guides</title>
+  <title>ai bytes — Documentation & Study Guides</title>
   <meta name="description" content="Access structured developer study notes, cheat sheets, syntax references, and technical guides." />
-  <meta property="og:title" content="Quick Bytes — Documentation &amp; Study Guides" />
+  <meta property="og:title" content="ai bytes — Documentation &amp; Study Guides" />
   <meta property="og:description" content="Access structured developer study notes, cheat sheets, syntax references, and technical guides." />
   <meta property="og:image" content="assets/logo.svg" />
   <meta property="og:image:width" content="100" />
@@ -13,20 +13,20 @@
   <meta property="og:url" content="/docs.html" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Quick Bytes — Documentation &amp; Study Guides" />
+  <meta name="twitter:title" content="ai bytes — Documentation &amp; Study Guides" />
   <meta name="twitter:description" content="Access structured developer study notes, cheat sheets, syntax references, and technical guides." />
   <meta name="twitter:image" content="assets/logo.svg" />
-  <meta name="twitter:image:alt" content="Quick Bytes logo — Circle of Knowledge" />
+  <meta name="twitter:image:alt" content="ai bytes logo — Circle of Knowledge" />
   <meta name="keywords" content="quick bytes, documentation, study guides, python, compiler, interpreter, GIL, data types, control flow, file handling, API, study notes" />
   <meta name="author" content="Kallol Chakraborty" />
   <meta name="robots" content="index, follow" />
-  <meta property="og:site_name" content="Quick Bytes" />
+  <meta property="og:site_name" content="ai bytes" />
   <meta property="og:locale" content="en_US" />
   <meta name="theme-color" content="#E95420" />
   <link rel="canonical" href="https://kallolchakraborty.github.io/quick-reference/docs.html" />
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebPage","name":"Quick Bytes — Documentation & Study Guides","description":"Access structured developer study notes, cheat sheets, syntax references, and technical guides.","author":{"@type":"Person","name":"Kallol Chakraborty"}}
+  {"@context":"https://schema.org","@type":"WebPage","name":"ai bytes — Documentation & Study Guides","description":"Access structured developer study notes, cheat sheets, syntax references, and technical guides.","author":{"@type":"Person","name":"Kallol Chakraborty"}}
   </script>
   
   <link rel="prefetch" href="compiler.html" as="document" />
@@ -92,10 +92,10 @@
       <!-- Logo and Brand -->
       <a href="index.html" class="flex items-center gap-2.5 group">
         <div class="w-6 h-6 shrink-0">
-          <img src="assets/logo.svg" alt="Quick Bytes Logo" class="w-full h-full object-contain" />
+          <img src="assets/logo.svg" alt="ai bytes Logo" class="w-full h-full object-contain" />
         </div>
         <span class="font-bold text-base text-slate-900 dark:text-white tracking-tight group-hover:text-brand-500 dark:group-hover:text-brand-500 transition-colors">
-          Quick Bytes
+          ai bytes
         </span>
       </a>
 
@@ -105,20 +105,20 @@
         <!-- Utility Buttons -->
         <div class="flex items-center gap-2">
           <!-- Theme toggle -->
-          <button class="theme-toggle-btn w-7 h-7 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Toggle theme">
+          <button class="theme-toggle-btn w-7 h-7 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Toggle theme">
             <span class="material-symbols-outlined text-[16px]">light_mode</span>
           </button>
 
           <!-- Share button -->
-          <button class="open-share-btn w-7 h-7 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Share this page">
+          <button class="open-share-btn w-7 h-7 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Share this page">
             <span class="material-symbols-outlined text-[16px]">share</span>
           </button>
 
           <!-- Search trigger button -->
-          <button class="open-search-btn flex items-center gap-1.5 h-7 px-2.5 border border-slate-200 dark:border-slate-800 hover:border-brand-500 dark:hover:border-brand-500 bg-slate-50 dark:bg-slate-800/40 rounded-lg text-slate-400 hover:text-brand-500 font-medium text-xs transition-all">
+          <button class="open-search-btn flex items-center gap-1.5 h-7 px-2.5 bg-slate-50 dark:bg-slate-800/40 rounded-lg text-slate-400 hover:text-brand-500 font-medium text-xs transition-all">
             <span class="material-symbols-outlined text-[16px]">search</span>
             <span>Search</span>
-            <kbd class="hidden sm:inline-block font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-1 rounded text-[9px] leading-none">⌘K</kbd>
+            <kbd class="hidden sm:inline-block font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-1 rounded text-[9px] leading-none">Ctrl+K</kbd>
           </button>
 
         </div>
@@ -139,7 +139,7 @@
         </div>
 
         <div class="sidebar-section">
-          <h4 class="sidebar-label">History</h4>
+          <h4 class="sidebar-label">Python — History</h4>
           <a href="#python-history" class="sidebar-link">History of Python</a>
         </div>
 
@@ -248,16 +248,25 @@
 
         <div class="sidebar-section">
           <h4 class="sidebar-label">Gen AI</h4>
-          <a href="#genai-what-is-llm" class="sidebar-link">What is an LLM?</a>
-          <a href="#genai-kvcache" class="sidebar-link">KV Cache</a>
+
+          <p class="sidebar-subheader">Foundations</p>
+          <a href="#genai-what-is-llm" class="sidebar-link">LLM Architecture</a>
+          <a href="#genai-transformer-architecture" class="sidebar-link">Transformer Architecture</a>
+          <a href="#genai-pretraining" class="sidebar-link">Pre-Training at Scale</a>
+
+          <p class="sidebar-subheader">Applied Patterns</p>
+          <a href="#genai-prompt-engineering" class="sidebar-link">Prompt Engineering</a>
           <a href="#genai-rag" class="sidebar-link">RAG</a>
           <a href="#genai-finetuning" class="sidebar-link">Fine-Tuning &amp; PEFT</a>
-          <a href="#genai-prompt-engineering" class="sidebar-link">Prompt Engineering</a>
-          <a href="#genai-context-engineering" class="sidebar-link">Context Engineering</a>
-          <a href="#genai-harness-engineering" class="sidebar-link">Harness Engineering</a>
-          <a href="#genai-loop-engineering" class="sidebar-link">Loop Engineering</a>
-          <a href="#genai-moe" class="sidebar-link">Mixture of Experts</a>
+          <a href="#genai-loop-engineering" class="sidebar-link">LLM Agents</a>
+          <a href="#genai-context-engineering" class="sidebar-link">Long-Context &amp; Caching</a>
+
+          <p class="sidebar-subheader">Production &amp; Optimization</p>
+          <a href="#genai-kvcache" class="sidebar-link">Inference Optimization</a>
           <a href="#genai-llm-serving" class="sidebar-link">LLM Serving &amp; Deployment</a>
+          <a href="#genai-harness-engineering" class="sidebar-link">LLM Evaluation</a>
+          <a href="#genai-moe" class="sidebar-link">Mixture of Experts</a>
+          <a href="#genai-alignment" class="sidebar-link">Alignment &amp; Safety</a>
         </div>
 
       </nav>
@@ -281,18 +290,17 @@
   <!-- ==================== FOOTER ==================== -->
   <footer class="border-t border-slate-200 dark:border-slate-800 py-8 bg-slate-100 dark:bg-slate-900/60">
     <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
-      <span>Made with ❤️ by <a href="https://www.linkedin.com/in/kallol-chakraborty-9728a699/" target="_blank" rel="noopener noreferrer" class="text-brand-500 hover:text-brand-600 transition-colors font-semibold">Kallol Chakraborty</a>.</span>
+      <span>Made with ❤️ by <a href="https://www.linkedin.com/in/kallol-chakraborty-9728a699/" target="_blank" rel="noopener noreferrer" class="text-brand-500 hover:text-brand-600 transition-colors font-semibold">Kallol Chakraborty</a></span>
       <div class="flex gap-6 font-medium">
         <a href="docs.html#readme" class="hover:text-brand-500 transition-colors">Docs</a>
-        <a href="https://github.com/kallolchakraborty/quick-bytes" target="_blank" rel="noopener noreferrer" class="text-brand-500 font-semibold hover:text-brand-600 transition-colors">GitHub</a>
+        <a href="https://github.com/kallolchakraborty/ai-bytes" target="_blank" rel="noopener noreferrer" class="text-brand-500 font-semibold hover:text-brand-600 transition-colors">GitHub</a>
       </div>
     </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+  <script src="js/generated.js" defer></script>
   <script src="js/modals.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js" defer></script>
   <script src="js/loader.js" defer></script>
 </body>
 </html>

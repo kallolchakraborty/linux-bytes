@@ -1,4 +1,4 @@
-# Quick Bytes
+# ai bytes
 
 A modern, search-first documentation portal for developer study notes, cheat sheets, and interactive visual guides — built as a static site for GitHub Pages.
 
