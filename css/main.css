@@ -664,6 +664,37 @@ html.dark .python-section > .sidebar-link:hover {
   color: #E95420;
 }
 
+/* ========== Sidebar section active state ========== */
+.section-active > .sidebar-label {
+  color: #E95420 !important;
+}
+.section-active {
+  position: relative;
+}
+.section-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #E95420;
+  border-radius: 0 3px 3px 0;
+  opacity: 0.5;
+}
+
+/* ========== Study tracks diagram animation ========== */
+@keyframes trackFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+#section-dive .not-prose.grid > div {
+  animation: trackFadeIn 0.5s ease-out both;
+}
+#section-dive .not-prose.grid > div:nth-child(1) { animation-delay: 0s; }
+#section-dive .not-prose.grid > div:nth-child(2) { animation-delay: 0.15s; }
+#section-dive .not-prose.grid > div:nth-child(3) { animation-delay: 0.3s; }
+
 /* ========== Utility buttons: blend into background ========== */
 .theme-toggle-btn, .open-share-btn {
   background: transparent !important;

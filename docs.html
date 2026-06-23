@@ -70,6 +70,13 @@
       }
     });
   })();
+  if (navigator.platform.indexOf('Mac') !== -1) {
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('kbd').forEach(function(el) {
+        el.textContent = el.textContent.replace('Ctrl', '\u2318');
+      });
+    });
+  }
   </script>
   <link rel="stylesheet" href="css/tailwind.css" />
   <link rel="stylesheet" href="css/main.css" />

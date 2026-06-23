@@ -269,11 +269,16 @@ async function loadContent(hash) {
 
     colorizeTags(contentArea);
 
-    // Highlight active link in left sidebar
+    // Highlight active link and its parent section in left sidebar
+    document.querySelectorAll('.sidebar-section').forEach(function(section) {
+      section.classList.remove('section-active');
+    });
     document.querySelectorAll('.sidebar-link').forEach(link => {
       if (link.getAttribute('href') === hash) {
         link.classList.add('active-doc-link');
         link.setAttribute('aria-current', 'page');
+        var section = link.closest('.sidebar-section');
+        if (section) section.classList.add('section-active');
       } else {
         link.classList.remove('active-doc-link');
         link.removeAttribute('aria-current');
