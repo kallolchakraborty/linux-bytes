@@ -3,7 +3,7 @@
 
   // ---- Templates ----
 
-  var shareHTML = [
+  const shareHTML = [
     '<div id="share-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm p-4 sm:p-10 justify-center items-center" role="dialog" aria-modal="true" aria-label="Share this page">',
     '<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-lg rounded-2xl shadow-2xl flex flex-col overflow-hidden">',
     '<div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">',
@@ -40,7 +40,7 @@
     '</div>'
   ].join('\n');
 
-  var searchHTML = [
+  const searchHTML = [
     '<div id="search-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm p-4 sm:p-10 justify-center items-start" role="dialog" aria-modal="true" aria-label="Search documentation">',
     '<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col overflow-hidden mt-10">',
     '<div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3 bg-slate-50/50 dark:bg-slate-900/50">',
@@ -62,7 +62,7 @@
 
   document.body.insertAdjacentHTML('beforeend', shareHTML);
 
-  var hasSearch = document.querySelector('.open-search-btn') !== null;
+  const hasSearch = document.querySelector('.open-search-btn') !== null;
   if (hasSearch) {
     document.body.insertAdjacentHTML('beforeend', searchHTML);
   }
@@ -70,21 +70,23 @@
   // ---- Share Modal Logic ----
 
   document.addEventListener('click', function(e) {
-    var btn = e.target.closest('.open-share-btn');
+    let btn = e.target.closest('.open-share-btn');
     if (!btn) return;
-    var modal = document.getElementById('share-modal');
-    var input = document.getElementById('share-url-input');
-    var confirm = document.getElementById('copy-confirm');
+    let modal = document.getElementById('share-modal');
+    let input = document.getElementById('share-url-input');
+    let confirm = document.getElementById('copy-confirm');
     if (!modal) return;
 
-    var url = window.location.href;
-    var title = document.title || 'Quick Bytes';
+    _lastFocusedEl = document.activeElement;
+
+    let url = window.location.href;
+    let title = document.title || 'Quick Bytes';
 
     if (input) input.value = url;
     if (confirm) confirm.classList.add('hidden');
 
-    var encodedUrl = encodeURIComponent(url);
-    var encodedTitle = encodeURIComponent(title);
+    let encodedUrl = encodeURIComponent(url);
+    let encodedTitle = encodeURIComponent(title);
 
     document.querySelectorAll('.share-link').forEach(function(link) {
       link.href = (link.getAttribute('data-href') || '')
@@ -94,32 +96,36 @@
 
     modal.classList.remove('hidden');
     modal.classList.add('flex');
+    if (input) input.focus();
   });
+
+  function closeShareModal() {
+    let modal = document.getElementById('share-modal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    if (_lastFocusedEl) { _lastFocusedEl.focus(); _lastFocusedEl = null; }
+  }
 
   document.addEventListener('click', function(e) {
     if (e.target.id === 'close-share-btn' || e.target.closest('#close-share-btn')) {
-      var modal = document.getElementById('share-modal');
-      if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-      }
+      closeShareModal();
     }
   });
 
   document.addEventListener('click', function(e) {
-    var modal = document.getElementById('share-modal');
+    let modal = document.getElementById('share-modal');
     if (!modal || modal.classList.contains('hidden')) return;
     if (e.target === modal) {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
+      closeShareModal();
     }
   });
 
   document.addEventListener('click', function(e) {
-    var copyBtn = e.target.closest('#copy-share-btn');
+    let copyBtn = e.target.closest('#copy-share-btn');
     if (!copyBtn) return;
-    var input = document.getElementById('share-url-input');
-    var confirm = document.getElementById('copy-confirm');
+    let input = document.getElementById('share-url-input');
+    let confirm = document.getElementById('copy-confirm');
     if (!input) return;
     input.select();
     navigator.clipboard.writeText(input.value).then(function() {
@@ -131,19 +137,17 @@
   });
 
   document.addEventListener('keydown', function(e) {
-    if (e.key !== 'Escape') return;
-    var modal = document.getElementById('share-modal');
-    if (modal && !modal.classList.contains('hidden')) {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
+    let modal = document.getElementById('share-modal');
+    if (!modal || modal.classList.contains('hidden')) return;
+    _trapFocus(e, 'share-modal');
+    if (e.key === 'Escape') closeShareModal();
   });
 
   // ---- Search Modal Logic ----
 
   if (!hasSearch) return;
 
-  var searchIndex = [
+  const searchIndex = [
     { title: "Built-in Collections (legacy route)", category: "Python", url: "docs.html#py-basics-ds", tags: ["python", "data", "structures", "builtins", "ds-route"], },
     { title: "Data Types & Operations", category: "Python", url: "docs.html#py-basics-datatypes", tags: ["python", "basics", "bitwise", "operators", "casting", "coercion", "masking", "flags", "overflow", "shift"] },
     { title: "Loops & Control Flow", category: "Python", url: "docs.html#py-basics-loops", tags: ["python", "basics", "loops", "for", "while", "control", "flow", "if"] },
@@ -161,6 +165,17 @@
     { title: "Time & Space Complexity", category: "Python", url: "docs.html#py-complexity", tags: ["python", "complexity", "big-o", "time", "space", "analysis", "asymptotic"] },
     { title: "Algorithms & Patterns", category: "Python", url: "docs.html#py-algorithms", tags: ["python", "algorithms", "patterns", "two-pointers", "binary-search", "dp", "backtracking", "divide-conquer"] },
     { title: "OOP & Design Patterns", category: "Python", url: "docs.html#py-oop", tags: ["python", "oop", "design", "patterns", "solid", "decorator", "metaclass", "inheritance"] },
+    { title: "Testing & Debugging", category: "Python", url: "docs.html#py-testing", tags: ["python", "testing", "pytest", "mock", "unittest", "debugging", "profiling", "tdd"] },
+    { title: "Error Handling & Exceptions", category: "Python", url: "docs.html#py-exceptions", tags: ["python", "errors", "exceptions", "try", "except", "finally", "chaining", "custom"] },
+    { title: "Type System & Annotations", category: "Python", url: "docs.html#py-typing", tags: ["python", "typing", "type-hints", "annotations", "mypy", "pyright", "generic", "protocol"] },
+    { title: "Memory Management & GC", category: "Python", url: "docs.html#py-memory", tags: ["python", "memory", "gc", "garbage-collection", "reference-counting", "weakref", "leak"] },
+    { title: "Module System & Packaging", category: "Python", url: "docs.html#py-modules", tags: ["python", "modules", "packaging", "import", "pip", "pyproject", "virtual-env", "monorepo"] },
+    { title: "Functional Programming", category: "Python", url: "docs.html#py-functional", tags: ["python", "functional", "itertools", "functools", "map", "filter", "reduce", "lambda", "closure"] },
+    { title: "Performance & Profiling", category: "Python", url: "docs.html#py-performance", tags: ["python", "performance", "profiling", "cprofile", "cython", "pypy", "optimization", "numba"] },
+    { title: "Google Python Culture", category: "Python", url: "docs.html#py-google-culture", tags: ["python", "google", "style-guide", "readability", "code-review", "sre", "design-docs", "okr"] },
+    { title: "Design Docs for Python", category: "Python", url: "docs.html#py-design-docs", tags: ["python", "design-docs", "template", "architecture", "review", "google", "staff"] },
+    { title: "Security Best Practices for Python", category: "Python", url: "docs.html#py-security", tags: ["python", "security", "injection", "sast", "secrets", "pickle", "sandboxing", "supply-chain"] },
+    { title: "Logging & Observability for Python", category: "Python", url: "docs.html#py-logging", tags: ["python", "logging", "observability", "opentelemetry", "structured-logging", "correlation-id", "pii", "monitoring"] },
     { title: "What exactly is an LLM?", category: "Gen AI", url: "docs.html#genai-what-is-llm", tags: ["genai", "llm", "transformer", "attention", "scaling", "next-token", "pretraining", "sft", "rlhf"] },
     { title: "KV Cache", category: "Gen AI", url: "docs.html#genai-kvcache", tags: ["genai", "kv", "cache", "attention", "inference", "memory", "decoding", "transformer"] },
     { title: "RAG — Retrieval-Augmented Generation", category: "Gen AI", url: "docs.html#genai-rag", tags: ["genai", "rag", "retrieval", "augmented", "generation", "vector", "search", "chunking"] },
@@ -206,12 +221,43 @@
     { title: "FAANG Engineering Facts", category: "FAANG", url: "docs.html#faang-facts", tags: ["faang", "meta", "amazon", "apple", "netflix", "google", "scale", "facts", "interview", "system", "design", "numbers", "dynamo", "spanner", "kubernetes", "tao", "borg", "latency", "throughput", "storage"] },
   ];
 
-  var _selectedIndex = -1;
+  let _selectedIndex = -1;
+  let _lastFocusedEl = null;
+
+  function _getFocusable(el) {
+    if (!el) return [];
+    let selectors = 'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    return Array.from(el.querySelectorAll(selectors)).filter(function(f) {
+      return f.offsetParent !== null;
+    });
+  }
+
+  function _trapFocus(e, modalId) {
+    if (e.key !== 'Tab') return;
+    let modal = document.getElementById(modalId);
+    if (!modal || modal.classList.contains('hidden')) return;
+    let focusable = _getFocusable(modal);
+    if (focusable.length === 0) return;
+    let first = focusable[0];
+    let last = focusable[focusable.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }
 
   function openSearchModal() {
-    var modal = document.getElementById('search-modal');
-    var input = document.getElementById('modal-search-input');
+    let modal = document.getElementById('search-modal');
+    let input = document.getElementById('modal-search-input');
     if (!modal) return;
+    _lastFocusedEl = document.activeElement;
     modal.classList.remove('hidden');
     modal.classList.add('flex');
     if (input) input.focus();
@@ -221,9 +267,9 @@
   }
 
   function closeSearchModal() {
-    var modal = document.getElementById('search-modal');
-    var input = document.getElementById('modal-search-input');
-    var results = document.getElementById('modal-search-results');
+    let modal = document.getElementById('search-modal');
+    let input = document.getElementById('modal-search-input');
+    let results = document.getElementById('modal-search-results');
     if (!modal) return;
     modal.classList.remove('flex');
     modal.classList.add('hidden');
@@ -231,6 +277,7 @@
     if (input) input.value = '';
     if (results) results.innerHTML = '';
     _selectedIndex = -1;
+    if (_lastFocusedEl) { _lastFocusedEl.focus(); _lastFocusedEl = null; }
   }
 
   document.addEventListener('click', function(e) {
@@ -246,18 +293,18 @@
   });
 
   document.addEventListener('click', function(e) {
-    var modal = document.getElementById('search-modal');
+    let modal = document.getElementById('search-modal');
     if (!modal || modal.classList.contains('hidden')) return;
     if (e.target === modal) closeSearchModal();
   });
 
   document.addEventListener('click', function(e) {
-    var link = e.target.closest('#modal-search-results a');
+    let link = e.target.closest('#modal-search-results a');
     if (link) closeSearchModal();
   });
 
   document.addEventListener('keydown', function(e) {
-    var modal = document.getElementById('search-modal');
+    let modal = document.getElementById('search-modal');
     if (!modal || modal.classList.contains('hidden')) return;
 
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -270,10 +317,10 @@
 
   // Keyboard shortcut to open search
   document.addEventListener('keydown', function(e) {
-    var modal = document.getElementById('share-modal');
+    let modal = document.getElementById('share-modal');
     if (modal && !modal.classList.contains('hidden')) return;
 
-    var searchModal = document.getElementById('search-modal');
+    let searchModal = document.getElementById('search-modal');
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
       e.preventDefault();
       if (searchModal && searchModal.classList.contains('hidden')) {
@@ -292,17 +339,17 @@
 
   function _highlight(text, query) {
     if (!query) return text;
-    var re = new RegExp('(' + _escapeRe(query) + ')', 'gi');
+    let re = new RegExp('(' + _escapeRe(query) + ')', 'gi');
     return text.replace(re, '<mark class="bg-brand-100 dark:bg-brand-500/30 text-inherit rounded-sm px-0.5">$1</mark>');
   }
 
   function renderResults(query) {
-    var results = document.getElementById('modal-search-results');
+    let results = document.getElementById('modal-search-results');
     if (!results) return;
 
-    var q = query.toLowerCase().trim();
+    let q = query.toLowerCase().trim();
 
-    var items;
+    let items;
     if (!q) {
       items = searchIndex.slice(0, 6);
     } else {
@@ -325,8 +372,8 @@
     }
 
     results.innerHTML = items.map(function(item, i) {
-      var titleHtml = q ? _highlight(item.title, q) : item.title;
-      var catHtml = q ? _highlight(item.category, q) : item.category;
+      let titleHtml = q ? _highlight(item.title, q) : item.title;
+      let catHtml = q ? _highlight(item.category, q) : item.category;
       return [
         '<a href="' + item.url + '" role="option" class="search-result flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 hover:bg-brand-50 dark:hover:bg-brand-500/10 border border-slate-100 dark:border-slate-800 hover:border-brand-100 dark:hover:border-brand-500/30 rounded-lg transition-all group" data-index="' + i + '">',
         '<div class="flex flex-col gap-1">',
@@ -348,7 +395,7 @@
   }
 
   function _navigateSearch(dir) {
-    var links = document.querySelectorAll('#modal-search-results .search-result');
+    let links = document.querySelectorAll('#modal-search-results .search-result');
     if (links.length === 0) return;
 
     if (_selectedIndex >= 0 && links[_selectedIndex]) {
@@ -369,8 +416,10 @@
 
   // Keyboard navigation
   document.addEventListener('keydown', function(e) {
-    var modal = document.getElementById('search-modal');
+    let modal = document.getElementById('search-modal');
     if (!modal || modal.classList.contains('hidden')) return;
+
+    _trapFocus(e, 'search-modal');
 
     if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -379,7 +428,7 @@
       e.preventDefault();
       _navigateSearch(-1);
     } else if (e.key === 'Enter') {
-      var links = document.querySelectorAll('#modal-search-results .search-result');
+      let links = document.querySelectorAll('#modal-search-results .search-result');
       if (_selectedIndex >= 0 && links[_selectedIndex]) {
         e.preventDefault();
         window.location.href = links[_selectedIndex].getAttribute('href');
@@ -390,9 +439,9 @@
 
   // Track selection on hover
   document.addEventListener('mouseover', function(e) {
-    var result = e.target.closest('.search-result');
+    let result = e.target.closest('.search-result');
     if (!result) return;
-    var links = document.querySelectorAll('#modal-search-results .search-result');
+    let links = document.querySelectorAll('#modal-search-results .search-result');
     if (_selectedIndex >= 0 && links[_selectedIndex]) {
       links[_selectedIndex].classList.remove('bg-brand-50', 'dark:bg-brand-500/20', 'border-brand-100', 'dark:border-brand-500/30');
     }
@@ -401,7 +450,7 @@
 
   // ---- Readme Modal Logic & Markup ----
 
-  var readmeHTML = [
+  const readmeHTML = [
     '<div id="readme-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm p-4 sm:p-10 justify-center items-start" role="dialog" aria-modal="true" aria-label="Documentation">',
     '<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col overflow-hidden mt-4 max-h-[85vh]">',
     '<div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50 shadow-sm shrink-0">',
@@ -411,7 +460,7 @@
     '</div>',
     '<button id="close-readme-btn" class="text-xs text-slate-400 border border-slate-200 dark:border-slate-800 px-2.5 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">ESC</button>',
     '</div>',
-    '<div id="readme-content" class="p-6 overflow-y-auto text-sm leading-relaxed text-slate-700 dark:text-slate-300 font-sans prose dark:prose-invert max-w-none">',
+    '<div id="readme-content" class="p-6 overflow-y-auto min-h-0 text-sm leading-relaxed text-slate-700 dark:text-slate-300 font-sans prose dark:prose-invert max-w-none">',
     '<div class="flex items-center justify-center py-12">',
     '<span class="material-symbols-outlined animate-spin text-brand-500 text-3xl">sync</span>',
     '</div>',
@@ -422,24 +471,27 @@
 
   document.body.insertAdjacentHTML('beforeend', readmeHTML);
 
-  var readmeLoaded = false;
+  let readmeLoaded = false;
 
   function openReadmeModal() {
-    var modal = document.getElementById('readme-modal');
+    let modal = document.getElementById('readme-modal');
     if (!modal) return;
+    _lastFocusedEl = document.activeElement;
     modal.classList.remove('hidden');
     modal.classList.add('flex');
     document.body.style.overflow = 'hidden';
+    let closeBtn = document.getElementById('close-readme-btn');
+    if (closeBtn) closeBtn.focus();
 
     if (!readmeLoaded) {
       if (typeof marked === 'undefined') {
-        var script = document.createElement('script');
+        let script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
         script.onload = function() {
           loadAndRenderReadme();
         };
         script.onerror = function() {
-          var content = document.getElementById('readme-content');
+          let content = document.getElementById('readme-content');
           if (content) content.innerHTML = '<p class="text-red-500 text-center font-semibold">Failed to load markdown parser library.</p>';
         };
         document.head.appendChild(script);
@@ -456,8 +508,8 @@
         return res.text();
       })
       .then(function(text) {
-        var html = marked.parse(text);
-        var content = document.getElementById('readme-content');
+        let html = marked.parse(text);
+        let content = document.getElementById('readme-content');
         if (content) {
           content.innerHTML = html;
           // Apply custom styles matching the rich aesthetic
@@ -493,7 +545,7 @@
       })
       .catch(function(err) {
         console.error(err);
-        var content = document.getElementById('readme-content');
+        let content = document.getElementById('readme-content');
         if (content) {
           content.innerHTML = '<p class="text-red-500 text-center font-semibold">Failed to load documentation content.</p>';
         }
@@ -501,11 +553,12 @@
   }
 
   function closeReadmeModal() {
-    var modal = document.getElementById('readme-modal');
+    let modal = document.getElementById('readme-modal');
     if (!modal) return;
     modal.classList.add('hidden');
     modal.classList.remove('flex');
     document.body.style.overflow = '';
+    if (_lastFocusedEl) { _lastFocusedEl.focus(); _lastFocusedEl = null; }
   }
 
   document.addEventListener('click', function(e) {
@@ -515,7 +568,7 @@
   });
 
   document.addEventListener('click', function(e) {
-    var modal = document.getElementById('readme-modal');
+    let modal = document.getElementById('readme-modal');
     if (!modal || modal.classList.contains('hidden')) return;
     if (e.target === modal) {
       closeReadmeModal();
@@ -523,10 +576,9 @@
   });
 
   document.addEventListener('keydown', function(e) {
-    if (e.key !== 'Escape') return;
-    var modal = document.getElementById('readme-modal');
-    if (modal && !modal.classList.contains('hidden')) {
-      closeReadmeModal();
-    }
+    let modal = document.getElementById('readme-modal');
+    if (!modal || modal.classList.contains('hidden')) return;
+    _trapFocus(e, 'readme-modal');
+    if (e.key === 'Escape') closeReadmeModal();
   });
 })();

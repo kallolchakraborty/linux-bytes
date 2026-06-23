@@ -17,6 +17,17 @@ const routeMap = {
   '#py-complexity': 'content/python/basics/complexity.json',
   '#py-algorithms': 'content/python/basics/algorithms.json',
   '#py-oop': 'content/python/basics/oop.json',
+  '#py-testing': 'content/python/basics/testing.json',
+  '#py-exceptions': 'content/python/basics/exceptions.json',
+  '#py-typing': 'content/python/basics/typing.json',
+  '#py-memory': 'content/python/basics/memory.json',
+  '#py-modules': 'content/python/basics/modules.json',
+  '#py-functional': 'content/python/basics/functional.json',
+  '#py-performance': 'content/python/basics/performance.json',
+  '#py-google-culture': 'content/python/basics/google-culture.json',
+  '#py-design-docs': 'content/python/basics/design-docs.json',
+  '#py-security': 'content/python/basics/security.json',
+  '#py-logging': 'content/python/basics/logging.json',
   '#genai-what-is-llm': 'content/genai/what-is-llm.json',
   '#genai-kvcache': 'content/genai/kv-cache.json',
   '#genai-rag': 'content/genai/rag.json',
@@ -73,7 +84,7 @@ function codeBlock(code, langClass) {
 function renderSections(sections, dataId, langClass, extraClass) {
   if (!sections) return '';
   return `<div class="flex flex-col gap-8${extraClass || ''}">` + sections.map(function(section, idx) {
-    var sectionId = 'section-' + dataId + '-' + idx;
+    let sectionId = 'section-' + dataId + '-' + idx;
     return (
       '<div id="' + sectionId + '" class="scroll-mt-24 flex flex-col gap-3">' +
       '<h3 class="text-xl font-semibold text-slate-900 dark:text-white">' + section.title + '</h3>' +
@@ -123,7 +134,7 @@ async function loadContent(hash) {
               '<span class="material-symbols-outlined text-[18px]">close</span>' +
             '</button>' +
           '</div>' +
-          '<div class="flex-1 overflow-y-auto px-6 py-5 readme-content">' + marked.parse(md) + '</div>' +
+          '<div class="flex-1 overflow-y-auto px-6 py-5 readme-content min-h-0">' + marked.parse(md) + '</div>' +
         '</div>';
 
       document.body.appendChild(modal);
@@ -165,12 +176,11 @@ async function loadContent(hash) {
     // Render content dynamically
     const langClass = data.language ? 'language-' + data.language : 'text-slate-800 dark:text-slate-200';
     let embedCode = '';
-    const isInteractive = data.id === 'compiler' || data.id === 'interpreter' || data.id === 'gil' || data.id === 'concurrency';
+    const isInteractive = data.interactive === true;
     if (isInteractive) {
-      const pageTitles = { compiler: 'How a Compiler Works', interpreter: 'How an Interpreter Works', gil: "How Python's GIL Works", concurrency: 'Python Concurrency Visualizer' };
       embedCode = `
         <div class="w-full aspect-auto h-[530px] md:aspect-[16/12] md:h-auto border border-blue-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-lg bg-white dark:bg-[#0F1115]">
-          <iframe src="${data.id}.html?t=${new Date().getTime()}" class="w-full h-full border-none" allowfullscreen aria-label="${pageTitles[data.id] || 'Interactive visualization'}"></iframe>
+          <iframe src="${data.id}.html?t=${new Date().getTime()}" class="w-full h-full border-none" allowfullscreen aria-label="${data.title || 'Interactive visualization'}"></iframe>
         </div>
       `;
       if (data.sections) {
@@ -218,13 +228,13 @@ async function loadContent(hash) {
     }
 
     contentArea.innerHTML = `
-      <section class="flex flex-col gap-6 docs-section">
+      <article class="flex flex-col gap-6 docs-section">
           <div class="flex items-center justify-between flex-wrap gap-2">
             <div class="flex flex-wrap gap-2 text-xs font-bold text-brand-500 uppercase tracking-wider items-center">
               <span>${data.category}</span>
               <span class="text-slate-300 dark:text-slate-600">&bull;</span>
               <span>${data.subcategory}</span>
-              ${data.tags ? data.tags.filter(function(t){return t !== 'FAANG';}).map(function(t){return '<span class="ml-1.5 inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider tag-badge tag-' + t.replace(/[+]/g,'p').replace(/[&]/g,'') + '">' + t + '</span>';}).join('') : ''}
+              ${data.tags ? data.tags.filter(function(t){return t !== 'FAANG';}).map(function(t){let tc = t.replace(/[+]/g, 'p').replace(/[&]/g, '').replace(/\s+/g, '-'); return '<span class="ml-1.5 inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider tag-badge tag-' + tc + '">' + t + '</span>';}).join('') : ''}
             </div>
             <button id="flashcard-toggle" class="no-print" title="Toggle flashcard mode" style="font-size:0.75rem;padding:0.2rem 0.5rem;border-radius:6px;border:1px solid #e2e8f0;background:#f8fafc;color:#475569;cursor:pointer">Flashcards</button>
           </div>
@@ -295,7 +305,7 @@ async function loadContent(hash) {
             ${data.details}
           </div>
         </div>
-      </section>
+      </article>
     `;
 
     // Mark Q&A answer elements for flashcard mode
@@ -313,7 +323,7 @@ async function loadContent(hash) {
       ft.onclick = function() {
         document.body.classList.toggle('flashcard-mode');
         ft.classList.toggle('active');
-        ft.textContent = document.body.classList.contains('flashcard-mode') ? '🃏 Flashcards: ON' : '🃏 Flashcards';
+        ft.textContent = document.body.classList.contains('flashcard-mode') ? '[Cards] ON' : '[Cards]';
       };
     }
     // Click to reveal individual answers
@@ -327,8 +337,10 @@ async function loadContent(hash) {
     document.querySelectorAll('.sidebar-link').forEach(link => {
       if (link.getAttribute('href') === hash) {
         link.classList.add('active-doc-link');
+        link.setAttribute('aria-current', 'page');
       } else {
         link.classList.remove('active-doc-link');
+        link.removeAttribute('aria-current');
       }
     });
 

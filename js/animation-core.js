@@ -1,5 +1,5 @@
 function initAnimationPlayer(config) {
-  var state = {
+  let state = {
     currentScene: 0,
     currentStep: 0,
     steps: [],
@@ -10,27 +10,27 @@ function initAnimationPlayer(config) {
     config: config
   };
 
-  var TOTAL = config.totalScenes;
-  var data = config.sceneData;
-  var stepInterval = config.stepIntervalMs || 1800;
-  var scenePauseMs = config.scenePauseMs || 1200;
+  let TOTAL = config.totalScenes;
+  let data = config.sceneData;
+  let stepInterval = config.stepIntervalMs || 1800;
+  let scenePauseMs = config.scenePauseMs || 1200;
 
   // ========== SCENE MARKERS ==========
   function createSceneMarkers() {
-    var track = document.querySelector('.timeline-track');
+    let track = document.querySelector('.timeline-track');
     if (!track || TOTAL < 2) return;
-    var dots = track.querySelectorAll('.scene-marker');
-    for (var d = 0; d < dots.length; d++) dots[d].remove();
-    for (var i = 0; i < TOTAL; i++) {
-      var dot = document.createElement('span');
-      var pct = TOTAL > 1 ? (i / (TOTAL - 1)) * 100 : 50;
+    let dots = track.querySelectorAll('.scene-marker');
+    for (let d = 0; d < dots.length; d++) dots[d].remove();
+    for (let i = 0; i < TOTAL; i++) {
+      let dot = document.createElement('span');
+      let pct = TOTAL > 1 ? (i / (TOTAL - 1)) * 100 : 50;
       dot.className = 'scene-marker';
       dot.style.left = pct + '%';
       track.appendChild(dot);
     }
   }
 
-  var el = {
+  let el = {
     progress: document.getElementById('timeline-progress'),
     subtitle: document.getElementById('scene-subtitle'),
     playBtn: document.getElementById('play-btn'),
@@ -45,7 +45,7 @@ function initAnimationPlayer(config) {
 
   // ========== STEP DOTS ==========
   function createStepDotsContainer() {
-    var container = document.createElement('div');
+    let container = document.createElement('div');
     container.id = 'step-dots';
     container.className = 'flex items-center justify-center gap-[2px] mt-0.5 h-1.5';
     if (config.stepDotsParent) {
@@ -58,9 +58,9 @@ function initAnimationPlayer(config) {
 
   function renderStepDots() {
     if (!el.stepDots) return;
-    var html = '';
-    for (var i = 0; i < state.totalSteps; i++) {
-      var cls = 'w-1 h-1 rounded-full transition-all duration-300 ';
+    let html = '';
+    for (let i = 0; i < state.totalSteps; i++) {
+      let cls = 'w-1 h-1 rounded-full transition-all duration-300 ';
       if (i <= state.currentStep) {
         cls += 'bg-orange-600 dark:bg-orange-400';
       } else {
@@ -75,8 +75,8 @@ function initAnimationPlayer(config) {
   function showScene(sceneIndex) {
     if (sceneIndex < 1 || sceneIndex > TOTAL) return;
     if (state.currentScene !== sceneIndex) {
-      for (var i = 1; i <= TOTAL; i++) {
-        var vis = document.getElementById('vis-scene-' + i);
+      for (let i = 1; i <= TOTAL; i++) {
+        let vis = document.getElementById('vis-scene-' + i);
         if (!vis) continue;
         vis.classList.add('opacity-0', 'pointer-events-none');
         if (i === 2 && config.scene2HideClass) vis.classList.add(config.scene2HideClass);
@@ -84,7 +84,7 @@ function initAnimationPlayer(config) {
       state.currentScene = sceneIndex;
     }
 
-    var percent = ((sceneIndex - 1) / (TOTAL - 1)) * 100;
+    let percent = ((sceneIndex - 1) / (TOTAL - 1)) * 100;
     el.progress.style.width = percent + '%';
 
     if (el.subtitle) {
@@ -103,7 +103,7 @@ function initAnimationPlayer(config) {
       }
     }, 300);
 
-    var activeVis = document.getElementById('vis-scene-' + sceneIndex);
+    let activeVis = document.getElementById('vis-scene-' + sceneIndex);
     if (activeVis) {
       activeVis.classList.remove('opacity-0', 'pointer-events-none');
       if (sceneIndex === 2 && config.scene2HideClass) activeVis.classList.remove(config.scene2HideClass);
@@ -130,7 +130,7 @@ function initAnimationPlayer(config) {
     if (stepIndex < 0 || stepIndex >= state.totalSteps) return;
     if (stepIndex <= state.currentStep) return;
     // Execute all unplayed steps up to and including stepIndex
-    for (var i = state.currentStep + 1; i <= stepIndex; i++) {
+    for (let i = state.currentStep + 1; i <= stepIndex; i++) {
       if (state.steps[i]) state.steps[i]();
     }
     state.currentStep = stepIndex;
@@ -138,7 +138,7 @@ function initAnimationPlayer(config) {
 
     // Dynamically update subtitle if stepSubtitles exists
     if (el.subtitle && data && data[state.currentScene - 1] && data[state.currentScene - 1].stepSubtitles) {
-      var subs = data[state.currentScene - 1].stepSubtitles;
+      let subs = data[state.currentScene - 1].stepSubtitles;
       if (subs[stepIndex]) {
         el.subtitle.style.opacity = '0';
         setTimeout(function() {
@@ -163,7 +163,7 @@ function initAnimationPlayer(config) {
 
   state.advanceStep = function() {
     if (state.totalSteps === 0) return false; // no steps defined
-    var nextStep = state.currentStep + 1;
+    let nextStep = state.currentStep + 1;
     if (nextStep < state.totalSteps) {
       executeStep(nextStep);
       return true;
@@ -189,7 +189,7 @@ function initAnimationPlayer(config) {
 
   function stepLoop() {
     if (!state.isPlaying) return;
-    var advanced = state.advanceStep();
+    let advanced = state.advanceStep();
     if (!advanced) {
       // Scene complete — wait then go to next scene
       state.stepPlayTimer = setTimeout(function () {
@@ -223,11 +223,11 @@ function initAnimationPlayer(config) {
     stopAutoPlay();
     if (state.currentStep > 0) {
       // Go back one step — re-enter scene and play to previous step
-      var target = state.currentStep - 1;
+      let target = state.currentStep - 1;
       showScene(state.currentScene);
       if (target >= 0) executeStep(target);
     } else if (state.currentScene > 1) {
-      var prevScene = state.currentScene - 1;
+      let prevScene = state.currentScene - 1;
       showScene(prevScene);
       // Go to last step of previous scene
       setTimeout(function () {
@@ -240,7 +240,7 @@ function initAnimationPlayer(config) {
 
   el.nextBtn.addEventListener('click', function () {
     stopAutoPlay();
-    var advanced = state.advanceStep();
+    let advanced = state.advanceStep();
     if (!advanced && state.currentScene < TOTAL) {
       showScene(state.currentScene + 1);
     }
@@ -250,7 +250,7 @@ function initAnimationPlayer(config) {
   if (el.canvas) {
     el.canvas.addEventListener('click', function () {
       stopAutoPlay();
-      var advanced = state.advanceStep();
+      let advanced = state.advanceStep();
       if (!advanced && state.currentScene < TOTAL) {
         showScene(state.currentScene + 1);
       }
@@ -259,19 +259,19 @@ function initAnimationPlayer(config) {
 
   el.timelineBar.addEventListener('click', function (e) {
     stopAutoPlay();
-    var rect = e.currentTarget.getBoundingClientRect();
-    var x = e.clientX - rect.left;
-    var pct = x / rect.width;
-    var target = Math.min(TOTAL, Math.max(1, Math.round(pct * (TOTAL - 1)) + 1));
+    let rect = e.currentTarget.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let pct = x / rect.width;
+    let target = Math.min(TOTAL, Math.max(1, Math.round(pct * (TOTAL - 1)) + 1));
     showScene(target);
   });
 
   // ========== FULLSCREEN ==========
   if (el.canvas) {
-    var stage = document.createElement('div');
+    let stage = document.createElement('div');
     stage.className = 'fullscreen-stage';
-    var canvChildren = el.canvas.querySelectorAll('[id^="vis-scene-"]');
-    for (var ci = 0; ci < canvChildren.length; ci++) {
+    let canvChildren = el.canvas.querySelectorAll('[id^="vis-scene-"]');
+    for (let ci = 0; ci < canvChildren.length; ci++) {
       stage.appendChild(canvChildren[ci]);
     }
     el.canvas.appendChild(stage);
@@ -293,7 +293,7 @@ function initAnimationPlayer(config) {
   }
 
   document.addEventListener('fullscreenchange', function () {
-    var icon = el.fullscreenBtn ? el.fullscreenBtn.querySelector('span') : null;
+    let icon = el.fullscreenBtn ? el.fullscreenBtn.querySelector('span') : null;
     if (icon) {
       icon.textContent = document.fullscreenElement ? 'fullscreen_exit' : 'fullscreen';
     }
@@ -305,7 +305,7 @@ function initAnimationPlayer(config) {
       e.preventDefault();
       stopAutoPlay();
       if (state.currentStep > 0) {
-        var target = state.currentStep - 1;
+        let target = state.currentStep - 1;
         showScene(state.currentScene);
         if (target >= 0) executeStep(target);
       } else if (state.currentScene > 1) {
@@ -314,7 +314,7 @@ function initAnimationPlayer(config) {
     } else if (e.key === 'ArrowRight') {
       e.preventDefault();
       stopAutoPlay();
-      var advanced = state.advanceStep();
+      let advanced = state.advanceStep();
       if (!advanced && state.currentScene < TOTAL) {
         showScene(state.currentScene + 1);
       }
@@ -329,18 +329,18 @@ function initAnimationPlayer(config) {
 
   // ========== IFRAME EMBED HANDLING ==========
   if (window.self !== window.top) {
-    var header = document.querySelector('header');
-    var footer = document.querySelector('footer');
+    let header = document.querySelector('header');
+    let footer = document.querySelector('footer');
     if (header) header.classList.add('hidden');
     if (footer) footer.classList.add('hidden');
     document.body.classList.remove('justify-between');
     document.body.classList.add('justify-center', 'p-0', 'overflow-hidden');
-    var main = document.querySelector('main');
+    let main = document.querySelector('main');
     if (main) {
       main.classList.remove('md:py-16', 'py-8', 'px-6');
       main.classList.add('py-0', 'px-2', 'max-w-full');
     }
-    var tl = document.querySelector('main > div:last-child');
+    let tl = document.querySelector('main > div:last-child');
     if (tl) {
       tl.classList.remove('mt-6', 'mt-8');
       tl.classList.add('mt-3');

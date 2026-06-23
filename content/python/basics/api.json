@@ -2,7 +2,7 @@
   "id": "py-basics-api",
   "title": "API Handling",
   "category": "Python",
-  "subcategory": "Basics",
+  "subcategory": "Advanced & FAANG",
   "description": "Backend and ML engineering roles at FAANG require designing resilient API clients. This covers session pooling, retry logic, async HTTP, rate limiting, authentication, and the circuit breaker pattern.",
   "language": "python",
   "sections": [

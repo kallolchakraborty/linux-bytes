@@ -1,9 +1,10 @@
 {
   "id": "concurrency",
+  "interactive": true,
   "language": "python",
   "title": "Multithreading & Concurrency",
   "category": "Python",
-  "subcategory": "Basics",
+  "subcategory": "Advanced & FAANG",
   "description": "Python concurrency is the single most common topic in FAANG mid-to-senior Python interviews. You must understand the GIL, when threading helps despite it, asyncio vs threading decision frameworks, and the no-GIL (free-threading) future in Python 3.13+.",
   "sections": [
     {

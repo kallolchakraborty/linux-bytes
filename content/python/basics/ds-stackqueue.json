@@ -32,6 +32,11 @@
       "codeBlock": "from collections import deque\n\ndef max_sliding_window(nums, k):\n    \"\"\"\n    Deque stores indices in decreasing order of nums[i].\n    Front = index of current window maximum.\n    \"\"\"\n    dq = deque()  # stores indices, front = max index\n    result = []\n\n    for i, num in enumerate(nums):\n        # Remove indices outside window\n        while dq and dq[0] < i - k + 1:\n            dq.popleft()\n\n        # Remove smaller elements from back (they'll never be the max)\n        while dq and nums[dq[-1]] < num:\n            dq.pop()\n\n        dq.append(i)\n\n        # Window is full \u2014 record maximum (front of deque)\n        if i >= k - 1:\n            result.append(nums[dq[0]])\n\n    return result\n\n# Example\nprint(max_sliding_window([1,3,-1,-3,5,3,6,7], k=3))\n# [3, 3, 5, 5, 6, 7]"
     },
     {
+      "title": "Staff+ — Concurrent Queues at Scale",
+      "description": "<strong>MPMC queues</strong> (Multiple Producer, Multiple Consumer): Python's <code>queue.Queue</code> is thread-safe (uses <code>threading.Lock</code> + <code>Condition</code>). For high-throughput, use <code>collections.deque</code> with <code>asyncio.Queue</code> or a lock-free ring buffer. At Google scale, queues back every RPC, task scheduler, and build pipeline.<br><br><strong>Ring buffer (circular buffer):</strong> Fixed-size pre-allocated array with head/tail pointers. O(1) enqueue/dequeue, zero GC pressure. Used in kernel io_uring, Kafka partitions, and Log-structured merge-trees.<br><br><strong>Lock-free queues:</strong> Hazard pointers or RCU for safe concurrent access without mutexes. Python's GIL makes true lock-freedom unnecessary within a process, but cross-process (shared memory) or cross-network queues need real lock-free or transaction-log semantics.<br><br><strong>Backpressure & bounded queues:</strong> Unbounded queues hide backpressure and crash under spike load. Always bound your queue. Use <code>queue.Queue(maxsize=N)</code>; when full, the producer blocks or raises. Tail-drop, head-drop, or TTL-based eviction for real-time systems.",
+      "codeBlock": "from collections import deque\n\n# Ring buffer skeleton\nclass RingBuffer:\n    def __init__(self, capacity):\n        self.buf = [None] * capacity\n        self.cap = capacity\n        self.head = 0  # read position\n        self.tail = 0  # write position\n        self.size = 0\n\n    def enqueue(self, item):\n        if self.size == self.cap:\n            raise OverflowError('Ring buffer full')\n        self.buf[self.tail] = item\n        self.tail = (self.tail + 1) % self.cap\n        self.size += 1\n\n    def dequeue(self):\n        if self.size == 0:\n            raise IndexError('Empty')\n        item = self.buf[self.head]\n        self.head = (self.head + 1) % self.cap\n        self.size -= 1\n        return item\n\n    def __len__(self):\n        return self.size\n"
+    },
+    {
       "title": "References & Further Reading",
       "description": "<ul><li><a href=\"https://docs.python.org/3/tutorial/datastructures.html#using-lists-as-stacks\"><b>Using Lists as Stacks</b></a> — Python list as stack (LIFO) documentation</li><li><a href=\"https://docs.python.org/3/library/collections.html#collections.deque\"><b>deque — Efficient Stacks and Queues</b></a> — O(1) queue operations with collections.deque</li><li><a href=\"https://docs.python.org/3/library/queue.html\"><b>queue — Synchronized queue class</b></a> — Thread-safe queues for concurrent programming</li><li><a href=\"https://realpython.com/queue-in-python/\"><b>Python Stacks, Queues, and Priority Queues</b></a> — Real Python comprehensive guide</li><li><a href=\"https://leetcode.com/tag/stack/\"><b>LeetCode — Stack Problems</b></a> — Curated stack interview problems (monotonic stack, etc.)</li></ul>",
       "codeBlock": ""
@@ -43,6 +48,9 @@
     "FAANG",
     "Python",
     "data-structures",
-    "stack-queue"
+    "stack-queue",
+    "Staff+",
+    "concurrent-queues",
+    "ring-buffer"
   ]
 }

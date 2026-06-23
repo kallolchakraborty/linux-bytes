@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>Quick Bytes — Documentation & Study Guides</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-src 'self';" />
   <meta name="description" content="Access structured developer study notes, cheat sheets, syntax references, and technical guides." />
   <meta property="og:title" content="Quick Bytes — Documentation &amp; Study Guides" />
   <meta property="og:description" content="Access structured developer study notes, cheat sheets, syntax references, and technical guides." />
@@ -25,6 +26,9 @@
   <meta name="theme-color" content="#E95420" />
   <link rel="canonical" href="https://kallolchakraborty.github.io/quick-reference/docs.html" />
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebPage","name":"Quick Bytes — Documentation & Study Guides","description":"Access structured developer study notes, cheat sheets, syntax references, and technical guides.","author":{"@type":"Person","name":"Kallol Chakraborty"}}
+  </script>
   
   <link rel="prefetch" href="compiler.html" as="document" />
   <link rel="prefetch" href="interpreter.html" as="document" />
@@ -75,7 +79,7 @@
   <link rel="stylesheet" href="css/main.css" />
   <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" />
 
 </head>
 
@@ -128,7 +132,7 @@
     
     <!-- LEFT SIDEBAR -->
     <aside id="left-sidebar" class="lg:w-56 lg:sticky lg:top-24 lg:h-[calc(100vh-120px)] overflow-y-auto shrink-0 border-b lg:border-b-0 border-slate-200 dark:border-slate-800 pb-4 lg:pb-0 pr-0 lg:pr-5">
-      <div class="sidebar-sections">
+      <nav aria-label="Documentation navigation" class="sidebar-sections">
 
         <div class="sidebar-section">
           <h4 class="sidebar-label">Study Plan</h4>
@@ -141,22 +145,16 @@
         </div>
 
         <div class="sidebar-section">
-          <h4 class="sidebar-label">Basics</h4>
+          <h4 class="sidebar-label">Python — Fundamentals</h4>
           <a href="#py-basics-datatypes" class="sidebar-link">Data Types &amp; Operations</a>
           <a href="#py-basics-loops" class="sidebar-link">Loops &amp; Control Flow</a>
           <a href="#py-basics-io" class="sidebar-link">Input &amp; Output</a>
-        </div>
-
-        <div class="sidebar-section">
-          <h4 class="sidebar-label">Advanced</h4>
           <a href="#py-basics-files" class="sidebar-link">File Handling</a>
-          <a href="#py-basics-api" class="sidebar-link">API Handling</a>
-          <a href="#py-basics-concurrency" class="sidebar-link">Multithreading &amp; Concurrency</a>
-          <a href="#py-oop" class="sidebar-link">OOP &amp; Design Patterns</a>
+          <a href="#py-complexity" class="sidebar-link">Time &amp; Space Complexity</a>
         </div>
 
         <div class="sidebar-section">
-          <h4 class="sidebar-label">Data Structures</h4>
+          <h4 class="sidebar-label">Python — Data Structures</h4>
           <a href="#py-ds-builtins" class="sidebar-link">Built-in Collections</a>
           <a href="#py-ds-linkedlist" class="sidebar-link">Linked Lists</a>
           <a href="#py-ds-stackqueue" class="sidebar-link">Stacks &amp; Queues</a>
@@ -166,9 +164,26 @@
         </div>
 
         <div class="sidebar-section">
-          <h4 class="sidebar-label">Algorithms</h4>
-          <a href="#py-complexity" class="sidebar-link">Time &amp; Space Complexity</a>
+          <h4 class="sidebar-label">Python — Core Patterns</h4>
+          <a href="#py-oop" class="sidebar-link">OOP &amp; Design Patterns</a>
+          <a href="#py-testing" class="sidebar-link">Testing &amp; Debugging</a>
+          <a href="#py-exceptions" class="sidebar-link">Error Handling &amp; Exceptions</a>
+          <a href="#py-typing" class="sidebar-link">Type System &amp; Annotations</a>
+          <a href="#py-memory" class="sidebar-link">Memory Management &amp; GC</a>
+          <a href="#py-modules" class="sidebar-link">Module System &amp; Packaging</a>
+        </div>
+
+        <div class="sidebar-section">
+          <h4 class="sidebar-label">Python — Advanced &amp; FAANG</h4>
+          <a href="#py-basics-concurrency" class="sidebar-link">Multithreading &amp; Concurrency</a>
           <a href="#py-algorithms" class="sidebar-link">Algorithms &amp; Patterns</a>
+          <a href="#py-basics-api" class="sidebar-link">API Handling</a>
+          <a href="#py-functional" class="sidebar-link">Functional Programming</a>
+          <a href="#py-performance" class="sidebar-link">Performance &amp; Profiling</a>
+          <a href="#py-google-culture" class="sidebar-link">Google Python Culture</a>
+          <a href="#py-design-docs" class="sidebar-link">Design Docs</a>
+          <a href="#py-security" class="sidebar-link">Security</a>
+          <a href="#py-logging" class="sidebar-link">Logging &amp; Observability</a>
         </div>
 
         <div class="sidebar-section">
@@ -246,7 +261,7 @@
           <a href="#genai-llm-serving" class="sidebar-link">LLM Serving &amp; Deployment</a>
         </div>
 
-      </div>
+      </nav>
     </aside>
 
     <!-- MIDDLE COLUMN (Docs Content) -->
@@ -257,7 +272,7 @@
     <!-- RIGHT SIDEBAR (On this page) -->
     <aside class="hidden xl:block w-48 sticky top-24 h-[calc(100vh-120px)] overflow-y-auto shrink-0 border-l border-slate-200 dark:border-slate-800 pl-6">
       <h4 class="sidebar-label !text-[10px] !pt-0 !pb-0 mb-3">On this page</h4>
-      <nav id="docs-right-outline" class="space-y-3 text-xs text-slate-500 dark:text-slate-400">
+      <div id="docs-right-outline" class="space-y-3 text-xs text-slate-500 dark:text-slate-400" role="navigation" aria-label="Page sections">
         <!-- Loaded dynamically via js/loader.js -->
       </nav>
     </aside>
@@ -277,8 +292,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
   <script src="js/modals.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js" defer></script>
   <script src="js/loader.js" defer></script>
 </body>
 </html>

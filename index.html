@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>Quick Bytes — Documentation & Study Materials</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-src 'self';" />
   <meta name="description" content="Modern, search-first documentation portal for developer study notes, cheat sheets, and technical quick references." />
   <meta property="og:title" content="Quick Bytes — Documentation &amp; Study Materials" />
   <meta property="og:description" content="Modern, search-first documentation portal for developer study notes, cheat sheets, and technical quick references." />
@@ -25,6 +26,9 @@
   <meta name="theme-color" content="#E95420" />
   <link rel="canonical" href="https://kallolchakraborty.github.io/quick-reference/" />
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"CollectionPage","name":"Quick Bytes — Documentation & Study Materials","description":"Modern, search-first documentation portal for developer study notes, cheat sheets, and technical quick references.","author":{"@type":"Person","name":"Kallol Chakraborty"}}
+  </script>
   
   <link rel="prefetch" href="docs.html" as="document" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -184,11 +188,11 @@
             </div>
           </div>
 
-          <!-- PHASE 1: Foundations -->
+          <!-- PHASE 1: Python Fundamentals -->
           <div class="lp-phase">
             <div class="lp-phase-header">
               <span class="lp-phase-num">01</span>
-              <span class="lp-phase-name">Foundations</span>
+              <span class="lp-phase-name">Python Fundamentals</span>
               <div class="lp-phase-rule" aria-hidden="true"></div>
             </div>
             <div class="lp-items">
@@ -196,109 +200,98 @@
                 <span class="lp-item-dot"></span>
                 <span class="lp-title">Data Types &amp; Operations</span>
                 <span class="lp-tag">Python</span>
-                <p class="lp-desc">Mutability, hash contract, <code>is</code> vs <code>==</code>, int/float/str/bytes internals.</p>
+                <p class="lp-desc">Mutability, hash contract, memory layout, GC internals.</p>
                 <span class="lp-arrow" aria-hidden="true">&#8594;</span>
               </a>
               <a href="docs.html#py-basics-loops" class="lp-item" id="lp-loops">
                 <span class="lp-item-dot"></span>
                 <span class="lp-title">Loops &amp; Control Flow</span>
                 <span class="lp-tag">Python</span>
-                <p class="lp-desc">Iterator protocol, generator expressions, <code>itertools</code> patterns.</p>
+                <p class="lp-desc">Iterator protocol, generators, async iteration, <code>itertools</code>.</p>
                 <span class="lp-arrow" aria-hidden="true">&#8594;</span>
               </a>
               <a href="docs.html#py-basics-io" class="lp-item" id="lp-io">
                 <span class="lp-item-dot"></span>
                 <span class="lp-title">Input &amp; Output</span>
                 <span class="lp-tag">Python</span>
-                <p class="lp-desc">Fast stdin reading, <code>sys.stdin</code>, formatted output.</p>
+                <p class="lp-desc">Fast I/O, zero-copy, <code>io_uring</code>, async file I/O.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#py-basics-files" class="lp-item" id="lp-files">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">File Handling</span>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">Context managers, <code>mmap</code>, Parquet, cloud storage patterns.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#py-complexity" class="lp-item" id="lp-complexity">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Time &amp; Space Complexity</span>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">Big-O of built-ins, amortized analysis, I/O complexity model.</p>
                 <span class="lp-arrow" aria-hidden="true">&#8594;</span>
               </a>
             </div>
           </div>
 
-          <!-- PHASE 2: Data Structures -->
+          <!-- PHASE 2: Python Data Structures -->
           <div class="lp-phase">
             <div class="lp-phase-header">
               <span class="lp-phase-num">02</span>
-              <span class="lp-phase-name">Data Structures</span>
+              <span class="lp-phase-name">Python Data Structures</span>
               <div class="lp-phase-rule" aria-hidden="true"></div>
             </div>
             <div class="lp-items">
               <a href="docs.html#py-ds-builtins" class="lp-item" id="lp-builtins">
                 <span class="lp-item-dot"></span>
                 <span class="lp-title">Built-in Collections</span>
-                <span class="lp-tag">DS</span>
-                <p class="lp-desc">Amortized ops, LRU Cache, Counter — tools for every interview.</p>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">Hash map internals, Swiss Table, compact dict, LRU Cache.</p>
                 <span class="lp-arrow" aria-hidden="true">&#8594;</span>
               </a>
               <a href="docs.html#py-ds-linkedlist" class="lp-item" id="lp-linkedlist">
                 <span class="lp-item-dot"></span>
                 <span class="lp-title">Linked Lists</span>
-                <span class="lp-tag">DS</span>
-                <p class="lp-desc">Floyd's cycle detection, slow/fast pointer, merge K sorted lists.</p>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">Floyd's cycle, slow/fast pointer, skip lists, lock-free lists.</p>
                 <span class="lp-arrow" aria-hidden="true">&#8594;</span>
               </a>
               <a href="docs.html#py-ds-stackqueue" class="lp-item" id="lp-stackqueue">
                 <span class="lp-item-dot"></span>
                 <span class="lp-title">Stacks &amp; Queues</span>
-                <span class="lp-tag">DS</span>
-                <p class="lp-desc">Monotonic stack, min-stack O(1), sliding window max.</p>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">Monotonic stack, min-stack, ring buffers, MPMC queues.</p>
                 <span class="lp-arrow" aria-hidden="true">&#8594;</span>
               </a>
               <a href="docs.html#py-ds-heap" class="lp-item" id="lp-heap">
                 <span class="lp-item-dot"></span>
                 <span class="lp-title">Priority Queues &amp; Heaps</span>
-                <span class="lp-tag">DS</span>
-                <p class="lp-desc">K-way merge, median of stream, Dijkstra's shortest path.</p>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">Heapify O(N), median of stream, Fib heap, pairing heap.</p>
                 <span class="lp-arrow" aria-hidden="true">&#8594;</span>
               </a>
               <a href="docs.html#py-ds-tree" class="lp-item" id="lp-tree">
                 <span class="lp-item-dot"></span>
                 <span class="lp-title">Trees &amp; BSTs</span>
-                <span class="lp-tag">DS</span>
-                <p class="lp-desc">LCA, serialize/deserialize, diameter, BST validation.</p>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">LCA, B-Tree, LSM-Tree, Treap, persistent segment tree.</p>
                 <span class="lp-arrow" aria-hidden="true">&#8594;</span>
               </a>
               <a href="docs.html#py-ds-graph" class="lp-item" id="lp-graph">
                 <span class="lp-item-dot"></span>
                 <span class="lp-title">Graphs &amp; Networks</span>
-                <span class="lp-tag">DS</span>
-                <p class="lp-desc">Kahn's topo sort, Union-Find, Bellman-Ford.</p>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">Tarjan's SCC, max flow, min cut, bipartite matching.</p>
                 <span class="lp-arrow" aria-hidden="true">&#8594;</span>
               </a>
             </div>
           </div>
 
-          <!-- PHASE 3: Algorithms -->
+          <!-- PHASE 3: Python Core Patterns -->
           <div class="lp-phase">
             <div class="lp-phase-header">
               <span class="lp-phase-num">03</span>
-              <span class="lp-phase-name">Algorithms</span>
-              <div class="lp-phase-rule" aria-hidden="true"></div>
-            </div>
-            <div class="lp-items">
-              <a href="docs.html#py-complexity" class="lp-item" id="lp-complexity">
-                <span class="lp-item-dot"></span>
-                <span class="lp-title">Time &amp; Space Complexity</span>
-                <span class="lp-tag">Theory</span>
-                <p class="lp-desc">Big-O, amortized complexity, space trade-offs — know this cold.</p>
-                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
-              </a>
-              <a href="docs.html#py-algorithms" class="lp-item" id="lp-algorithms">
-                <span class="lp-item-dot"></span>
-                <span class="lp-title">Algorithms &amp; Patterns</span>
-                <span class="lp-tag">Core</span>
-                <p class="lp-desc">Two pointers, binary search, DP, backtracking, divide &amp; conquer.</p>
-                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
-              </a>
-            </div>
-          </div>
-
-          <!-- PHASE 4: Advanced Python -->
-          <div class="lp-phase">
-            <div class="lp-phase-header">
-              <span class="lp-phase-num">04</span>
-              <span class="lp-phase-name">Advanced Python</span>
+              <span class="lp-phase-name">Python Core Patterns</span>
               <div class="lp-phase-rule" aria-hidden="true"></div>
             </div>
             <div class="lp-items">
@@ -306,28 +299,116 @@
                 <span class="lp-item-dot"></span>
                 <span class="lp-title">OOP &amp; Design Patterns</span>
                 <span class="lp-tag">Python</span>
-                <p class="lp-desc">SOLID, decorators, metaclasses, singleton/observer/factory.</p>
+                <p class="lp-desc">Dunder methods, MRO, metaclasses, descriptors, DI patterns.</p>
                 <span class="lp-arrow" aria-hidden="true">&#8594;</span>
               </a>
-              <a href="docs.html#py-basics-files" class="lp-item" id="lp-files">
+              <a href="docs.html#py-testing" class="lp-item" id="lp-testing">
                 <span class="lp-item-dot"></span>
-                <span class="lp-title">File Handling</span>
+                <span class="lp-title">Testing &amp; Debugging</span>
                 <span class="lp-tag">Python</span>
-                <p class="lp-desc">Context managers, <code>mmap</code>, <code>pathlib</code> — production I/O patterns.</p>
+                <p class="lp-desc">pytest, mocking, property-based, hermetic tests, CI/CD.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#py-exceptions" class="lp-item" id="lp-exceptions">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Error Handling &amp; Exceptions</span>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">Chaining, suppression, custom exceptions, production patterns.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#py-typing" class="lp-item" id="lp-typing">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Type System &amp; Annotations</span>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">PEP 484/695, Generic, Protocol, TypedDict, mypy/Pyright.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#py-memory" class="lp-item" id="lp-memory">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Memory Management &amp; GC</span>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">RC, generational GC, tcmalloc, weakref, leak detection.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#py-modules" class="lp-item" id="lp-modules">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Module System &amp; Packaging</span>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">Import system, Bazel, circular deps, monorepo patterns.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- PHASE 4: Python Advanced & FAANG -->
+          <div class="lp-phase">
+            <div class="lp-phase-header">
+              <span class="lp-phase-num">04</span>
+              <span class="lp-phase-name">Python Advanced &amp; FAANG</span>
+              <div class="lp-phase-rule" aria-hidden="true"></div>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#py-basics-concurrency" class="lp-item" id="lp-concurrency">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Concurrency &amp; Async</span>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">GIL deep dive, asyncio internals, structured concurrency, Trio.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#py-algorithms" class="lp-item" id="lp-algorithms">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Algorithms &amp; Patterns</span>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">String algos, bitmask DP, segment tree, Fenwick tree.</p>
                 <span class="lp-arrow" aria-hidden="true">&#8594;</span>
               </a>
               <a href="docs.html#py-basics-api" class="lp-item" id="lp-api">
                 <span class="lp-item-dot"></span>
                 <span class="lp-title">API Handling</span>
                 <span class="lp-tag">Python</span>
-                <p class="lp-desc">Session pooling, async HTTP, circuit breaker, JWT.</p>
+                <p class="lp-desc">gRPC, GraphQL, service mesh, protobuf schema evolution.</p>
                 <span class="lp-arrow" aria-hidden="true">&#8594;</span>
               </a>
-              <a href="docs.html#py-basics-concurrency" class="lp-item" id="lp-concurrency">
+              <a href="docs.html#py-functional" class="lp-item" id="lp-functional">
                 <span class="lp-item-dot"></span>
-                <span class="lp-title">Concurrency &amp; Async</span>
+                <span class="lp-title">Functional Programming</span>
                 <span class="lp-tag">Python</span>
-                <p class="lp-desc">GIL internals, <code>asyncio</code>, thread pools, <code>multiprocessing</code>.</p>
+                <p class="lp-desc">itertools, functools, closures, partial, operator module.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#py-performance" class="lp-item" id="lp-performance">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Performance &amp; Profiling</span>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">cProfile, Cython, PyPy, pybind11, flame graphs.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#py-google-culture" class="lp-item" id="lp-google-culture">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Google Python Culture</span>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">Style guide, readability, SRE, OKRs, migration planning.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#py-design-docs" class="lp-item" id="lp-design-docs">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Design Docs</span>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">Design doc templates, review checklist, real Staff+ examples.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#py-security" class="lp-item" id="lp-security">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Security</span>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">Injection prevention, SAST, secrets management, pickle risks, sandboxing, Staff+ security architecture.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#py-logging" class="lp-item" id="lp-logging">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Logging &amp; Observability</span>
+                <span class="lp-tag">Python</span>
+                <p class="lp-desc">Structured JSON logging, OpenTelemetry, correlation IDs, PII redaction, Staff+ observability.</p>
                 <span class="lp-arrow" aria-hidden="true">&#8594;</span>
               </a>
             </div>

@@ -2,7 +2,7 @@
   "id": "py-complexity",
   "title": "Time & Space Complexity",
   "category": "Python",
-  "subcategory": "Algorithms & Complexity",
+  "subcategory": "Fundamentals",
   "description": "Mastering Big-O analysis is table stakes at FAANG. This covers complexity of all built-in Python operations, amortized analysis, space complexity, and the mental models interviewers expect.",
   "language": "python",
   "sections": [
