@@ -556,31 +556,6 @@
     }
 
     logoImgs.forEach(inlineSVG);
-
-    function updateClocks() {
-      let now = new Date();
-      let h = now.getHours() % 12;
-      let m = now.getMinutes();
-      let s = now.getSeconds();
-      let ms = now.getMilliseconds();
-
-      let hDeg = (h * 30) + (m * 0.5);
-      let mDeg = (m * 6) + (s * 0.1);
-      let sDeg = (s * 6) + (ms * 0.006);
-
-      let svgClocks = document.querySelectorAll('svg#ai-bytes-logo');
-      svgClocks.forEach(svg => {
-        let hh = svg.querySelector('#hour-hand');
-        let mh = svg.querySelector('#minute-hand');
-        let sh = svg.querySelector('#second-hand');
-
-        if (hh) hh.setAttribute('transform', 'rotate(' + hDeg + ' 78 70)');
-        if (mh) mh.setAttribute('transform', 'rotate(' + mDeg + ' 78 70)');
-        if (sh) sh.setAttribute('transform', 'rotate(' + sDeg + ' 78 70)');
-      });
-    }
-
-    setInterval(updateClocks, 100);
   }
 
   if (document.readyState !== 'loading') {
