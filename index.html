@@ -83,10 +83,11 @@
 
     <div class="max-w-4xl mx-auto flex flex-col items-center text-center gap-3 relative z-10">
       
-      <!-- Logo Container with glow backing and animated sparkle -->
-      <div class="relative w-24 h-24 md:w-32 md:h-32 mb-4 flex items-center justify-center logo-hero-pulse">
-        <div class="absolute inset-0 bg-[#E95420]/15 dark:bg-[#E95420]/30 rounded-full blur-2xl animate-pulse"></div>
-        <span class="material-symbols-outlined text-7xl md:text-8xl select-none sparkle-gradient relative z-10">auto_awesome</span>
+      <!-- Logo Container with soft glow backing and custom sparkle animation -->
+      <div class="relative w-32 h-32 md:w-40 md:h-40 mb-6 flex items-center justify-center">
+        <!-- Soft ambient glow shaped like a diamond/sparkle -->
+        <div class="absolute w-24 h-24 md:w-32 md:h-32 bg-[#E95420]/15 dark:bg-[#E95420]/30 blur-[40px] pointer-events-none transform rotate-45 animate-pulse"></div>
+        <span class="material-symbols-outlined text-8xl md:text-9xl select-none sparkle-gradient sparkle-hero-animate relative z-10">auto_awesome</span>
       </div>
 
       <!-- Hero Header -->
