@@ -30,8 +30,20 @@
       "title": "Evaluation: Benchmarks & LMSYS",
       "description": "How do you know if your fine-tuned model is actually better? Use both automated benchmarks and human evaluation.<br><br><strong>Automated benchmarks:</strong> MMLU (knowledge), HellaSwag (commonsense), HumanEval (code), GSM8K (math), MT-Bench (instruction following). Run with lm-evaluation-harness (EleutherAI).<br><strong>LLM-as-judge:</strong> Use GPT-4 to score model outputs on criteria (accuracy, coherence, relevance) 1–10. Correlates well with human preference (Chatbot Arena).<br><strong>Task-specific evals:</strong> For production, always evaluate on a held-out test set from your actual task distribution — generic benchmarks are a poor proxy.",
       "codeBlock": "# LLM-as-judge evaluation\nimport openai\n\ndef llm_judge(question: str, reference: str, prediction: str, model='gpt-4o') -> dict:\n    prompt = f\"\"\"\nRate the following answer on a scale of 1-10 for accuracy and helpfulness.\nQuestion: {question}\nReference answer: {reference}\nModel answer: {prediction}\n\nRespond with JSON: {{\"score\": int, \"reasoning\": str}}\"\"\"\n\n    response = openai.chat.completions.create(\n        model=model,\n        messages=[{'role': 'user', 'content': prompt}],\n        response_format={'type': 'json_object'}\n    )\n    return response.choices[0].message.content\n\n# Batch evaluation\ndef evaluate_model(test_set, model, judge_model='gpt-4o'):\n    scores = []\n    for item in test_set:\n        pred = model.generate(item['question'])\n        result = llm_judge(item['question'], item['reference'], pred, judge_model)\n        scores.append(result['score'])\n    return {'mean': sum(scores)/len(scores), 'scores': scores}"
+    },
+    {
+      "title": "References & Further Reading",
+      "description": "<ul><li><a href=\"https://arxiv.org/abs/2106.09685\"><b>LoRA: Low-Rank Adaptation of Large Language Models</b></a> (Hu et al., 2021) — The most influential PEFT method, standard at FAANG for efficient fine-tuning</li><li><a href=\"https://arxiv.org/abs/2305.14314\"><b>QLoRA: Efficient Finetuning of Quantized Language Models</b></a> (Dettmers et al., 2023) — LoRA + 4-bit NF4 quantization, fine-tune 65B on a single GPU</li><li><a href=\"https://arxiv.org/abs/1909.08593\"><b>Prefix-Tuning: Optimizing Continuous Prompts for Generation</b></a> (Li & Liang, 2021) — Lightweight alternative to full fine-tuning</li><li><a href=\"https://huggingface.co/docs/peft\"><b>HuggingFace PEFT Library</b></a> — Implementation of all major PEFT methods (LoRA, Prefix, IA3, AdaLoRA)</li><li><a href=\"https://huggingface.co/docs/trl/index\"><b>HuggingFace TRL — Transformer Reinforcement Learning</b></a> — SFTTrainer, DPOTrainer for fine-tuning with RLHF support</li></ul>",
+      "codeBlock": ""
     }
   ],
   "details": "<p class=\"mb-3\"><strong>Catastrophic Forgetting:</strong> Fine-tuning on a narrow task causes the model to lose its general capabilities. Mitigations: (1) Include a mix of general instruction data with your task data (~5–20% general), (2) Use PEFT (LoRA) — adapters don't modify the base weights, preserving general knowledge, (3) Use elastic weight consolidation (EWC) for continual learning scenarios.</p><p class=\"mb-3\"><strong>LoRA Rank Selection:</strong> r=8 is a good default for simple style transfer. r=16–32 for complex task adaptation. r=64–128 for tasks very different from pre-training. Higher rank = more expressivity but more memory and risk of overfitting. α=2r is the standard starting point. Use W&B sweeps to find optimal r for your dataset.</p><p class=\"mb-3\"><strong>Merging LoRA Adapters:</strong> After training, LoRA weights (BA) can be merged back into the base model: W_merged = W + (α/r)×BA. This adds zero inference latency. Multiple adapters can be merged with task arithmetic or DARE-TIES for multi-task models.</p>",
-  "codeBlock": ""
+  "codeBlock": "",
+  "tags": [
+    "FAANG",
+    "gen-ai",
+    "fine-tuning",
+    "peft",
+    "training"
+  ]
 }

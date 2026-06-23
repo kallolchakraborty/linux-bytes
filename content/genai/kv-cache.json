@@ -45,8 +45,20 @@
       "title": "PagedAttention & vLLM: OS-Style KV Cache Management",
       "description": "In production, serving multiple requests with different sequence lengths causes massive KV cache <strong>fragmentation</strong> — up to 60–80% VRAM wasted. PagedAttention (Kwon et al., 2023) borrows the OS virtual memory paging concept to fix this.<br><br><strong>How it works:</strong> KV cache is split into fixed-size <em>blocks</em> (like memory pages). A <em>block table</em> maps logical token positions to physical blocks. Blocks can be non-contiguous in VRAM. New requests are allocated blocks on demand, returned when done.<br><br><strong>Benefits:</strong><br>• Near-zero internal fragmentation (only last block partially used)<br>• <strong>Copy-on-Write sharing</strong> for beam search (multiple beams share prefix blocks)<br>• <strong>Prefix caching:</strong> Blocks for a shared system prompt are reused across all requests → zero re-computation<br><br><strong>vLLM</strong> implements PagedAttention and achieves 2–24× higher throughput vs HuggingFace naive serving.",
       "codeBlock": "# PagedAttention conceptual block table (simplified)\nBLOCK_SIZE = 16  # tokens per block\n\nclass PagedKVCache:\n    def __init__(self, n_layers, n_kv_heads, head_dim, total_blocks=1000):\n        # Pre-allocate all physical KV blocks\n        shape = (total_blocks, 2, n_kv_heads, BLOCK_SIZE, head_dim)\n        self.store = torch.zeros(shape, dtype=torch.float16)\n        self.free_blocks = list(range(total_blocks))\n\n    def allocate(self, n_tokens):\n        n_blocks = (n_tokens + BLOCK_SIZE - 1) // BLOCK_SIZE\n        if len(self.free_blocks) < n_blocks:\n            raise MemoryError('OOM: no free KV blocks')\n        block_ids = [self.free_blocks.pop() for _ in range(n_blocks)]\n        return block_ids  # logical → physical mapping\n\n    def free(self, block_ids):\n        self.free_blocks.extend(block_ids)  # return blocks to pool\n\n# ponytail: real vLLM also handles CoW for beam search beam fork/merge"
+    },
+    {
+      "title": "References & Further Reading",
+      "description": "<ul><li><a href=\"https://arxiv.org/abs/2305.13218\"><b>KV Cache Quantization</b></a> — DeepSpeed inference: KV cache compression techniques</li><li><a href=\"https://arxiv.org/abs/2309.06180\"><b>MQA: Fast Transformer Decoding</b></a> — Multi-Query Attention: one KV head, significant cache reduction</li><li><a href=\"https://arxiv.org/abs/2305.17888\"><b>GQA: Grouped-Query Attention</b></a> — GQA paper by Ainslie et al. (Google), the standard for Llama/Mistral</li><li><a href=\"https://arxiv.org/abs/2312.16903\"><b>Ring Attention with Blockwise Transformers</b></a> — Distributed attention for context length scaling beyond single-GPU KV cache limits</li><li><a href=\"https://arxiv.org/abs/2405.05254\"><b>CacheBlend: Fast LLM Inference by Augmenting KV Cache</b></a> — Recent work on KV cache blending for multi-turn conversations</li></ul>",
+      "codeBlock": ""
     }
   ],
   "details": "<p class=\"mb-3\"><strong>Speculative Decoding:</strong> A technique to speed up auto-regressive generation: a small draft model generates K tokens in parallel, the large target model verifies them in one forward pass. If accepted, K tokens are generated for the cost of ~1. Works because verification is parallelizable (like pre-fill). Meta/Google use this in production. Speedup: 2–3× with no quality loss.</p><p class=\"mb-3\"><strong>Quantized KV Cache:</strong> KV tensors can be quantized to INT8 or even INT4 independently of weights. Halves or quarters KV memory with minimal quality loss. Combined with GQA, this can reduce KV footprint by 16–32× vs naive MHA FP16.</p><p class=\"mb-3\"><strong>Interview Cheat Sheet:</strong> Decode is memory-bandwidth bound (not compute). KV cache = 2 × L × H_kv × d_head × S × B × dtype. GQA reduces H_kv. PagedAttention eliminates fragmentation. FlashAttention reduces peak HBM usage. Speculative decoding adds throughput at no quality cost.</p>",
-  "codeBlock": ""
+  "codeBlock": "",
+  "tags": [
+    "FAANG",
+    "gen-ai",
+    "llm",
+    "performance",
+    "inference"
+  ]
 }

@@ -60,8 +60,19 @@
       "title": "Hallucination: Causes & Mitigations",
       "description": "Hallucination — the model generating factually incorrect but confident text — is a core reliability concern at FAANG scale.<br><br><strong>Root causes:</strong><br>• Knowledge gaps: facts not in pre-training data<br>• Sycophancy: RLHF reward hacking toward confident-sounding answers<br>• Exposure bias: training on ground truth, generating from own outputs<br>• Context overload: long contexts cause attention to drift from key facts<br><br><strong>Mitigations:</strong><br>• <strong>RAG:</strong> Ground responses in retrieved documents<br>• <strong>Self-consistency:</strong> Sample N outputs, majority vote (CoT)<br>• <strong>Citation forcing:</strong> Prompt/fine-tune to cite sources<br>• <strong>Logit calibration:</strong> Detect low-confidence tokens, abstain or hedge<br>• <strong>Constitutional AI:</strong> Model critiques its own outputs (Anthropic)<br>• <strong>FactScore:</strong> Automated fact-checking against knowledge base",
       "codeBlock": "# Self-consistency decoding (Wang et al., 2022)\ndef self_consistent_answer(question, llm, n_samples=10, temperature=0.7):\n    # Sample N reasoning chains\n    answers = []\n    for _ in range(n_samples):\n        chain = llm.generate(\n            f'{question}\\nLet\\'s think step by step.',\n            temperature=temperature\n        )\n        # Extract final answer from chain\n        answer = extract_answer(chain)\n        answers.append(answer)\n\n    # Majority vote\n    from collections import Counter\n    return Counter(answers).most_common(1)[0][0]"
+    },
+    {
+      "title": "References & Further Reading",
+      "description": "<ul><li><a href=\"https://arxiv.org/abs/1706.03762\"><b>Attention Is All You Need</b></a> (Vaswani et al., 2017) — The foundational Transformer paper that enables all modern LLMs</li><li><a href=\"https://arxiv.org/abs/2001.08361\"><b>Scaling Laws for Neural Language Models</b></a> (Kaplan et al., 2020) — Power-law scaling of loss with model size, data, and compute</li><li><a href=\"https://arxiv.org/abs/2203.15556\"><b>Training Compute-Optimal Large Language Models</b></a> (Chinchilla, Hoffmann et al., 2022) — 20-tokens-per-parameter scaling rule, FAANG interview favourite</li><li><a href=\"https://arxiv.org/abs/2307.09288\"><b>Llama 2: Open Foundation and Fine-Tuned Chat Models</b></a> — Open-source LLM with GQA and RoPE, production architecture reference</li><li><a href=\"https://arxiv.org/abs/2407.21783\"><b>Llama 3 Herd of Models</b></a> — Latest Llama architecture: 128K context, 128K vocab, GQA at all scales</li><li><a href=\"https://github.com/openai/tiktoken\"><b>tiktoken</b></a> — OpenAI's fast BPE tokenizer, used by Llama 3 and GPT-4</li></ul>",
+      "codeBlock": ""
     }
   ],
   "details": "<p class=\"mb-3\"><strong>Key Model Hyperparameters to Know:</strong> d_model (embedding dim), n_layers (depth), n_heads (attention heads), n_kv_heads (GQA groups), intermediate_size (FFN width), vocab_size, context_length. Llama 3 8B: d_model=4096, n_layers=32, n_heads=32, n_kv_heads=8, context=128K.</p><p class=\"mb-3\"><strong>Emergent Abilities:</strong> Abilities that appear suddenly at scale (e.g., >100B params) rather than gradually — chain-of-thought reasoning, arithmetic, code synthesis. Debated in literature (Schaeffer et al., 2023 argue it's a measurement artifact).</p><p class=\"mb-3\"><strong>Positional Encoding Variants:</strong> Sinusoidal (original), Learned (GPT-2), <strong>RoPE</strong> (Rotary, used in Llama/Mistral — rotates Q&K vectors in 2D subspaces, enabling relative position encoding and length extrapolation), <strong>ALiBi</strong> (adds linear bias to attention scores — extrapolates to longer sequences without retraining).</p>",
-  "codeBlock": ""
+  "codeBlock": "",
+  "tags": [
+    "FAANG",
+    "gen-ai",
+    "llm",
+    "foundations"
+  ]
 }
