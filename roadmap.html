@@ -90,12 +90,18 @@
         </span>
       </a>
 
+      <nav class="hidden sm:flex items-center gap-6 text-sm font-medium text-slate-500 dark:text-slate-400">
+        <a href="index.html" class="hover:text-brand-500 dark:hover:text-brand-500 transition-colors">Home</a>
+        <a href="docs.html" class="hover:text-brand-500 dark:hover:text-brand-500 transition-colors">Docs</a>
+        <a href="roadmap.html" class="text-brand-500 font-bold transition-colors">Roadmap</a>
+      </nav>
+
       <div class="flex items-center gap-2">
+        <button class="open-search-btn w-7 h-7 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Search (Ctrl+K / Cmd+K)">
+          <span class="material-symbols-outlined text-[16px]">search</span>
+        </button>
         <button class="theme-toggle-btn w-7 h-7 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Toggle theme">
           <span class="material-symbols-outlined text-[16px]">light_mode</span>
-        </button>
-        <button class="open-share-btn w-7 h-7 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Share this page">
-          <span class="material-symbols-outlined text-[16px]">share</span>
         </button>
       </div>
     </div>
@@ -105,10 +111,19 @@
   <main id="main-content" class="flex-grow">
     <div class="max-w-7xl mx-auto px-6 py-12">
 
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 text-sm text-slate-400 dark:text-slate-500 mb-6" aria-label="Breadcrumb">
+        <a href="index.html" class="hover:text-brand-500 dark:hover:text-brand-500 transition-colors">Home</a>
+        <span class="text-slate-300 dark:text-slate-600" aria-hidden="true">/</span>
+        <a href="index.html#learning-path" class="hover:text-brand-500 dark:hover:text-brand-500 transition-colors">Learning Path</a>
+        <span class="text-slate-300 dark:text-slate-600" aria-hidden="true">/</span>
+        <span class="text-slate-600 dark:text-slate-300 font-medium" aria-current="page">ML Study Roadmap</span>
+      </nav>
+
       <!-- Hero -->
       <div class="mb-12">
         <h1 class="text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">
-          &#x1F9ED; ML Study Roadmap
+          ML Study Roadmap
         </h1>
         <p class="text-slate-600 dark:text-slate-400 text-lg leading-relaxed max-w-3xl">
           A guided study plan from absolute beginner to Staff+ FAANG ML engineer.
@@ -117,178 +132,688 @@
         </p>
       </div>
 
-      <!-- Track Selector Tabs -->
-      <div class="flex gap-2 mb-8 flex-wrap">
-        <button onclick="switchTrack('3month')" id="tab-3month" class="px-4 py-2 rounded-lg text-sm font-bold transition-all bg-brand-500 text-white">&#x1F680; 3-Month Crash (ML background)</button>
-        <button onclick="switchTrack('6month')" id="tab-6month" class="px-4 py-2 rounded-lg text-sm font-bold transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700">&#x1F4DA; 6-Month Standard (Working engineer)</button>
-        <button onclick="switchTrack('12month')" id="tab-12month" class="px-4 py-2 rounded-lg text-sm font-bold transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700">&#x1F331; 12-Month Deep (True beginner)</button>
+      <!-- Track Selector -->
+      <div class="lp-header">
+        <span class="lp-phase-badge">Select Your Track</span>
+      </div>
+      <div class="flex gap-2 mb-8 flex-wrap" style="margin-top:1rem;">
+        <button onclick="switchTrack('3month')" id="tab-3month" class="px-4 py-2 rounded-lg text-sm font-bold transition-all bg-brand-500 text-white">3-Month Crash</button>
+        <button onclick="switchTrack('6month')" id="tab-6month" class="px-4 py-2 rounded-lg text-sm font-bold transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700">6-Month Standard</button>
+        <button onclick="switchTrack('12month')" id="tab-12month" class="px-4 py-2 rounded-lg text-sm font-bold transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700">12-Month Deep</button>
       </div>
 
-      <!-- Track 1: 3-Month Crash -->
+      <!-- ===== TRACK: 3-Month Crash ===== -->
       <div id="track-3month" class="track-content">
-        <div class="mb-6">
-          <h2 class="text-2xl font-bold text-slate-900 dark:text-white">&#x1F680; 3-Month Crash Track</h2>
-          <p class="text-slate-500 dark:text-slate-400 mt-1">For engineers who already have ML experience and need to focus on FAANG interview preparation. ~20 hours/week.</p>
+        <div class="lp-header" style="margin-bottom:0;">
+          <span class="lp-phase-badge">3-Month Crash &mdash; For engineers with ML experience, ~20 hrs/wk</span>
         </div>
-        <div class="flex flex-col gap-3">
-          <div class="border border-brand-200 dark:border-brand-500/20 bg-brand-50 dark:bg-brand-500/5 rounded-xl p-4">
-            <h3 class="font-bold text-brand-600 dark:text-brand-400 text-sm mb-2">Month 1: Interview Fundamentals</h3>
-            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
-              <li>&bull; <a href="docs.html#aiml-ml-fundamentals" class="text-brand-500 hover:underline">ML Fundamentals</a> — bias-variance, metrics, CV, data leakage</li>
-              <li>&bull; <a href="docs.html#aiml-supervised-learning" class="text-brand-500 hover:underline">Supervised Learning</a> — linear/logistic regression, trees, XGBoost, SVM</li>
-              <li>&bull; <a href="docs.html#aiml-ml-chestnut-questions" class="text-brand-500 hover:underline">Chestnut Questions</a> — 30 Q&As, (sections 1-20: core, 21-30: Staff+)</li>
-              <li>&bull; <a href="docs.html#aiml-ml-behavioral" class="text-brand-500 hover:underline">Behavioral (STAR)</a> — 13 scenarios (sections 1-8: core, 9-13: Staff+)</li>
-            </ul>
+        <div class="lp-track">
+          <div class="lp-phase">
+            <div class="lp-phase-header">
+              <span class="lp-phase-num">01</span>
+              <span class="lp-phase-name">Interview Fundamentals</span>
+              <div class="lp-phase-rule" aria-hidden="true"></div>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#aiml-ml-fundamentals" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">ML Fundamentals</span>
+                <span class="lp-tag">Foundations</span>
+                <p class="lp-desc">Bias-variance, metrics, cross-validation, data leakage, model selection.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-supervised-learning" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Supervised Learning</span>
+                <span class="lp-tag">Foundations</span>
+                <p class="lp-desc">Linear/logistic regression, decision trees, XGBoost, SVM — math + code.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-chestnut-questions" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Chestnut Questions</span>
+                <span class="lp-tag">Prep</span>
+                <p class="lp-desc">Sections 1-20: core ML Q&As. Sections 21-30: Staff+ level.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-behavioral" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Behavioral (STAR)</span>
+                <span class="lp-tag">Prep</span>
+                <p class="lp-desc">13 STAR scenarios: sections 1-8 core, 9-13 Staff+ org-wide influence.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+            </div>
           </div>
-          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 2: Deep Learning &amp; System Design</h3>
-            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
-              <li>&bull; <a href="docs.html#aiml-neural-network-training" class="text-brand-500 hover:underline">NN Training</a> + <a href="docs.html#aiml-types-of-anns" class="text-brand-500 hover:underline">Types of ANNs</a> + <a href="docs.html#aiml-activation-functions" class="text-brand-500 hover:underline">Activation Functions</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-zero-to-hero" class="text-brand-500 hover:underline">Zero to Hero</a> — micrograd, BPE, nanoGPT, KV cache</li>
-              <li>&bull; <a href="docs.html#aiml-ml-system-design" class="text-brand-500 hover:underline">ML System Design</a> — 6 full designs + deployment/monitoring</li>
-              <li>&bull; <a href="docs.html#aiml-recommendation-systems" class="text-brand-500 hover:underline">Rec Systems</a> — CF, MF, two-tower, multi-stage</li>
-            </ul>
+
+          <div class="lp-phase">
+            <div class="lp-phase-header">
+              <span class="lp-phase-num">02</span>
+              <span class="lp-phase-name">Deep Learning &amp; System Design</span>
+              <div class="lp-phase-rule" aria-hidden="true"></div>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#aiml-neural-network-training" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">NN Training</span>
+                <span class="lp-tag">Deep Learning</span>
+                <p class="lp-desc">Optimizers, normalization, regularization, mixed precision, FSDP.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-types-of-anns" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Types of ANNs</span>
+                <span class="lp-tag">Deep Learning</span>
+                <p class="lp-desc">7 architectures: CNN, RNN, Transformer, GAN, VAE, Diffusion, ViT.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-activation-functions" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Activation Functions</span>
+                <span class="lp-tag">Deep Learning</span>
+                <p class="lp-desc">10 functions with SVG curves: ReLU, GELU, Swish, Mish, PReLU, ELU.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-zero-to-hero" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Zero to Hero</span>
+                <span class="lp-tag">Build</span>
+                <p class="lp-desc">micrograd, BPE tokenizer, nanoGPT, manual backprop, KV cache.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-system-design" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">ML System Design</span>
+                <span class="lp-tag">System Design</span>
+                <p class="lp-desc">6 full designs: deployment, monitoring, drift detection end-to-end.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-recommendation-systems" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Recommendation Systems</span>
+                <span class="lp-tag">System Design</span>
+                <p class="lp-desc">CF, matrix factorization, two-tower, multi-stage ranking, FAISS.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+            </div>
           </div>
-          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 3: Staff+ Deep Dive &amp; Mock Interviews</h3>
-            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
-              <li>&bull; <a href="docs.html#aiml-ml-staff-system-design" class="text-brand-500 hover:underline">Staff+ System Design</a> — ML platform, real-time, multi-stage ranking, A/B platform</li>
-              <li>&bull; <a href="docs.html#aiml-llm-engineering" class="text-brand-500 hover:underline">LLM Engineering</a> — RAG, fine-tuning, RLHF, agents, serving</li>
-              <li>&bull; <a href="docs.html#aiml-ml-production-ops" class="text-brand-500 hover:underline">Production ML Ops</a> — online learning, feature platform, cascades</li>
-              <li>&bull; <a href="docs.html#aiml-ml-mock-interviews" class="text-brand-500 hover:underline">Mock Interview Walkthroughs</a> — full transcripts with scoring rubrics</li>
-              <li>&bull; <a href="docs.html#aiml-ml-leadership-strategy" class="text-brand-500 hover:underline">Leadership &amp; Strategy</a> — org-wide influence, technical vision, incident response</li>
-              <li>&bull; <a href="docs.html#aiml-ml-company-focus" class="text-brand-500 hover:underline">Company Focus</a> — Staff+ round structure per company</li>
-            </ul>
+
+          <div class="lp-phase">
+            <div class="lp-phase-header">
+              <span class="lp-phase-num">03</span>
+              <span class="lp-phase-name">Staff+ Deep Dive &amp; Mock Interviews</span>
+              <div class="lp-phase-rule" aria-hidden="true"></div>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#aiml-ml-staff-system-design" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Staff+ System Design</span>
+                <span class="lp-tag">Staff+</span>
+                <p class="lp-desc">ML platform, 10M+ QPS real-time, multi-stage ranking, A/B platform at scale.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-llm-engineering" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">LLM Engineering</span>
+                <span class="lp-tag">Staff+</span>
+                <p class="lp-desc">RAG, fine-tuning, RLHF/DPO, agents, safety, evaluation, serving.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-production-ops" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Production ML Ops</span>
+                <span class="lp-tag">Staff+</span>
+                <p class="lp-desc">Online learning, feature platform, model cascades, continuous training.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-leadership-strategy" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Leadership &amp; Strategy</span>
+                <span class="lp-tag">Staff+</span>
+                <p class="lp-desc">Org-wide influence, technical vision, incident response, mentorship.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-company-focus" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Company Focus</span>
+                <span class="lp-tag">Staff+</span>
+                <p class="lp-desc">Staff+ round structure per company: Google L6, Meta E6, Amazon L6, Apple ICT5.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-mock-interviews" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Mock Interview Walkthroughs</span>
+                <span class="lp-tag">Staff+</span>
+                <p class="lp-desc">Full transcripts with timestamps and scoring rubrics: Google L6, Meta E6, Amazon L6.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Track 2: 6-Month Standard -->
+      <!-- ===== TRACK: 6-Month Standard ===== -->
       <div id="track-6month" class="track-content hidden">
-        <div class="mb-6">
-          <h2 class="text-2xl font-bold text-slate-900 dark:text-white">&#x1F4DA; 6-Month Standard Track</h2>
-          <p class="text-slate-500 dark:text-slate-400 mt-1">For working engineers with some ML exposure. ~10-15 hours/week. Builds depth gradually.</p>
+        <div class="lp-header" style="margin-bottom:0;">
+          <span class="lp-phase-badge">6-Month Standard &mdash; For working engineers with ML exposure, ~10-15 hrs/wk</span>
         </div>
-        <div class="flex flex-col gap-3">
-          <div class="border border-brand-200 dark:border-brand-500/20 bg-brand-50 dark:bg-brand-500/5 rounded-xl p-4">
-            <h3 class="font-bold text-brand-600 dark:text-brand-400 text-sm mb-2">Month 1-2: Foundations</h3>
-            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
-              <li>&bull; <a href="docs.html#aiml-ml-fundamentals" class="text-brand-500 hover:underline">ML Fundamentals</a></li>
-              <li>&bull; <a href="docs.html#aiml-supervised-learning" class="text-brand-500 hover:underline">Supervised Learning</a></li>
-              <li>&bull; <a href="docs.html#aiml-unsupervised-learning" class="text-brand-500 hover:underline">Unsupervised Learning</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-math" class="text-brand-500 hover:underline">ML Math</a> — probability, linear algebra, info theory</li>
-              <li>&bull; <a href="docs.html#aiml-ml-data-centric" class="text-brand-500 hover:underline">Data-Centric AI</a></li>
-              <li>&bull; <a href="docs.html#aiml-ab-testing-experimentation" class="text-brand-500 hover:underline">A/B Testing</a></li>
-            </ul>
+        <div class="lp-track">
+          <div class="lp-phase">
+            <div class="lp-phase-header">
+              <span class="lp-phase-num">01</span>
+              <span class="lp-phase-name">Foundations</span>
+              <div class="lp-phase-rule" aria-hidden="true"></div>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#aiml-ml-fundamentals" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">ML Fundamentals</span>
+                <span class="lp-tag">Foundations</span>
+                <p class="lp-desc">Bias-variance, metrics, CV, data leakage, model selection.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-supervised-learning" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Supervised Learning</span>
+                <span class="lp-tag">Foundations</span>
+                <p class="lp-desc">Linear/logistic regression, trees, XGBoost, SVM.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-unsupervised-learning" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Unsupervised Learning</span>
+                <span class="lp-tag">Foundations</span>
+                <p class="lp-desc">K-Means, DBSCAN, PCA, t-SNE, UMAP, anomaly detection.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-math" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">ML Math</span>
+                <span class="lp-tag">Foundations</span>
+                <p class="lp-desc">Probability, linear algebra, info theory, convex optimization essentials.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-data-centric" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Data-Centric AI</span>
+                <span class="lp-tag">Foundations</span>
+                <p class="lp-desc">Data augmentation, weak supervision, confident learning, active learning.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ab-testing-experimentation" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">A/B Testing</span>
+                <span class="lp-tag">Foundations</span>
+                <p class="lp-desc">Experimental design, CUPED, sequential testing, network effects.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+            </div>
           </div>
-          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 3-4: Deep Learning &amp; System Design</h3>
-            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
-              <li>&bull; <a href="docs.html#aiml-ann-history" class="text-brand-500 hover:underline">Intro to Neural Networks</a></li>
-              <li>&bull; <a href="docs.html#aiml-activation-functions" class="text-brand-500 hover:underline">Activation Functions</a></li>
-              <li>&bull; <a href="docs.html#aiml-neural-network-training" class="text-brand-500 hover:underline">NN Training</a></li>
-              <li>&bull; <a href="docs.html#aiml-types-of-anns" class="text-brand-500 hover:underline">Types of ANNs</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-zero-to-hero" class="text-brand-500 hover:underline">Zero to Hero</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-system-design" class="text-brand-500 hover:underline">ML System Design</a></li>
-              <li>&bull; <a href="docs.html#aiml-recommendation-systems" class="text-brand-500 hover:underline">Rec Systems</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-gpu-deep-dive" class="text-brand-500 hover:underline">GPU Deep Dive</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-project-structure" class="text-brand-500 hover:underline">ML Project Structure</a></li>
-            </ul>
+
+          <div class="lp-phase">
+            <div class="lp-phase-header">
+              <span class="lp-phase-num">02</span>
+              <span class="lp-phase-name">Deep Learning &amp; System Design</span>
+              <div class="lp-phase-rule" aria-hidden="true"></div>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#aiml-ann-history" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Intro to Neural Networks</span>
+                <span class="lp-tag">Deep Learning</span>
+                <p class="lp-desc">Perceptron, backprop, full timeline from 1943 to Transformers.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-activation-functions" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Activation Functions</span>
+                <span class="lp-tag">Deep Learning</span>
+                <p class="lp-desc">10 functions with SVG curves, derivatives, and interview tips.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-neural-network-training" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">NN Training</span>
+                <span class="lp-tag">Deep Learning</span>
+                <p class="lp-desc">Optimizers, normalization, regularization, FP32/FP16/INT8, FSDP.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-types-of-anns" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Types of ANNs</span>
+                <span class="lp-tag">Deep Learning</span>
+                <p class="lp-desc">7 architectures with FAANG Q&As and diagram animations.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-zero-to-hero" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Zero to Hero</span>
+                <span class="lp-tag">Build</span>
+                <p class="lp-desc">Build everything from scratch: micrograd, BPE, nanoGPT, KV cache.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-system-design" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">ML System Design</span>
+                <span class="lp-tag">System Design</span>
+                <p class="lp-desc">6 full designs + deployment, drift detection, monitoring.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-recommendation-systems" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Recommendation Systems</span>
+                <span class="lp-tag">System Design</span>
+                <p class="lp-desc">CF, two-tower, multi-stage ranking, FAISS deep dive.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-gpu-deep-dive" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">GPU Deep Dive</span>
+                <span class="lp-tag">System Design</span>
+                <p class="lp-desc">Memory hierarchy, FlashAttention, quantization, vLLM, inference optimization.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-project-structure" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">ML Project Structure</span>
+                <span class="lp-tag">System Design</span>
+                <p class="lp-desc">Ng-style: HLP, error analysis, orthogonalization, fairness audits.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+            </div>
           </div>
-          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 5-6: Staff+ &amp; Advanced + Interview Prep</h3>
-            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
-              <li>&bull; <a href="docs.html#aiml-nlp-deep-dive" class="text-brand-500 hover:underline">NLP Deep Dive</a></li>
-              <li>&bull; <a href="docs.html#aiml-cv-deep-dive" class="text-brand-500 hover:underline">Computer Vision</a></li>
-              <li>&bull; <a href="docs.html#aiml-rl-rlhf" class="text-brand-500 hover:underline">RL &amp; RLHF</a></li>
-              <li>&bull; <a href="docs.html#aiml-llm-engineering" class="text-brand-500 hover:underline">LLM Engineering</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-staff-system-design" class="text-brand-500 hover:underline">Staff+ System Design</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-production-ops" class="text-brand-500 hover:underline">Production ML Ops</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-interpretability-fairness" class="text-brand-500 hover:underline">Interpretability &amp; Fairness</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-leadership-strategy" class="text-brand-500 hover:underline">Leadership &amp; Strategy</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-mock-interviews" class="text-brand-500 hover:underline">Mock Interview Walkthroughs</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-chestnut-questions" class="text-brand-500 hover:underline">Chestnut Questions</a> (all 30)</li>
-              <li>&bull; <a href="docs.html#aiml-ml-behavioral" class="text-brand-500 hover:underline">Behavioral (STAR)</a> (all 13)</li>
-              <li>&bull; <a href="docs.html#aiml-ml-company-focus" class="text-brand-500 hover:underline">Company Focus</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-papers" class="text-brand-500 hover:underline">Research Papers</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-coding-patterns" class="text-brand-500 hover:underline">Coding Patterns</a></li>
-            </ul>
+
+          <div class="lp-phase">
+            <div class="lp-phase-header">
+              <span class="lp-phase-num">03</span>
+              <span class="lp-phase-name">Staff+ &amp; Advanced + Interview Prep</span>
+              <div class="lp-phase-rule" aria-hidden="true"></div>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#aiml-nlp-deep-dive" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">NLP Deep Dive</span>
+                <span class="lp-tag">Advanced</span>
+                <p class="lp-desc">Word2Vec, GloVe, Transformers, BERT, fine-tuning, SoTA architectures.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-cv-deep-dive" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Computer Vision</span>
+                <span class="lp-tag">Advanced</span>
+                <p class="lp-desc">AlexNet through ViT, object detection, segmentation, self-supervised learning.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-rl-rlhf" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">RL &amp; RLHF</span>
+                <span class="lp-tag">Advanced</span>
+                <p class="lp-desc">DQN, PPO, TRPO, InstructGPT, DPO, KTO — math + code.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-llm-engineering" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">LLM Engineering</span>
+                <span class="lp-tag">Staff+</span>
+                <p class="lp-desc">Prompt patterns, RAG, PEFT, RLHF, safety, agents, serving, context optimization.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-staff-system-design" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Staff+ System Design</span>
+                <span class="lp-tag">Staff+</span>
+                <p class="lp-desc">ML platform, 10M+ QPS, ranking, distributed training, labeling platform.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-production-ops" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Production ML Ops</span>
+                <span class="lp-tag">Staff+</span>
+                <p class="lp-desc">Online learning, feature platform, labeling, cascades, continuous training.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-interpretability-fairness" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Interpretability &amp; Fairness</span>
+                <span class="lp-tag">Staff+</span>
+                <p class="lp-desc">SHAP, LIME, Integrated Gradients, bias metrics, EU AI Act, model cards.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-leadership-strategy" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Leadership &amp; Strategy</span>
+                <span class="lp-tag">Staff+</span>
+                <p class="lp-desc">Org influence, vision setting, roadmaps, incident response, mentorship.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-chestnut-questions" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Chestnut Questions</span>
+                <span class="lp-tag">Prep</span>
+                <p class="lp-desc">All 30 Q&As, including sections 21-30 Staff+ level.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-behavioral" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Behavioral (STAR)</span>
+                <span class="lp-tag">Prep</span>
+                <p class="lp-desc">All 13 scenarios, including 9-13 Staff+ org-wide scenarios.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-company-focus" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Company Focus</span>
+                <span class="lp-tag">Prep</span>
+                <p class="lp-desc">Staff+ round structure for each FAANG company.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-papers" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Research Papers</span>
+                <span class="lp-tag">Prep</span>
+                <p class="lp-desc">10 foundational papers with intuition, math, and interview angles.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-coding-patterns" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Coding Patterns</span>
+                <span class="lp-tag">Prep</span>
+                <p class="lp-desc">LRU cache, rate limiter, online K-Means, incremental AUC &mdash; LeetCode + ML.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-mock-interviews" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Mock Interviews</span>
+                <span class="lp-tag">Prep</span>
+                <p class="lp-desc">Full transcripts: system design, coding, behavioral &mdash; with scoring rubrics.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Track 3: 12-Month Deep -->
+      <!-- ===== TRACK: 12-Month Deep ===== -->
       <div id="track-12month" class="track-content hidden">
-        <div class="mb-6">
-          <h2 class="text-2xl font-bold text-slate-900 dark:text-white">&#x1F331; 12-Month Deep Track</h2>
-          <p class="text-slate-500 dark:text-slate-400 mt-1">For true beginners. ~8-10 hours/week. Assumes no ML or advanced math background.</p>
+        <div class="lp-header" style="margin-bottom:0;">
+          <span class="lp-phase-badge">12-Month Deep &mdash; For true beginners, ~8-10 hrs/wk, no ML background assumed</span>
         </div>
-        <div class="flex flex-col gap-3">
-          <div class="border border-brand-200 dark:border-brand-500/20 bg-brand-50 dark:bg-brand-500/5 rounded-xl p-4">
-            <h3 class="font-bold text-brand-600 dark:text-brand-400 text-sm mb-2">Month 1-2: Math Foundations</h3>
-            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
-              <li>&bull; Learn Python basics (if not already)</li>
-              <li>&bull; <a href="docs.html#aiml-ml-math" class="text-brand-500 hover:underline">ML Math</a> — probability, linear algebra, calculus, statistics</li>
-              <li>&bull; Linear algebra essentials: vectors, matrices, eigenvalues, SVD</li>
-              <li>&bull; Probability: Bayes' theorem, distributions, MLE, KL divergence</li>
-              <li>&bull; Calculus: partial derivatives, chain rule, gradient descent</li>
-              <li>&bull; Statistics: hypothesis testing, p-values, confidence intervals</li>
-            </ul>
+        <div class="lp-track">
+          <div class="lp-phase">
+            <div class="lp-phase-header">
+              <span class="lp-phase-num">01</span>
+              <span class="lp-phase-name">Math Foundations</span>
+              <div class="lp-phase-rule" aria-hidden="true"></div>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#aiml-ml-math" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">ML Math</span>
+                <span class="lp-tag">Foundations</span>
+                <p class="lp-desc">Probability, linear algebra, calculus, statistics. Partial derivatives, chain rule, gradient descent.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="https://www.khanacademy.org/math/linear-algebra" class="lp-item" target="_blank" rel="noopener noreferrer">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Linear Algebra Essentials</span>
+                <span class="lp-tag">External</span>
+                <p class="lp-desc">Vectors, matrices, eigenvalues, SVD &mdash; Khan Academy or MIT OCW.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="https://www.khanacademy.org/math/statistics-probability" class="lp-item" target="_blank" rel="noopener noreferrer">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Probability &amp; Statistics</span>
+                <span class="lp-tag">External</span>
+                <p class="lp-desc">Bayes' theorem, distributions, MLE, KL divergence, hypothesis testing.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+            </div>
           </div>
-          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 3-4: Classical ML Foundations</h3>
-            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
-              <li>&bull; <a href="docs.html#aiml-ml-fundamentals" class="text-brand-500 hover:underline">ML Fundamentals</a></li>
-              <li>&bull; <a href="docs.html#aiml-supervised-learning" class="text-brand-500 hover:underline">Supervised Learning</a></li>
-              <li>&bull; <a href="docs.html#aiml-unsupervised-learning" class="text-brand-500 hover:underline">Unsupervised Learning</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-data-centric" class="text-brand-500 hover:underline">Data-Centric AI</a></li>
-              <li>&bull; <a href="docs.html#aiml-ab-testing-experimentation" class="text-brand-500 hover:underline">A/B Testing</a></li>
-            </ul>
+
+          <div class="lp-phase">
+            <div class="lp-phase-header">
+              <span class="lp-phase-num">02</span>
+              <span class="lp-phase-name">Classical ML Foundations</span>
+              <div class="lp-phase-rule" aria-hidden="true"></div>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#aiml-ml-fundamentals" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">ML Fundamentals</span>
+                <span class="lp-tag">Foundations</span>
+                <p class="lp-desc">Bias-variance, metrics, CV, data leakage, model selection.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-supervised-learning" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Supervised Learning</span>
+                <span class="lp-tag">Foundations</span>
+                <p class="lp-desc">Linear/logistic regression, decision trees, ensemble methods, SVM.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-unsupervised-learning" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Unsupervised Learning</span>
+                <span class="lp-tag">Foundations</span>
+                <p class="lp-desc">K-Means, DBSCAN, PCA, t-SNE, UMAP, anomaly detection.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-data-centric" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Data-Centric AI</span>
+                <span class="lp-tag">Foundations</span>
+                <p class="lp-desc">Data augmentation, weak supervision, confident learning, active learning.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ab-testing-experimentation" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">A/B Testing</span>
+                <span class="lp-tag">Foundations</span>
+                <p class="lp-desc">Design, CUPED, sequential testing, network effects, metrics.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+            </div>
           </div>
-          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 5-7: Deep Learning</h3>
-            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
-              <li>&bull; <a href="docs.html#aiml-ann-history" class="text-brand-500 hover:underline">Intro to Neural Networks</a></li>
-              <li>&bull; <a href="docs.html#aiml-activation-functions" class="text-brand-500 hover:underline">Activation Functions</a></li>
-              <li>&bull; <a href="docs.html#aiml-neural-network-training" class="text-brand-500 hover:underline">NN Training</a></li>
-              <li>&bull; <a href="docs.html#aiml-types-of-anns" class="text-brand-500 hover:underline">Types of ANNs</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-zero-to-hero" class="text-brand-500 hover:underline">Zero to Hero</a> — build everything from scratch</li>
-              <li>&bull; <a href="docs.html#aiml-ml-coding-patterns" class="text-brand-500 hover:underline">Coding Patterns</a></li>
-            </ul>
+
+          <div class="lp-phase">
+            <div class="lp-phase-header">
+              <span class="lp-phase-num">03</span>
+              <span class="lp-phase-name">Deep Learning</span>
+              <div class="lp-phase-rule" aria-hidden="true"></div>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#aiml-ann-history" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Intro to Neural Networks</span>
+                <span class="lp-tag">Deep Learning</span>
+                <p class="lp-desc">Perceptron, backprop, full timeline from 1943 to Transformers.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-activation-functions" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Activation Functions</span>
+                <span class="lp-tag">Deep Learning</span>
+                <p class="lp-desc">10 functions with SVG curves, derivatives, interview analysis.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-neural-network-training" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">NN Training</span>
+                <span class="lp-tag">Deep Learning</span>
+                <p class="lp-desc">Optimizers, normalization, regularization, mixed precision, FSDP.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-types-of-anns" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Types of ANNs</span>
+                <span class="lp-tag">Deep Learning</span>
+                <p class="lp-desc">7 architectures: CNN, RNN, Transformer, GAN, VAE, Diffusion, ViT.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-zero-to-hero" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Zero to Hero</span>
+                <span class="lp-tag">Build</span>
+                <p class="lp-desc">Build everything from scratch: micrograd, BPE, nanoGPT, KV cache.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-coding-patterns" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Coding Patterns</span>
+                <span class="lp-tag">Build</span>
+                <p class="lp-desc">LRU cache, rate limiter, online K-Means, incremental AUC.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+            </div>
           </div>
-          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 8-9: System Design &amp; Advanced Topics</h3>
-            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
-              <li>&bull; <a href="docs.html#aiml-ml-system-design" class="text-brand-500 hover:underline">ML System Design</a></li>
-              <li>&bull; <a href="docs.html#aiml-recommendation-systems" class="text-brand-500 hover:underline">Rec Systems</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-gpu-deep-dive" class="text-brand-500 hover:underline">GPU Deep Dive</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-project-structure" class="text-brand-500 hover:underline">ML Project Structure</a></li>
-              <li>&bull; <a href="docs.html#aiml-nlp-deep-dive" class="text-brand-500 hover:underline">NLP Deep Dive</a></li>
-              <li>&bull; <a href="docs.html#aiml-cv-deep-dive" class="text-brand-500 hover:underline">Computer Vision</a></li>
-              <li>&bull; <a href="docs.html#aiml-rl-rlhf" class="text-brand-500 hover:underline">RL &amp; RLHF</a></li>
-            </ul>
+
+          <div class="lp-phase">
+            <div class="lp-phase-header">
+              <span class="lp-phase-num">04</span>
+              <span class="lp-phase-name">System Design &amp; Advanced Topics</span>
+              <div class="lp-phase-rule" aria-hidden="true"></div>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#aiml-ml-system-design" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">ML System Design</span>
+                <span class="lp-tag">System Design</span>
+                <p class="lp-desc">6 full designs: deployment, drift detection, monitoring end-to-end.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-recommendation-systems" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Recommendation Systems</span>
+                <span class="lp-tag">System Design</span>
+                <p class="lp-desc">CF, two-tower, multi-stage ranking, FAISS, HNSW.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-gpu-deep-dive" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">GPU Deep Dive</span>
+                <span class="lp-tag">System Design</span>
+                <p class="lp-desc">Memory hierarchy, FlashAttention, quantization, vLLM, inference.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-project-structure" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">ML Project Structure</span>
+                <span class="lp-tag">System Design</span>
+                <p class="lp-desc">Ng-style: HLP, error analysis, orthogonalization, fairness audits.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-nlp-deep-dive" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">NLP Deep Dive</span>
+                <span class="lp-tag">Advanced</span>
+                <p class="lp-desc">Word2Vec through Transformers, BERT, LoRA, QLoRA, SoTA.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-cv-deep-dive" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Computer Vision</span>
+                <span class="lp-tag">Advanced</span>
+                <p class="lp-desc">AlexNet through ViT, object detection, self-supervised learning.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-rl-rlhf" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">RL &amp; RLHF</span>
+                <span class="lp-tag">Advanced</span>
+                <p class="lp-desc">DQN, PPO, TRPO, InstructGPT, DPO, KTO.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+            </div>
           </div>
-          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 10-11: Staff+ &amp; Advanced</h3>
-            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
-              <li>&bull; <a href="docs.html#aiml-llm-engineering" class="text-brand-500 hover:underline">LLM Engineering</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-staff-system-design" class="text-brand-500 hover:underline">Staff+ System Design</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-production-ops" class="text-brand-500 hover:underline">Production ML Ops</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-interpretability-fairness" class="text-brand-500 hover:underline">Interpretability &amp; Fairness</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-leadership-strategy" class="text-brand-500 hover:underline">Leadership &amp; Strategy</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-papers" class="text-brand-500 hover:underline">Research Papers</a></li>
-            </ul>
+
+          <div class="lp-phase">
+            <div class="lp-phase-header">
+              <span class="lp-phase-num">05</span>
+              <span class="lp-phase-name">Staff+ &amp; Advanced</span>
+              <div class="lp-phase-rule" aria-hidden="true"></div>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#aiml-llm-engineering" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">LLM Engineering</span>
+                <span class="lp-tag">Staff+</span>
+                <p class="lp-desc">RAG, PEFT, RLHF, safety, agents, serving, context optimization.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-staff-system-design" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Staff+ System Design</span>
+                <span class="lp-tag">Staff+</span>
+                <p class="lp-desc">ML platform, 10M+ QPS, distributed training, labeling at scale.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-production-ops" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Production ML Ops</span>
+                <span class="lp-tag">Staff+</span>
+                <p class="lp-desc">Online learning, feature platform, cascades, continuous training.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-interpretability-fairness" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Interpretability &amp; Fairness</span>
+                <span class="lp-tag">Staff+</span>
+                <p class="lp-desc">SHAP, LIME, Integrated Gradients, bias, EU AI Act, model cards.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-leadership-strategy" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Leadership &amp; Strategy</span>
+                <span class="lp-tag">Staff+</span>
+                <p class="lp-desc">Org-wide influence, technical vision, incident response, mentorship.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-papers" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Research Papers</span>
+                <span class="lp-tag">Staff+</span>
+                <p class="lp-desc">10 foundational papers with intuition, math, and interview angles.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+            </div>
           </div>
-          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 12: Interview Prep &amp; Mock Interviews</h3>
-            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
-              <li>&bull; <a href="docs.html#aiml-ml-mock-interviews" class="text-brand-500 hover:underline">Mock Interview Walkthroughs</a></li>
-              <li>&bull; <a href="docs.html#aiml-ml-chestnut-questions" class="text-brand-500 hover:underline">Chestnut Questions</a> (all 30, especially sections 21-30 Staff+)</li>
-              <li>&bull; <a href="docs.html#aiml-ml-behavioral" class="text-brand-500 hover:underline">Behavioral (STAR)</a> (all 13, especially 9-13 Staff+)</li>
-              <li>&bull; <a href="docs.html#aiml-ml-company-focus" class="text-brand-500 hover:underline">Company Focus</a> — target your company</li>
-              <li>&bull; Practice system design whiteboarding (45-min simulated sessions)</li>
-              <li>&bull; Schedule real mock interviews with peers</li>
-            </ul>
+
+          <div class="lp-phase">
+            <div class="lp-phase-header">
+              <span class="lp-phase-num">06</span>
+              <span class="lp-phase-name">Interview Prep &amp; Mock Interviews</span>
+              <div class="lp-phase-rule" aria-hidden="true"></div>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#aiml-ml-mock-interviews" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Mock Interview Walkthroughs</span>
+                <span class="lp-tag">Prep</span>
+                <p class="lp-desc">Full transcripts for Google L6, Meta E6, Amazon L6 with scoring rubrics.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-chestnut-questions" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Chestnut Questions</span>
+                <span class="lp-tag">Prep</span>
+                <p class="lp-desc">All 30 Q&As &mdash; focus on sections 21-30 Staff+ level.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-behavioral" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Behavioral (STAR)</span>
+                <span class="lp-tag">Prep</span>
+                <p class="lp-desc">All 13 scenarios &mdash; focus on sections 9-13 Staff+ scenarios.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a href="docs.html#aiml-ml-company-focus" class="lp-item">
+                <span class="lp-item-dot"></span>
+                <span class="lp-title">Company Focus</span>
+                <span class="lp-tag">Prep</span>
+                <p class="lp-desc">Target your company: Google L6, Meta E6, Amazon L6, Apple ICT5, etc.</p>
+                <span class="lp-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -299,7 +824,7 @@
   <!-- ==================== FOOTER ==================== -->
   <footer class="border-t border-slate-200 dark:border-slate-800 py-8 bg-slate-100 dark:bg-slate-900/60">
     <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
-      <span>Made with &#x2764;&#xFE0F; by <a href="https://www.linkedin.com/in/kallol-chakraborty-9728a699/" target="_blank" rel="noopener noreferrer" class="text-brand-500 hover:text-brand-600 transition-colors font-semibold">Kallol Chakraborty</a>.</span>
+      <span>Made with  by <a href="https://www.linkedin.com/in/kallol-chakraborty-9728a699/" target="_blank" rel="noopener noreferrer" class="text-brand-500 hover:text-brand-600 transition-colors font-semibold">Kallol Chakraborty</a>.</span>
       <div class="flex gap-6 font-medium">
         <a href="docs.html#readme" class="hover:text-brand-500 transition-colors">Docs</a>
         <a href="https://github.com/kallolchakraborty/quick-bytes" target="_blank" rel="noopener noreferrer" class="text-brand-500 font-semibold hover:text-brand-600 transition-colors">GitHub</a>
