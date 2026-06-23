@@ -1,8 +1,8 @@
 {
   "id": "aiml-ml-zero-to-hero",
-  "title": "ML From Zero to Hero",
+  "title": "Foundations from Scratch",
   "category": "AI/ML",
-  "subcategory": "Zero-to-Hero",
+  "subcategory": "Foundations from Scratch",
   "description": "Eight from-scratch implementations inspired by Andrej Karpathy's Zero-to-Hero series \u2014 micrograd, BPE tokenizer, nanoGPT, and more \u2014 built with raw Python and NumPy, no ML libraries.",
   "language": "python",
   "codeBlock": "",

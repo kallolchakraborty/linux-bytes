@@ -480,7 +480,7 @@ window.__SEARCH_INDEX = [
     ]
   },
   {
-    "title": "ML From Zero to Hero",
+    "title": "Foundations from Scratch",
     "category": "AI/ML",
     "url": "docs.html#aiml-ml-zero-to-hero",
     "tags": [

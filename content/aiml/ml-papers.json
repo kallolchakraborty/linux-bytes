@@ -2,7 +2,7 @@
   "id": "aiml-ml-papers",
   "title": "ML Research Papers",
   "category": "AI/ML",
-  "subcategory": "Zero-to-Hero",
+  "subcategory": "Foundations from Scratch",
   "description": "Ten canonical ML papers every FAANG candidate must know — from Attention and ResNets to GANs, VAEs, diffusion models, and scaling laws — with the key formula, intuition, and interview angle for each.",
   "language": "python",
   "codeBlock": "",

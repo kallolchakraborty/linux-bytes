@@ -2,7 +2,7 @@
   "id": "aiml-ml-coding-patterns",
   "title": "ML Coding Patterns",
   "category": "AI/ML",
-  "subcategory": "Zero-to-Hero",
+  "subcategory": "Foundations from Scratch",
   "description": "Six LeetCode-style but ML-focused coding problems: online K-Means, incremental AUC, LRU cache, O(1) moving average, rate limiter, and sliding window metrics \u2014 every pattern has a real ML systems application.",
   "language": "python",
   "codeBlock": "",
