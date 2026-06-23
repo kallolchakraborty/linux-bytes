@@ -219,14 +219,15 @@ async function loadContent(hash) {
 
     contentArea.innerHTML = `
       <section class="flex flex-col gap-6 docs-section">
-        <div class="flex items-center justify-between">
-          <div class="flex flex-wrap gap-2 text-xs font-bold text-brand-500 uppercase tracking-wider">
-            <span>${data.category}</span>
-            <span>&bull;</span>
-            <span>${data.subcategory}</span>
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex flex-wrap gap-2 text-xs font-bold text-brand-500 uppercase tracking-wider items-center">
+              <span>${data.category}</span>
+              <span class="text-slate-300 dark:text-slate-600">&bull;</span>
+              <span>${data.subcategory}</span>
+              ${data.tags ? data.tags.filter(function(t){return t !== 'FAANG';}).map(function(t){return '<span class="ml-1.5 inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider tag-badge tag-' + t.replace(/[+]/g,'p').replace(/[&]/g,'') + '">' + t + '</span>';}).join('') : ''}
+            </div>
+            <button id="flashcard-toggle" class="no-print" title="Toggle flashcard mode" style="font-size:0.75rem;padding:0.2rem 0.5rem;border-radius:6px;border:1px solid #e2e8f0;background:#f8fafc;color:#475569;cursor:pointer">Flashcards</button>
           </div>
-          <button id="flashcard-toggle" class="no-print" title="Toggle flashcard mode — blur answers, click to reveal">🃏 Flashcards</button>
-        </div>
         <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">${data.title}</h1>
         <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-base">${data.description}</p>
         
