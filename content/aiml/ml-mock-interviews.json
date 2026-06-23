@@ -3,10 +3,10 @@
   "title": "ML Mock Interview Walkthroughs",
   "category": "AI/ML",
   "subcategory": "Staff+ & Advanced",
-  "description": "<p>[Intuition] Intuition: Interviews are a skill separate from ML knowledge. Knowing the material isn't enough \u2014 you need to structure your answers, manage time, handle follow-ups, and communicate clearly under pressure. This file provides complete mock interview walkthroughs for the 3 ML interview rounds at Staff+ level: system design (30 min), ML coding (45 min), and behavioral (30 min). Each walkthrough includes the question, your think-aloud process, whiteboard diagrams (as SVG descriptions), interviewer follow-ups, and scoring rubric.</p>",
+  "description": "<p>[Intuition]: Interviews are a skill separate from ML knowledge. Knowing the material isn't enough \u2014 you need to structure your answers, manage time, handle follow-ups, and communicate clearly under pressure. This file provides complete mock interview walkthroughs for the 3 ML interview rounds at Staff+ level: system design (30 min), ML coding (45 min), and behavioral (30 min). Each walkthrough includes the question, your think-aloud process, whiteboard diagrams (as SVG descriptions), interviewer follow-ups, and scoring rubric.</p>",
   "language": "python",
   "codeBlock": "",
-  "details": "<p>[Objectives] Objectives: Simulate the full FAANG Staff+ ML interview experience. Each mock walkthrough is structured as a real interview transcript with timestamps, candidate thinking, and interviewer feedback. Use these to practice your interview delivery \u2014 read the question, pause, and try to answer before reading the model response.</p>",
+  "details": "<p>[Objectives]: Simulate the full FAANG Staff+ ML interview experience. Each mock walkthrough is structured as a real interview transcript with timestamps, candidate thinking, and interviewer feedback. Use these to practice your interview delivery \u2014 read the question, pause, and try to answer before reading the model response.</p>",
   "sections": [
     {
       "title": "ML System Design Mock \u2014 Design an ML Platform (Google L6)",
