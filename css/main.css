@@ -860,3 +860,29 @@ html.dark .deep-dive-box {
 .deep-dive-box h4 {
   color: var(--text-primary) !important;
 }
+
+/* ========== Dark Mode Button Contrast Fix ========== */
+html.dark .bg-brand-500,
+html.dark .hover\:bg-brand-600:hover {
+  color: #0E1115 !important;
+}
+
+/* ========== Polyfills for missing Tailwind brand opacity classes ========== */
+html.dark .dark\:bg-brand-500\/10 {
+  background-color: rgba(233, 84, 32, 0.12) !important;
+}
+html.dark .dark\:bg-brand-500\/20 {
+  background-color: rgba(233, 84, 32, 0.2) !important;
+}
+html.dark .dark\:bg-brand-500\/30 {
+  background-color: rgba(233, 84, 32, 0.3) !important;
+}
+html.dark .dark\:border-brand-500\/10 {
+  border-color: rgba(233, 84, 32, 0.1) !important;
+}
+html.dark .dark\:border-brand-500\/20 {
+  border-color: rgba(233, 84, 32, 0.2) !important;
+}
+html.dark .dark\:border-brand-500\/30 {
+  border-color: rgba(233, 84, 32, 0.3) !important;
+}
