@@ -1,0 +1,33 @@
+{
+  "id": "genai-emerging-architectures",
+  "title": "Emerging AI Architectures — Mamba, Diffusion & Test-Time Compute",
+  "category": "Gen AI",
+  "subcategory": "Architecture",
+  "description": "The AI field is transitioning beyond pure dense Transformers. Staff Engineers must evaluate emerging paradigms including State Space Models (Mamba), Diffusion-based models, and Test-Time Compute scaling architectures (search, verifiers, reasoning models).",
+  "language": "python",
+  "sections": [
+    {
+      "title": "State Space Models: Mamba vs. Transformers",
+      "description": "<p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>psychology</span> <strong>Intuition:</strong> Transformers suffer from quadratic computational complexity $O(N^2)$ due to attention computations. **State Space Models (SSMs)** like **Mamba** achieve linear complexity $O(N)$ with sequence length by reformulating sequence processing as a continuous system discretization. They maintain a constant-size hidden state (no growing KV cache memory bottlenecks) while preserving selective scanning to focus on relevant information.</p><p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>bar_chart</span> <strong>Scale Comparison:</strong> At a sequence length of 128K, Transformers require massive KV cache VRAM; Mamba models process the context with a flat memory footprint, speeding up generation speeds.</p>",
+      "codeBlock": "# Selective Scan (Mamba) conceptual calculation\ndef selective_scan(x, A, B, C, Delta):\n    # Discretize continuous state matrices (Euler/Bilinear approximation)\n    dA = np.exp(Delta * A)\n    dB = Delta * B\n    \n    # Update hidden state: h_t = dA * h_{t-1} + dB * x_t\n    # Output: y_t = C * h_t\n    return dA, dB"
+    },
+    {
+      "title": "Diffusion Models: DDPM, Flow Matching & DiT",
+      "description": "<p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>psychology</span> <strong>Intuition:</strong> **Denoising Diffusion Probabilistic Models (DDPM)** generate images/audio by iteratively removing noise. Modern implementations use **Flow Matching** to trace straight paths between noise and target states, accelerating convergence. **Diffusion Transformers (DiT)** replace standard U-Net backbones with Transformer blocks to leverage scaling laws in generative vision pipelines.</p><p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>bar_chart</span> <strong>Throughput:</strong> DiT layouts achieve higher FID (Fréchet Inception Distance) quality scores than U-Net baselines at equivalent compute scales.</p>",
+      "codeBlock": "# Simple DDPM forward step (adding noise)\ndef forward_noising_process(x_0, alpha_bar, t):\n    noise = np.random.normal(size=x_0.shape)\n    # Compute noisy x_t = sqrt(alpha_bar_t) * x_0 + sqrt(1 - alpha_bar_t) * noise\n    x_t = np.sqrt(alpha_bar[t]) * x_0 + np.sqrt(1.0 - alpha_bar[t]) * noise\n    return x_t, noise"
+    },
+    {
+      "title": "Test-Time Compute Scaling: Search & Verifiers",
+      "description": "<p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>psychology</span> <strong>Intuition:</strong> Rather than returning the first token-decoding output, reasoning models (e.g. o1 style) scale compute at inference time. The architecture routes queries through a **Chain of Thought**, generates multiple candidate reasoning branches, and utilizes **Monte Carlo Tree Search (MCTS)** or verifiers (PRMs) to prune incorrect pathways.</p><p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>bar_chart</span> <strong>Performance scaling:</strong> Scoring accuracy scales logarithmically with the amount of search compute spent at test time, offering a new scaling vector independent of training size.</p>",
+      "codeBlock": "# Best-of-N candidate selection using a verifier score\ndef best_of_n_inference(generator_model, verifier_model, prompt, n=8):\n    candidates = [generator_model.generate(prompt) for _ in range(n)]\n    # Score candidates using Process Reward Model\n    scores = [verifier_model.score(cand) for cand in candidates]\n    best_idx = np.argmax(scores)\n    return candidates[best_idx], scores[best_idx]"
+    },
+    {
+      "title": "FAANG Staff+ Q&A: Emerging Architectures",
+      "description": "<p><strong>Q: When should you use a Mamba/SSM model over a Transformer in production?</strong><br><strong>A:</strong> Choose Mamba/SSMs when: 1) Processing extremely long sequences (e.g. 100K+ context lengths of telemetry, codebases, or genomic sequences) where Transformer KV cache memory limits are exceeded. 2) Deploying on edge devices where memory bandwidth is restricted. Choose Transformers when: 1) The task demands multi-hop semantic cross-attention. 2) You need to leverage highly optimized hardware libraries (like FlashAttention) and mature compiler support.</p><p><strong>Q: What is Flow Matching in generative modeling?</strong><br><strong>A:</strong> Flow Matching is a generative framework that generalizes diffusion models. Standard diffusion uses curved trajectories to map noise to data, which is slow to sample and requires many integration steps (e.g. 50-100). Flow Matching constructs straight vector fields (linear paths) between the noise and target, allowing models to generate high-quality outputs in fewer steps (e.g. 10-20), significantly improving serving speed.</p>",
+      "codeBlock": ""
+    }
+  ],
+  "details": "<p><strong>Staff Engineer Summary:</strong> Evaluate models using a two-dimensional matrix: context length requirements and inference budget. For linear-scaling contexts, deploy SSMs (Mamba). For generative vision, utilize DiT. For complex logical queries, implement search-based test-time compute verifiers.</p>",
+  "codeBlock": "",
+  "tags": ["FAANG", "architecture", "mamba", "diffusion", "reasoning"]
+}

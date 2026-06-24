@@ -1,0 +1,33 @@
+{
+  "id": "genai-llm-cost-engineering",
+  "title": "LLM Cost Engineering & FinOps — Routing, Batching & GPU Budgets",
+  "category": "Gen AI",
+  "subcategory": "Production & Optimization",
+  "description": "At scale, LLM serving costs represent the majority of operational spend. Staff Engineers must implement cost-optimizing serving layers, design dynamic routing cascades, model batching economics, and calculate build-vs-buy API crossovers.",
+  "language": "python",
+  "sections": [
+    {
+      "title": "Multi-Tier Model Routing Cascades",
+      "description": "<p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>psychology</span> <strong>Intuition:</strong> Serving all requests using frontier models (like Claude Sonnet or GPT-4o) is financially unsustainable. **Cascade Routing** dynamically evaluates query complexity. It routes simple queries (e.g. greeting, basic categorization) to a cheap model (e.g. Llama-3-8B) and uses a classifier to determine if a query requires escalation to a larger model.</p><p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>bar_chart</span> <strong>Savings:</strong> If 70% of traffic is resolved by a smaller model, routing cascades reduce total inference costs by up to 60% with negligible loss in user satisfaction scores.</p>",
+      "codeBlock": "def cascade_router(query, small_model_fn, large_model_fn, complexity_threshold=0.7):\n    # 1. Evaluate query complexity (simulated classifier score)\n    complexity_score = evaluate_query_complexity(query)\n    \n    if complexity_score < complexity_threshold:\n        # Route to cheap edge model\n        return small_model_fn(query), \"routed_small\"\n    else:\n        # Escalate to frontier model\n        return large_model_fn(query), \"routed_large\""
+    },
+    {
+      "title": "Batching Economics: Continuous vs. Static Batching",
+      "description": "<p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>psychology</span> <strong>Intuition:</strong> Naive static batching blocks generation until all sequences in the batch finish. **Continuous Batching** operates at the token-iteration level: as soon as a sequence generates an end-of-sentence token, it is evicted, and a new request is scheduled into that execution slot, keeping GPUs highly utilized.</p><p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>bar_chart</span> <strong>Efficiency gains:</strong> Continuous batching increases serving throughput by $3-5\\times$ compared to static batching, reducing cost-per-token overhead.</p>",
+      "codeBlock": "# Continuous batch simulator loop\nclass IterationScheduler:\n    def __init__(self, capacity=4):\n        self.active_requests = []\n        self.capacity = capacity\n        \n    def step(self, incoming_queue):\n        # Evict finished requests\n        self.active_requests = [r for r in self.active_requests if not r.is_finished()]\n        \n        # Add new requests to active slots\n        while len(self.active_requests) < self.capacity and incoming_queue:\n            self.active_requests.append(incoming_queue.pop(0))\n            \n        # Execute single token generation iteration step\n        for r in self.active_requests:\n            r.generate_token()"
+    },
+    {
+      "title": "Build vs. Buy: API Crossover Modeling",
+      "description": "<p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>psychology</span> <strong>Intuition:</strong> Determining whether to self-host models on dedicated GPU clusters or query external APIs depends on request volume. Self-hosting has high fixed costs (reservations, hardware) but low marginal token costs. External APIs have zero fixed costs but linear usage fees. The **Crossover Point** defines when hosting your own models becomes cheaper.</p><p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>bar_chart</span> <strong>Crossover Math:</strong> $Cost_{API}(V) = V \\times P_{API}$, $Cost_{Host}(V) = C_{Fixed} + V \\times P_{Compute}$. Solve for volume $V$ where $Cost_{API}(V) = Cost_{Host}(V)$.</p>",
+      "codeBlock": "def calculate_crossover_tokens(monthly_gpu_cost, api_cost_per_million, host_compute_cost_per_million):\n    # Fixed cost of hosting vs marginal cost differences\n    marginal_diff = (api_cost_per_million - host_compute_cost_per_million) / 1e6\n    if marginal_diff <= 0:\n        return float('inf') # Self-hosting is never cheaper if marginal compute is higher\n    return monthly_gpu_cost / marginal_diff"
+    },
+    {
+      "title": "FAANG Staff+ Q&A: LLM FinOps",
+      "description": "<p><strong>Q: How do you handle Spot Instance preemptions in training pipelines?</strong><br><strong>A:</strong> Spot instances can be reclaimed by the cloud provider with a short warning (usually 30-120 seconds). To prevent training progress loss: 1) Implement asynchronous checkpointers that save weights to distributed storage (S3/GCS) at regular steps. 2) Set up node auto-recovery scripts using Kubernetes/Ray that automatically detect termination signals, freeze gradients, flush state, and reschedule the task on standard/reserved nodes.</p><p><strong>Q: What is Model FLOP Utilization (MFU) and why is it monitored?</strong><br><strong>A:</strong> MFU measures the percentage of a GPU's theoretical maximum compute capacity (FLOPs) that is actually used during training or inference. In eager execution, MFU is often low (~20-30%) due to memory-bound overheads. Compiling graphs, optimizing kernels, and aligning batch sizes can lift MFU to ~50-60%, directly cutting hardware needs and compute costs in half.</p>",
+      "codeBlock": ""
+    }
+  ],
+  "details": "<p><strong>Staff Engineer Summary:</strong> High-scale serving requires structured cost management. Optimize unit economics via continuous batching, implement cascade routers to resolve queries on cheap models, and calculate build-vs-buy thresholds to justify hosting custom GPU nodes.</p>",
+  "codeBlock": "",
+  "tags": ["FAANG", "finops", "serving", "economics", "optimization"]
+}

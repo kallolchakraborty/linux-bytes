@@ -3,7 +3,7 @@
   "title": "FAANG Staff+ Preparation Study Plan",
   "category": "Study Plan",
   "subcategory": "Daily Curriculum",
-  "description": "A comprehensive 34-Day daily study plan structured from basic computer science up to advanced Staff+ GenAI and engineering leadership. Total recommended daily effort: 4–5 hours.",
+  "description": "A comprehensive 40-Day daily study plan structured from basic computer science up to advanced Staff+ GenAI, AI Infrastructure, and engineering leadership. Total recommended daily effort: 4–5 hours.",
   "timeline": [
     {
       "year": "Day 1",
@@ -208,10 +208,46 @@
       "title": "Mock Interviews & Strategy",
       "event": "<strong>Total: 4.5 Hours</strong><br>Core Theory (1.5h): <a href='#aiml-ml-mock-interviews' class='text-brand-500 hover:underline font-medium'>Mock Interview Walkthroughs</a>.<br>Practice (3h): Perform mock rounds based on <a href='#aiml-ml-company-focus' class='text-brand-500 hover:underline font-medium'>FAANG Company Focus</a>.",
       "tag": "Leadership"
+    },
+    {
+      "year": "Day 35",
+      "title": "Distributed Training Deep Dive",
+      "event": "<strong>Total: 4 Hours</strong><br>Core Theory (2h): <a href='#genai-distributed-training' class='text-brand-500 hover:underline font-medium'>Distributed Training Infrastructure</a> (3D Parallelism, NCCL, ZeRO).<br>Practice (2h): Math and memory modeling for pipeline bubbles.",
+      "tag": "AI Infra"
+    },
+    {
+      "year": "Day 36",
+      "title": "ML Platforms & Features",
+      "event": "<strong>Total: 4 Hours</strong><br>Core Theory (2h): <a href='#aiml-ml-platform-featurestore' class='text-brand-500 hover:underline font-medium'>ML Platform Design</a> (Feast, training-serving skew).<br>Practice (2h): Build point-in-time temporal joins.",
+      "tag": "AI Infra"
+    },
+    {
+      "year": "Day 37",
+      "title": "Model Compilation & Kernels",
+      "event": "<strong>Total: 4 Hours</strong><br>Core Theory (2h): <a href='#genai-model-compilation' class='text-brand-500 hover:underline font-medium'>Model Compilation & Kernels</a> (torch.compile, Triton, XLA).<br>Practice (2h): Study block offsets in Triton kernel functions.",
+      "tag": "AI Infra"
+    },
+    {
+      "year": "Day 38",
+      "title": "ML Data Engineering at Scale",
+      "event": "<strong>Total: 4 Hours</strong><br>Core Theory (2h): <a href='#aiml-ml-data-engineering' class='text-brand-500 hover:underline font-medium'>Data Engineering for ML at Scale</a> (LSH, MinHash, Beam/Ray).<br>Practice (2h): Write deduplication shingles code.",
+      "tag": "AI Infra"
+    },
+    {
+      "year": "Day 39",
+      "title": "Vector Databases & Search",
+      "event": "<strong>Total: 4 Hours</strong><br>Core Theory (2h): <a href='#genai-vector-search' class='text-brand-500 hover:underline font-medium'>Vector Search Infrastructure</a> (HNSW, IVF-PQ, hybrid fusion).<br>Practice (2h): Implement Reciprocal Rank Fusion.",
+      "tag": "AI Infra"
+    },
+    {
+      "year": "Day 40",
+      "title": "FinOps & Emerging Architectures",
+      "event": "<strong>Total: 4.5 Hours</strong><br>Core Theory (2.5h): <a href='#genai-llm-cost-engineering' class='text-brand-500 hover:underline font-medium'>LLM Cost Engineering</a> & <a href='#genai-emerging-architectures' class='text-brand-500 hover:underline font-medium'>Emerging AI Architectures</a> (Mamba, Diffusion, test-time compute).<br>Practice (2h): Calculate compute-crossover point math.",
+      "tag": "AI Infra"
     }
   ],
   "codeBlock": "",
-  "details": "<div class='not-prose mb-6 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400 text-center'>A structured day-by-day prep curriculum designed to transition a developer from core concepts to Staff+ architectural and leadership execution.</div>",
+  "details": "<div class='not-prose mb-6 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400 text-center'>A structured 40-day prep curriculum designed to transition a developer from core concepts to Staff+ architectural, infrastructure, and leadership execution.</div>",
   "tags": [
     "FAANG",
     "study-plan",

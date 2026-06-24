@@ -1,0 +1,38 @@
+{
+  "id": "genai-vector-search",
+  "title": "Vector Search Infrastructure — HNSW, IVF-PQ & Hybrid Retrieval",
+  "category": "Gen AI",
+  "subcategory": "Retrieval",
+  "description": "RAG and semantic retrieval require high-performance vector search. Staff Engineers must design search infrastructure that scales to billions of vectors, optimizing graphs (HNSW) and quantization (IVF-PQ) to maintain p99 latency < 10ms.",
+  "language": "python",
+  "sections": [
+    {
+      "title": "ANN Search: Approximate Nearest Neighbors",
+      "description": "<p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>psychology</span> <strong>Intuition:</strong> Exact Nearest Neighbor (KNN) search computes cosine/Euclidean distance against every vector in the index, which is $O(N)$ and too slow for large datasets. **Approximate Nearest Neighbor (ANN)** trade off slight accuracy (recall) for massive speedups (logarithmic search time) by structuring vectors into clusters or graphs.</p><p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>bar_chart</span> <strong>Scale Tradeoff:</strong> ANN search on 10M vectors: KNN scan = ~200ms; ANN search = ~3ms, achieving 98% recall.</p>",
+      "codeBlock": "# Exact KNN scan comparison\nimport numpy as np\n\ndef exact_knn(query, dataset, k=5):\n    # Calculate L2 distance pairwise\n    distances = np.linalg.norm(dataset - query, axis=1)\n    nearest_indices = np.argsort(distances)[:k]\n    return nearest_indices, distances[nearest_indices]"
+    },
+    {
+      "title": "HNSW Algorithm: Hierarchical Navigable Small World",
+      "description": "<p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>psychology</span> <strong>Intuition:</strong> **HNSW** builds a multi-layer graph of vectors. The top layers contain long-range connections (like a skip list) to traverse the space quickly. The lower layers contain short-range connections for fine-grained localization. Search starts at the top, routing to the closest neighbor, and descends layer-by-layer.</p><p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>bar_chart</span> <strong>Parameters:</strong> $M$ (max connections per node, typically 16-64), $efConstruction$ (search depth during index build), $efSearch$ (search depth during query time). Increasing $efSearch$ improves recall but increases query latency.</p>",
+      "codeBlock": "# HNSW Search conceptual flow\ndef hnsw_search_sim(layers, query, ef_search):\n    curr_node = layers[0].entry_point\n    for layer in layers:\n        # Find local nearest node inside current layer\n        curr_node = search_layer(layer, curr_node, query, ef=ef_search)\n    return curr_node"
+    },
+    {
+      "title": "IVF-PQ Indexing: Inverted File + Product Quantization",
+      "description": "<p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>psychology</span> <strong>Intuition:</strong> For databases with 100M+ vectors, HNSW graph structures consume too much memory (RAM). **IVF-PQ** solves this. **Inverted File (IVF)** clusters vectors into $K$ centroids; queries search only the nearest centroids (defined by $nprobe$). **Product Quantization (PQ)** splits high-dimensional vectors (e.g. 1536-dim) into $M$ sub-vectors, quantizing each sub-vector into 8-bit codes. This compresses the index size by up to $95\\%$, allowing in-memory operations.</p><p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>bar_chart</span> <strong>Memory footprint:</strong> A 1536-dim FP32 vector requires 6144 bytes. IVF-PQ compresses this to 64 bytes (96$\\times$ reduction), shifting the bottleneck from network/RAM size to CPU/cache speed.</p>",
+      "codeBlock": "# Quantization mapping simulation\ndef quantize_vector(vector, sub_spaces=8, centroids_per_subspace=256):\n    # Split 1536-dim vector into 8 sub-vectors of 192 dimensions\n    sub_vectors = np.split(vector, sub_spaces)\n    quantized_codes = []\n    for sv in sub_vectors:\n        # Map sub-vector to the nearest centroid index (0-255)\n        centroid_idx = find_nearest_centroid(sv)\n        quantized_codes.append(centroid_idx)\n    return np.array(quantized_codes, dtype=np.uint8)"
+    },
+    {
+      "title": "Hybrid Retrieval: Dense + Sparse Fusion & RRF",
+      "description": "<p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>psychology</span> <strong>Intuition:</strong> Dense vectors (embeddings) capture semantic meaning but miss exact keywords (serial numbers, product codes). Sparse vectors (BM25) capture exact keywords but miss semantic context. **Hybrid retrieval** executes both searches and merges findings using **Reciprocal Rank Fusion (RRF)**, which relies on rank positions rather than score normalization.</p><p><span class='material-symbols-outlined text-sm align-middle text-slate-400' aria-hidden='true'>bar_chart</span> <strong>RRF Formula:</strong> $RRF(d) = \\sum_{m \\in M} \\frac{1}{k + r_m(d)}$. $k \\approx 60$ is a smoothing constant; $r_m(d)$ is document rank under search method $m$.</p>",
+      "codeBlock": "def reciprocal_rank_fusion(dense_ranks, sparse_ranks, k=60):\n    rrf_scores = {}\n    all_docs = set(dense_ranks.keys()).union(set(sparse_ranks.keys()))\n    for doc in all_docs:\n        # Rank is 1-indexed; default to large rank if document is missing in a split\n        r_dense = dense_ranks.get(doc, 1000)\n        r_sparse = sparse_ranks.get(doc, 1000)\n        \n        score = 1.0 / (k + r_dense) + 1.0 / (k + r_sparse)\n        rrf_scores[doc] = score\n    return rrf_scores"
+    },
+    {
+      "title": "FAANG Staff+ Q&A: Vector Search",
+      "description": "<p><strong>Q: What is the differences between Pinecone, Milvus, and pgvector?</strong><br><strong>A:</strong> 1) <em>pgvector:</em> Postgres extension, simple setup, joins vectors with relational data easily, but lacks massive horizontal scale (suitable for <10M vectors). 2) <em>Pinecone:</em> SaaS, fully managed, pod/serverless storage abstractions, but locks data inside a proprietary service. 3) <em>Milvus / Vespa:</em> Cloud-native, distributed search engines, decoupling compute from storage, writing index segments to S3 and query pods reading to RAM (suitable for 1B+ vectors at high QPS).</p><p><strong>Q: Explain Late Interaction (ColBERT) retrieval.</strong><br><strong>A:</strong> Single-vector embeddings compress an entire document into one array, losing granular token details. Late interaction models like ColBERT generate token-level embedding vectors for both query and document. During retrieval, we align every query token vector with the best matching document token vector and sum the maximum cosine similarities. This achieves state-of-the-art retrieval accuracy at the cost of higher index storage requirements.</p>",
+      "codeBlock": ""
+    }
+  ],
+  "details": "<p><strong>Staff Engineer Summary:</strong> Scalable vector search requires matching index structures to memory targets. Use HNSW for sub-10M scale where speed is critical and RAM budget is flexible. Upgrade to IVF-PQ for billion-scale databases. Fuse dense and sparse queries using RRF to improve relevance.</p>",
+  "codeBlock": "",
+  "tags": ["FAANG", "vector-search", "rag", "hnsw", "quantization"]
+}
