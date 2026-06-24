@@ -4,7 +4,7 @@
   "category": "FAANG",
   "subcategory": "Company Facts",
   "description": "Real scale numbers, architectural decisions, and engineering culture facts from Meta, Amazon, Apple, Netflix, and Google. These are the facts that make system design discussions grounded in reality.",
-  "language": "none",
+  "language": "python",
   "sections": [
     {
       "title": "Meta (Facebook) — Social Graph at Planetary Scale",

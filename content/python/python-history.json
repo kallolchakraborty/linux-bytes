@@ -3,6 +3,7 @@
   "title": "History of Python",
   "category": "Python",
   "subcategory": "History",
+  "language": "text",
   "description": "Python was created by <a href=\"https://en.wikipedia.org/wiki/Guido_van_Rossum\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-brand-500 hover:text-brand-600 transition-colors\">Guido van Rossum</a> and first released in 1991. The language emphasizes readability, simplicity, and explicitness \u2014 famously captured in the Zen of Python.",
   "timeline": [
     {
