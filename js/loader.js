@@ -277,7 +277,7 @@ async function loadContent(hash) {
           </div>
         ` : ''}
         ${data.details ? `
-        <div id="section-dive" class="scroll-mt-24 p-5 bg-brand-50 dark:bg-brand-500/10 border border-brand-100 dark:border-brand-500/20 rounded-xl text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+        <div id="section-dive" class="scroll-mt-24 p-5 rounded-xl text-sm leading-relaxed deep-dive-box">
           <div>
             <h4 class="font-bold text-slate-900 dark:text-white mb-1">Deep Dive</h4>
             ${data.details}

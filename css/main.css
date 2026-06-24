@@ -847,3 +847,16 @@ html:not(.dark) #docs-dynamic-content .bg-slate-900\/60,
 html:not(.dark) .readme-content .bg-slate-900\/60 {
   background-color: var(--bg-secondary) !important;
 }
+
+/* ========== Deep Dive Container Overrides ========== */
+.deep-dive-box {
+  background-color: var(--brand-light) !important;
+  border: 1px solid rgba(233, 84, 32, 0.2) !important;
+  color: var(--text-secondary) !important;
+}
+html.dark .deep-dive-box {
+  border-color: rgba(233, 84, 32, 0.35) !important;
+}
+.deep-dive-box h4 {
+  color: var(--text-primary) !important;
+}
