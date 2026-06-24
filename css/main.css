@@ -796,3 +796,54 @@ html.dark .tag-badge:hover {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ========== Light Mode Color Overrides for Hardcoded HTML Content ========== */
+html:not(.dark) #docs-dynamic-content .text-slate-300,
+html:not(.dark) .readme-content .text-slate-300,
+html:not(.dark) #docs-dynamic-content .text-slate-400,
+html:not(.dark) .readme-content .text-slate-400 {
+  color: var(--text-primary) !important;
+}
+
+html:not(.dark) #docs-dynamic-content .text-sky-300,
+html:not(.dark) .readme-content .text-sky-300 {
+  color: var(--brand-primary) !important;
+  font-weight: 600 !important;
+}
+
+html:not(.dark) #docs-dynamic-content .bg-slate-800\/60,
+html:not(.dark) #docs-dynamic-content .bg-slate-800\/80,
+html:not(.dark) #docs-dynamic-content .bg-slate-800,
+html:not(.dark) .readme-content .bg-slate-800\/60,
+html:not(.dark) .readme-content .bg-slate-800\/80,
+html:not(.dark) .readme-content .bg-slate-800 {
+  background-color: var(--bg-secondary) !important;
+}
+
+html:not(.dark) #docs-dynamic-content .border-slate-700,
+html:not(.dark) #docs-dynamic-content .divide-slate-700\/50,
+html:not(.dark) .readme-content .border-slate-700,
+html:not(.dark) .readme-content .divide-slate-700\/50 {
+  border-color: var(--border-default) !important;
+}
+
+html:not(.dark) #docs-dynamic-content tr.hover\:bg-slate-800\/40:hover,
+html:not(.dark) .readme-content tr.hover\:bg-slate-800\/40:hover {
+  background-color: rgba(0, 0, 0, 0.02) !important;
+}
+
+html:not(.dark) #docs-dynamic-content td,
+html:not(.dark) .readme-content td {
+  color: var(--text-primary) !important;
+}
+
+html:not(.dark) #docs-dynamic-content th,
+html:not(.dark) .readme-content th {
+  color: var(--text-primary) !important;
+  background-color: var(--bg-secondary) !important;
+}
+
+html:not(.dark) #docs-dynamic-content .bg-slate-900\/60,
+html:not(.dark) .readme-content .bg-slate-900\/60 {
+  background-color: var(--bg-secondary) !important;
+}
