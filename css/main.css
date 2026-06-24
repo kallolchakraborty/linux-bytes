@@ -950,8 +950,8 @@ html.dark .dark\:border-brand-500\/30 {
 }
 
 /* ========== Global Smooth Theme Transitions ========== */
-body, header, aside, nav, main, article, section, footer, .glass-nav, .sidebar-link, .outline-link, .tag-badge, .search-result, table, th, td, pre, code, svg, rect, circle, path, line, text, .deep-dive-box {
-  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, fill 0.25s ease, stroke 0.25s ease;
+body, header, aside, nav, main, article, section, footer, .glass-nav, .sidebar-link, .outline-link, .tag-badge, .search-result, table, th, td, pre, code, .deep-dive-box {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
 }
 
 /* ========== Sidebar Progress & Bookmarks Styling ========== */
@@ -1051,36 +1051,61 @@ html.dark .related-topic-card:hover {
 }
 
 /* ========== SVG Text Rendering and Overflow Fixes ========== */
-svg text {
+/* Target only elements designed as monospace labels to prevent box overflows, without affecting system-ui titles */
+svg text[class*="-lbl"]:not([class*="-title"]),
+svg text[class*="mono"],
+svg text.l,
+svg text.co-lbl,
+svg text.ll-lbl,
+svg text.sq-lbl,
+svg text.tr-lbl,
+svg text.hp-lbl,
+svg text.sr-lbl,
+svg text.ha-lbl,
+svg text.mu-lbl,
+svg text.db-lbl,
+svg text.sys-lbl,
+svg text.sec-lbl,
+svg text.net-lbl,
+svg text.oop-lbl,
+svg text.prod-lbl,
+svg text.prg-lbl,
+svg text.pattern-lbl,
+svg text.os-lbl,
+svg text.faang-lbl {
   font-family: 'JetBrains Mono', 'Ubuntu Mono', 'Courier New', monospace !important;
   letter-spacing: -0.04em !important;
   text-rendering: optimizeLegibility !important;
 }
 
-/* Adjust font sizes globally within SVGs to ensure container fit */
-svg text {
-  font-size: 9.5px !important;
-}
-
-/* Specific overrides for labels that are values or need to be slightly larger */
+/* Ensure clean sizes for monospace data labels inside SVG boxes */
 svg text.ll-lbl-val, 
 svg text.sq-lbl-val, 
-svg text.tr-lbl-val, 
-svg text.ll-lbl,
-svg text.sq-lbl,
-svg text.tr-lbl {
-  font-size: 10.5px !important;
+svg text.tr-lbl-val,
+svg text.hp-lbl-val {
+  font-size: 10px !important;
 }
 
-/* Bold titles inside SVGs */
-svg text[style*="bold"], 
-svg text[font-weight="bold"],
+/* Let titles and non-monospace elements render in their native styles and sizes */
 svg text.sq-lbl-title,
 svg text.co-lbl-title,
 svg text.tr-lbl-title,
-svg text.mc-lbl-title {
+svg text.mc-lbl-title,
+svg text.ha-lbl-title,
+svg text.mu-lbl-title,
+svg text.db-lbl-title,
+svg text.sys-lbl-title,
+svg text.sec-lbl-title,
+svg text.net-lbl-title,
+svg text.oop-lbl-title,
+svg text.prod-lbl-title,
+svg text.prg-lbl-title,
+svg text.pattern-lbl-title,
+svg text.os-lbl-title,
+svg text.faang-lbl-title {
+  font-family: system-ui, -apple-system, sans-serif !important;
   font-size: 11px !important;
-  letter-spacing: -0.02em !important;
+  letter-spacing: -0.01em !important;
 }
 
 
