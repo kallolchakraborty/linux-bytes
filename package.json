@@ -6,11 +6,15 @@
   "scripts": {
     "validate": "node scripts/validate.mjs",
     "build": "node scripts/build.mjs",
+    "build:book": "node pdf/generate-book.mjs",
     "build:css": "npx tailwindcss -i css/input.css -o css/tailwind.css --minify",
     "watch:css": "npx tailwindcss -i css/input.css -o css/tailwind.css --watch",
     "check:json": "node -e \"const fs=require('fs');const path=require('path');const dir='content';fs.readdirSync(dir).forEach(cat=>{fs.readdirSync(path.join(dir,cat)).forEach(f=>{if(f.endsWith('.json')){JSON.parse(fs.readFileSync(path.join(dir,cat,f),'utf8'));console.log('OK:',path.join(dir,cat,f));}})});\""
   },
   "devDependencies": {
     "tailwindcss": "^3.4.0"
+  },
+  "dependencies": {
+    "puppeteer": "^25.3.0"
   }
 }
