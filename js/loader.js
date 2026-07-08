@@ -66,7 +66,7 @@ function toggleProgress(hash) {
 window.toggleProgress = toggleProgress;
 
 function updateBookmarkUI(hash) {
-  if (window.location.hash !== hash && (window.location.hash || '#python-history') !== hash) return;
+  if (window.location.hash !== hash && (window.location.hash || '#linux-history') !== hash) return;
   var btn = document.getElementById('btn-bookmark');
   if (!btn) return;
   var isBookmarked = getBookmarks().includes(hash);
@@ -84,7 +84,7 @@ function updateBookmarkUI(hash) {
 }
 
 function updateProgressUI(hash) {
-  if (window.location.hash !== hash && (window.location.hash || '#python-history') !== hash) return;
+  if (window.location.hash !== hash && (window.location.hash || '#linux-history') !== hash) return;
   var btn = document.getElementById('btn-progress');
   if (!btn) return;
   var isCompleted = getProgress().includes(hash);
@@ -173,52 +173,39 @@ function updateSidebarLinksUI() {
   });
 }
 
-function calculateReadingTimeAndDifficulty(data) {
-  var text = data.description || '';
-  if (data.details) text += ' ' + data.details;
-  if (data.sections) {
-    data.sections.forEach(function(s) {
-      if (s.title) text += ' ' + s.title;
-      if (s.description) text += ' ' + s.description;
-      if (s.codeBlock) text += ' ' + s.codeBlock;
-    });
-  }
+function getContentMeta(data) {
+  var readingTime = data.readingTime || (function() {
+    var text = data.description || '';
+    if (data.sections) {
+      data.sections.forEach(function(s) {
+        if (s.title) text += ' ' + s.title;
+        if (s.description) text += ' ' + s.description;
+        if (s.codeBlock) text += ' ' + s.codeBlock;
+      });
+    }
+    var cleanText = text.replace(/<[^>]*>/g, ' ');
+    var words = cleanText.split(/\s+/).filter(function(w) { return w.length > 0; }).length;
+    var codeBlocks = 0;
+    if (data.sections) data.sections.forEach(function(s) { if (s.codeBlock) codeBlocks++; });
+    if (data.codeBlock) codeBlocks++;
+    return Math.max(5, Math.round((words / 200) + (codeBlocks * 0.25)));
+  })();
   
-  var cleanText = text.replace(/<[^>]*>/g, ' ');
-  var words = cleanText.split(/\s+/).filter(function(w) { return w.length > 0; }).length;
-  
-  var codeBlocksCount = 0;
-  if (data.sections) {
-    data.sections.forEach(function(s) { if (s.codeBlock) codeBlocksCount++; });
-  }
-  if (data.codeBlock) codeBlocksCount++;
-  
-  var readingMinutes = Math.max(1, Math.round((words / 200) + (codeBlocksCount * 0.25)));
-  
-  var tags = (data.tags || []).map(function(t) { return t.toLowerCase(); });
-  var title = (data.title || '').toLowerCase();
-  var isAdvanced = tags.includes('faang') || tags.includes('staff+') || tags.includes('scale') || tags.includes('distributed systems') || title.includes('staff+') || title.includes('distributed');
-  var isIntermediate = !isAdvanced && (tags.includes('system design') || tags.includes('machine learning') || tags.includes('architecture') || title.includes('system design') || title.includes('database') || title.includes('deep learning'));
-  
-  var difficulty = 'Foundational';
-  var diffColor = 'text-emerald-500 border-emerald-500/20 dark:border-emerald-500/30 bg-emerald-550/5';
-  var diffIcon = 'signal_cellular_1_bar';
-  
-  if (isAdvanced) {
-    difficulty = 'Advanced / Staff+';
-    diffColor = 'text-purple-500 border-purple-500/20 dark:border-purple-500/30 bg-purple-550/5';
-    diffIcon = 'signal_cellular_4_bar';
-  } else if (isIntermediate) {
-    difficulty = 'Intermediate';
-    diffColor = 'text-amber-500 border-amber-500/20 dark:border-amber-500/30 bg-amber-550/5';
-    diffIcon = 'signal_cellular_3_bar';
-  }
+  var diffConfig = {
+    beginner: { label: 'Beginner', color: 'difficulty-beginner', icon: 'signal_cellular_1_bar' },
+    intermediate: { label: 'Intermediate', color: 'difficulty-intermediate', icon: 'signal_cellular_3_bar' },
+    advanced: { label: 'Advanced', color: 'difficulty-advanced', icon: 'signal_cellular_4_bar' }
+  };
+  var diffKey = data.difficulty || 'beginner';
+  if (!diffConfig[diffKey]) diffKey = 'beginner';
   
   return {
-    time: readingMinutes,
-    difficulty: difficulty,
-    diffColor: diffColor,
-    diffIcon: diffIcon
+    time: readingTime,
+    practiceTime: data.practiceTime || Math.round(readingTime * 0.75),
+    difficulty: diffConfig[diffKey].label,
+    diffColor: diffConfig[diffKey].color,
+    diffIcon: diffConfig[diffKey].icon,
+    rawDifficulty: diffKey
   };
 }
 
@@ -321,6 +308,180 @@ function renderSections(sections, dataId, langClass, extraClass) {
   }).join('\n') + '</div>';
 }
 
+function getChapterTitle(id) {
+  var entry = (window.__SEARCH_INDEX || []).find(function(e) { return e.url === 'docs.html#' + id; });
+  return entry ? entry.title : id;
+}
+
+function renderDifficultyBadge(diffKey, label) {
+  return '<span class="difficulty-badge ' + (diffKey === 'beginner' ? 'difficulty-beginner' : diffKey === 'intermediate' ? 'difficulty-intermediate' : 'difficulty-advanced') + '">' +
+    '<span class="material-symbols-outlined" style="font-size:12px">' + (diffKey === 'beginner' ? 'signal_cellular_1_bar' : diffKey === 'intermediate' ? 'signal_cellular_3_bar' : 'signal_cellular_4_bar') + '</span>' +
+    '<span>' + label + '</span></span>';
+}
+
+function renderPrerequisites(prereqs) {
+  if (!prereqs || prereqs.length === 0) return '';
+  var chips = prereqs.map(function(id) {
+    var title = getChapterTitle(id);
+    return '<a href="#' + id + '" class="prereq-chip">' +
+      '<span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>' +
+      title + '</a>';
+  }).join('');
+  return '<div class="flex flex-col gap-1.5">' +
+    '<div class="icon-heading icon-heading-objectives"><span class="material-symbols-outlined">school</span>Prerequisites</div>' +
+    '<div class="prereq-list">' + chips + '</div></div>';
+}
+
+function renderLearningObjectives(objectives) {
+  if (!objectives || objectives.length === 0) return '';
+  var items = objectives.map(function(obj) {
+    return '<li class="objective-item"><span class="material-symbols-outlined">checklist</span><span>' + obj + '</span></li>';
+  }).join('');
+  return '<div class="flex flex-col gap-2 lcm-section" id="section-objectives">' +
+    '<div class="icon-heading icon-heading-objectives"><span class="material-symbols-outlined">track_changes</span>Learning Objectives</div>' +
+    '<ul class="objectives-list">' + items + '</ul></div>';
+}
+
+function renderAnalogy(analogy) {
+  if (!analogy || !analogy.title) return '';
+  return '<div class="analogy-box lcm-section" id="section-analogy">' +
+    '<div class="flex items-center gap-2 mb-1">' +
+    '<span class="material-symbols-outlined" style="font-size:16px;color:#f59e0b">lightbulb</span>' +
+    '<div class="analogy-title">' + analogy.title + '</div></div>' +
+    '<div class="analogy-body">' + analogy.description + '</div></div>';
+}
+
+function renderCommonMistakes(mistakes) {
+  if (!mistakes || mistakes.length === 0) return '';
+  var items = mistakes.map(function(m) {
+    return '<div class="mistake-item">' +
+      '<div class="mistake-text"><span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;margin-right:4px">warning</span>' + m.mistake + '</div>' +
+      '<div class="mistake-solution">' + m.solution + '</div></div>';
+  }).join('');
+  return '<div class="flex flex-col gap-1 lcm-section" id="section-mistakes">' +
+    '<div class="icon-heading icon-heading-mistakes"><span class="material-symbols-outlined">error_outline</span>Common Mistakes</div>' +
+    '<div class="mistakes-box">' + items + '</div></div>';
+}
+
+function renderPracticeLabs(labs) {
+  if (!labs || labs.length === 0) return '';
+  var items = labs.map(function(lab) {
+    return '<div class="lab-box">' +
+      '<div class="lab-title"><span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;margin-right:4px">terminal</span>' + lab.title + '</div>' +
+      (lab.task ? '<div class="lab-task">' + lab.task + '</div>' : '') +
+      (lab.expectedOutput ? '<div class="lab-expected">Expected: ' + lab.expectedOutput + '</div>' : '') +
+      (lab.hint ? '<div class="lab-hint">Hint: ' + lab.hint + '</div>' : '') +
+      '</div>';
+  }).join('');
+  return '<div class="flex flex-col gap-2 lcm-section" id="section-labs">' +
+    '<div class="icon-heading icon-heading-lab"><span class="material-symbols-outlined">build</span>Practice Labs</div>' +
+    items + '</div>';
+}
+
+function renderQuickReference(qr) {
+  if (!qr || !qr.content) return '';
+  // Parse markdown table and render as HTML
+  var content = qr.content;
+  var title = qr.title || 'Quick Reference';
+  
+  // If content looks like a markdown table, parse it
+  var html = content;
+  if (content.includes('|')) {
+    var lines = content.split('\n').filter(function(l) { return l.trim(); });
+    if (lines.length >= 2) {
+      var tableHtml = '<table class="quickref-table">';
+      var headerRow = lines[0];
+      var headers = headerRow.split('|').filter(function(c) { return c.trim(); });
+      tableHtml += '<thead><tr>' + headers.map(function(h) { return '<th>' + h.trim() + '</th>'; }).join('') + '</tr></thead>';
+      tableHtml += '<tbody>';
+      for (var i = 2; i < lines.length; i++) {
+        var cells = lines[i].split('|').filter(function(c) { return c.trim(); });
+        if (cells.length > 0) {
+          tableHtml += '<tr>' + cells.map(function(c) { return '<td>' + c.trim() + '</td>'; }).join('') + '</tr>';
+        }
+      }
+      tableHtml += '</tbody></table>';
+      html = tableHtml;
+    }
+  }
+  
+  return '<div class="flex flex-col gap-2 lcm-section" id="section-reference">' +
+    '<div class="icon-heading icon-heading-reference"><span class="material-symbols-outlined">summarize</span>' + title + '</div>' +
+    html + '</div>';
+}
+
+function renderTroubleshooting(ts) {
+  if (!ts || ts.length === 0) return '';
+  var items = ts.map(function(t) {
+    return '<div class="ts-item">' +
+      '<div class="ts-symptom"><span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;margin-right:4px">bug_report</span>' + t.symptom + '</div>' +
+      (t.cause ? '<div class="ts-cause">Cause: ' + t.cause + '</div>' : '') +
+      (t.solution ? '<div class="ts-solution">Solution: ' + t.solution + '</div>' : '') +
+      '</div>';
+  }).join('');
+  return '<div class="flex flex-col gap-1 lcm-section" id="section-troubleshooting">' +
+    '<div class="icon-heading icon-heading-troubleshooting"><span class="material-symbols-outlined">health_and_safety</span>Troubleshooting</div>' +
+    '<div class="troubleshooting-box">' + items + '</div></div>';
+}
+
+function renderQuiz(quiz) {
+  if (!quiz || quiz.length === 0) return '';
+  var items = quiz.map(function(q, idx) {
+    var optionsHtml = '';
+    if (q.options && q.options.length > 0) {
+      optionsHtml = '<div class="quiz-options">' + q.options.map(function(opt, oi) {
+        return '<div class="quiz-option" onclick="this.parentElement.nextElementSibling.classList.toggle(\'revealed\')">' +
+          '<span class="radio-circle"></span><span>' + opt + '</span></div>';
+      }).join('') + '</div>';
+    }
+    return '<div class="quiz-item">' +
+      '<div class="quiz-question">' + (idx + 1) + '. ' + q.question + '</div>' +
+      optionsHtml +
+      '<div class="quiz-answer" id="quiz-answer-' + idx + '">' +
+      '<div class="answer-label">Answer:</div> ' + q.answer +
+      (q.explanation ? '<div style="margin-top:4px;color:#94a3b8;font-size:11px;">' + q.explanation + '</div>' : '') +
+      '</div>' +
+      '<button class="quiz-show-btn" onclick="document.getElementById(\'quiz-answer-' + idx + '\').classList.toggle(\'revealed\');this.textContent=this.textContent===\'Show Answer\'?\'Hide Answer\':\'Show Answer\'">Show Answer</button>' +
+      '</div>';
+  }).join('');
+  return '<div class="flex flex-col gap-2 lcm-section" id="section-quiz">' +
+    '<div class="icon-heading icon-heading-quiz"><span class="material-symbols-outlined">quiz</span>Quick Quiz</div>' +
+    '<div class="quiz-section">' + items + '</div></div>';
+}
+
+function renderInterviewTips(tips) {
+  if (!tips || tips.length === 0) return '';
+  var items = tips.map(function(t) { return '<li>' + t + '</li>'; }).join('');
+  return '<div class="flex flex-col gap-1 lcm-section" id="section-interview">' +
+    '<div class="icon-heading icon-heading-interview"><span class="material-symbols-outlined">record_voice_over</span>Interview Tips</div>' +
+    '<div class="interview-box"><ul>' + items + '</ul></div></div>';
+}
+
+function renderProductionTips(tips) {
+  if (!tips || tips.length === 0) return '';
+  var items = tips.map(function(t) { return '<li>' + t + '</li>'; }).join('');
+  return '<div class="flex flex-col gap-1 lcm-section" id="section-production">' +
+    '<div class="icon-heading icon-heading-production"><span class="material-symbols-outlined">settings</span>Production Tips</div>' +
+    '<div class="production-box"><ul>' + items + '</ul></div></div>';
+}
+
+function renderBestPractices(practices) {
+  if (!practices || practices.length === 0) return '';
+  var items = practices.map(function(p) {
+    return '<div class="practice-item"><span class="material-symbols-outlined">check_circle</span><span>' + p + '</span></div>';
+  }).join('');
+  return '<div class="flex flex-col gap-1 lcm-section" id="section-practices">' +
+    '<div class="icon-heading icon-heading-practice"><span class="material-symbols-outlined">star</span>Best Practices</div>' +
+    '<div class="practice-box">' + items + '</div></div>';
+}
+
+function renderEnterprisePerspective(perspective) {
+  if (!perspective) return '';
+  return '<div class="flex flex-col gap-1 lcm-section" id="section-enterprise">' +
+    '<div class="icon-heading icon-heading-enterprise"><span class="material-symbols-outlined">business</span>Enterprise Perspective</div>' +
+    '<div class="enterprise-box">' + perspective + '</div></div>';
+}
+
 async function loadContent(hash) {
   if (scrollSpyCleanup) {
     scrollSpyCleanup();
@@ -371,7 +532,7 @@ async function loadContent(hash) {
 
       function closeReadme() {
         modal.remove();
-        window.location.hash = '#python-history';
+        window.location.hash = '#linux-history';
       }
 
       document.getElementById('readme-modal-close').addEventListener('click', closeReadme);
@@ -454,13 +615,12 @@ async function loadContent(hash) {
       embedCode = `<div id="section-syntax" class="scroll-mt-24">${data.codeBlock ? codeBlock(data.codeBlock, langClass) : ''}</div>`;
     }
 
-    var meta = calculateReadingTimeAndDifficulty(data);
+    var meta = getContentMeta(data);
     var relatedHtml = renderRelatedTopics(hash, data.tags, data.category);
 
     contentArea.innerHTML = `
-      <article class="flex flex-col gap-5 docs-section" role="region" aria-label="${data.title || 'Documentation content'}">
+      <article class="flex flex-col gap-6 docs-section" role="region" aria-label="${data.title || 'Documentation content'}">
         <div class="flex flex-col gap-3">
-          <!-- Premium Minimalist Breadcrumbs & Actions Row -->
           <div class="flex items-center justify-between gap-4 flex-wrap select-none">
             <nav class="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
               <span>${data.category}</span>
@@ -470,32 +630,30 @@ async function loadContent(hash) {
             
             <!-- Article Action Buttons -->
             <div class="flex items-center gap-2" id="article-actions-toolbar">
-              <!-- Bookmark -->
               <button onclick="toggleBookmark('${hash}')" id="btn-bookmark" class="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-400 hover:text-amber-500 hover:border-amber-500/30 flex items-center justify-center transition-all bg-white dark:bg-slate-900" aria-label="Pin this guide">
                 <span class="material-symbols-outlined text-[18px]">star_border</span>
               </button>
               
-              <!-- Progress Checkbox -->
               <button onclick="toggleProgress('${hash}')" id="btn-progress" class="h-8 px-3 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-emerald-500 hover:border-emerald-500/30 flex items-center gap-1.5 text-[11px] font-semibold transition-all bg-white dark:bg-slate-900">
                 <span class="material-symbols-outlined text-[16px] text-slate-400">circle</span>
                 <span class="progress-btn-text">Mark as Done</span>
               </button>
-              
             </div>
           </div>
           
           <!-- Document Title -->
           <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">${data.title}</h1>
           
-          <!-- Metadata Badges -->
-          <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 select-none">
-            <span class="inline-flex items-center gap-1">
-              <span class="material-symbols-outlined text-[16px] text-slate-405">schedule</span>
+          <!-- Metadata Badges (LCM) -->
+          <div class="metadata-row">
+            ${renderDifficultyBadge(meta.rawDifficulty, meta.difficulty)}
+            <span class="meta-item">
+              <span class="material-symbols-outlined">schedule</span>
               <span>${meta.time} min read</span>
             </span>
-            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${meta.diffColor}">
-              <span class="material-symbols-outlined text-[12px]">${meta.diffIcon}</span>
-              <span>${meta.difficulty}</span>
+            <span class="meta-item">
+              <span class="material-symbols-outlined">terminal</span>
+              <span>${meta.practiceTime} min practice</span>
             </span>
           </div>
 
@@ -509,10 +667,26 @@ async function loadContent(hash) {
           ` : ''}
         </div>
 
-        <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-base">${data.description}</p>
+        <!-- LCM Sections -->
         
+        <!-- Prerequisites -->
+        ${renderPrerequisites(data.prerequisites)}
+        
+        <!-- Learning Objectives -->
+        ${renderLearningObjectives(data.learningObjectives)}
+        
+        <!-- Why This Matters -->
+        <div class="flex flex-col gap-1 lcm-section" id="section-why">
+          <div class="icon-heading icon-heading-why"><span class="material-symbols-outlined">info</span>Why This Matters</div>
+          <div class="why-box">${data.description}</div>
+        </div>
+        
+        <!-- Analogy -->
+        ${renderAnalogy(data.analogy)}
+        
+        <!-- Content Sections -->
         ${embedCode}
-
+        
         ${data.comparisonTable ? `
           <div id="section-comparison" class="scroll-mt-24">
             <h4 class="text-xs font-mono font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-3 mt-6">${data.comparisonTableTitle || 'Comparison Matrix'}</h4>
@@ -568,23 +742,34 @@ async function loadContent(hash) {
             </div>
           </div>
         ` : ''}
-        ${data.details ? `
-        <div id="section-dive" class="scroll-mt-24">
-          <details class="group border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 rounded-xl overflow-hidden transition-all duration-300">
-            <summary class="flex items-center justify-between p-4 font-bold text-sm text-slate-800 dark:text-slate-200 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
-              <span class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px] text-brand-500">lightbulb</span>
-                <span>Quick Summary &amp; Deep Dive Takeaways</span>
-              </span>
-              <span class="material-symbols-outlined text-[18px] transition-transform duration-200 group-open:rotate-180 text-slate-400">expand_more</span>
-            </summary>
-            <div class="px-5 pb-5 pt-2 text-slate-600 dark:text-slate-400 text-sm leading-relaxed border-t border-slate-100 dark:border-slate-800/60 font-sans">
-              ${data.details}
-            </div>
-          </details>
-        </div>
-        ` : ''}
 
+        <!-- Common Mistakes -->
+        ${renderCommonMistakes(data.commonMistakes)}
+        
+        <!-- Practice Labs -->
+        ${renderPracticeLabs(data.practiceLabs)}
+        
+        <!-- Quick Reference -->
+        ${renderQuickReference(data.quickReference)}
+        
+        <!-- Troubleshooting -->
+        ${renderTroubleshooting(data.troubleshooting)}
+        
+        <!-- Quiz -->
+        ${renderQuiz(data.quiz)}
+        
+        <!-- Interview Tips -->
+        ${renderInterviewTips(data.interviewTips)}
+        
+        <!-- Production Tips -->
+        ${renderProductionTips(data.productionTips)}
+        
+        <!-- Best Practices -->
+        ${renderBestPractices(data.bestPractices)}
+        
+        <!-- Enterprise Perspective -->
+        ${renderEnterprisePerspective(data.enterprisePerspective)}
+        
         ${relatedHtml}
       </article>
     `;
@@ -617,36 +802,40 @@ async function loadContent(hash) {
     // Populate right outline dynamically
     const outlineArea = document.getElementById('docs-right-outline');
     if (outlineArea) {
+      var outlineLinks = [];
+      
+      // Add LCM section outline entries if data has them
+      if (data.prerequisites && data.prerequisites.length > 0) outlineLinks.push({ href: '#section-objectives', label: 'Prerequisites' });
+      if (data.learningObjectives && data.learningObjectives.length > 0) outlineLinks.push({ href: '#section-objectives', label: 'Learning Objectives' });
+      if (data.analogy && data.analogy.title) outlineLinks.push({ href: '#section-analogy', label: 'Analogy' });
+      
       if (data.sections) {
-        let outlineHtml = data.sections.map((section, idx) => {
-          if (!section.title) return '';
-          const sectionId = `section-${data.id}-${idx}`;
-          return `<a href="#${sectionId}" class="outline-link">${section.title}</a>`;
-        }).filter(Boolean).join('\n');
-        if (data.comparisonTable) {
-          outlineHtml += `\n<a href="#section-comparison" class="outline-link">Comparison Matrix</a>`;
-        }
-        if (data.diffTable) {
-          outlineHtml += `\n<a href="#section-differences" class="outline-link">Differences Matrix</a>`;
-        }
-        if (data.details) {
-          outlineHtml += `\n<a href="#section-dive" class="outline-link">Deep Dive</a>`;
-        }
-        outlineArea.innerHTML = outlineHtml;
+        data.sections.forEach((section, idx) => {
+          if (!section.title) return;
+          const sectionId = 'section-' + data.id + '-' + idx;
+          outlineLinks.push({ href: '#' + sectionId, label: section.title });
+        });
+      } else if (data.timeline) {
+        outlineLinks.push({ href: '#section-syntax', label: 'Timeline' });
       } else {
-        const syntaxLabel = data.id === 'python-history' ? 'Timeline' : 'Syntax Guide';
-        let outlineHtml = `<a href="#section-syntax" class="outline-link">${syntaxLabel}</a>`;
-        if (data.comparisonTable) {
-          outlineHtml += `\n<a href="#section-comparison" class="outline-link">Comparison Matrix</a>`;
-        }
-        if (data.diffTable) {
-          outlineHtml += `\n<a href="#section-differences" class="outline-link">Differences Matrix</a>`;
-        }
-        if (data.details) {
-          outlineHtml += `\n<a href="#section-dive" class="outline-link">Deep Dive</a>`;
-        }
-        outlineArea.innerHTML = outlineHtml;
+        outlineLinks.push({ href: '#section-syntax', label: 'Syntax Guide' });
       }
+      
+      if (data.comparisonTable) outlineLinks.push({ href: '#section-comparison', label: 'Comparison Matrix' });
+      if (data.diffTable) outlineLinks.push({ href: '#section-differences', label: 'Differences Matrix' });
+      if (data.commonMistakes && data.commonMistakes.length > 0) outlineLinks.push({ href: '#section-mistakes', label: 'Common Mistakes' });
+      if (data.practiceLabs && data.practiceLabs.length > 0) outlineLinks.push({ href: '#section-labs', label: 'Practice Labs' });
+      if (data.quickReference && data.quickReference.content) outlineLinks.push({ href: '#section-reference', label: 'Quick Reference' });
+      if (data.troubleshooting && data.troubleshooting.length > 0) outlineLinks.push({ href: '#section-troubleshooting', label: 'Troubleshooting' });
+      if (data.quiz && data.quiz.length > 0) outlineLinks.push({ href: '#section-quiz', label: 'Quiz' });
+      if (data.interviewTips && data.interviewTips.length > 0) outlineLinks.push({ href: '#section-interview', label: 'Interview Tips' });
+      if (data.productionTips && data.productionTips.length > 0) outlineLinks.push({ href: '#section-production', label: 'Production Tips' });
+      if (data.bestPractices && data.bestPractices.length > 0) outlineLinks.push({ href: '#section-practices', label: 'Best Practices' });
+      if (data.enterprisePerspective) outlineLinks.push({ href: '#section-enterprise', label: 'Enterprise' });
+      
+      outlineArea.innerHTML = outlineLinks.map(function(l) {
+        return '<a href="' + l.href + '" class="outline-link">' + l.label + '</a>';
+      }).filter(Boolean).join('\n');
       setupOutlineSmoothScroll();
       scrollSpyCleanup = setupOutlineScrollSpy();
     }

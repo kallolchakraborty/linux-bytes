@@ -1,35 +1,38 @@
 {
+  "schemaVersion": "2.0",
+  "contentVersion": "1.0",
+  "lastReviewed": "2026-07-08",
+  "reviewStatus": "migrated",
   "id": "linux-users",
   "title": "Users, Groups & Authentication",
   "category": "Linux",
   "subcategory": "Systems & Operations",
   "language": "bash",
-  "description": "Linux is a multi-user operating system from the ground up. Every process runs as a specific user, every file has an owner and group, and access decisions are made by the kernel based on user/group IDs. At FAANG, understanding user management, PAM (Pluggable Authentication Modules), and sudo policies is critical for security, compliance, and least-privilege deployments.",
-  "codeBlock": "",
+  "description": "Linux is a multi-user operating system from the ground up. Every process runs as a specific user, every file has an owner and group, and access decisions are made by the kernel based on user/group IDs. At Enterprise, understanding user management, PAM (Pluggable Authentication Modules), and sudo policies is critical for security, compliance, and least-privilege deployments.",
   "sections": [
     {
       "title": "User & Group Fundamentals",
-      "description": "Users are identified by <strong>UID</strong> (User ID) and groups by <strong>GID</strong> (Group ID). The mapping is stored in <code>/etc/passwd</code>, <code>/etc/shadow</code> (passwords), <code>/etc/group</code>, and <code>/etc/gshadow</code>. <strong>UID 0 is root</strong> — the superuser with unrestricted access. At FAANG, human engineers almost never use root — they sudo to specific commands.",
+      "description": "Users are identified by <strong>UID</strong> (User ID) and groups by <strong>GID</strong> (Group ID). The mapping is stored in <code>/etc/passwd</code>, <code>/etc/shadow</code> (passwords), <code>/etc/group</code>, and <code>/etc/gshadow</code>. <strong>UID 0 is root</strong> — the superuser with unrestricted access. At Enterprise, human engineers almost never use root — they sudo to specific commands.",
       "codeBlock": "# === Key files ===\ncat /etc/passwd          # User accounts: username:x:UID:GID:comment:home:shell\ncat /etc/shadow          # Password hashes (root only)\ncat /etc/group           # Group definitions: groupname:x:GID:member1,member2\ncat /etc/gshadow         # Group passwords (rarely used)\n\n# Understanding /etc/passwd format:\n# kallol:x:1000:1000:Kallol:/home/kallol:/bin/bash\n# [1] username\n# [2] password placeholder (x = hash in /etc/shadow)\n# [3] UID (User ID)\n# [4] GID (Primary Group ID)\n# [5] GECOS (user info, often empty)\n# [6] Home directory\n# [7] Login shell\n\n# === Adding users ===\nsudo useradd -m -s /bin/bash -G sudo,docker kallol\n# -m  create home directory\n# -s  login shell\n# -G  supplementary groups\n# -c  comment (full name)\n\nsudo useradd --system --no-create-home --shell /usr/sbin/nologin myapp\n# System user (UID < 1000), no login, no home\n\nsudo passwd kallol         # Set/change password\nsudo usermod -aG docker kallol   # Add to group (append, don't forget -a!)\nsudo userdel -r kallol     # Delete user + home + mail spool\n\n# === Listing users ===\nwho                       # Currently logged in users\nw                         # Detailed who (login time, idle, what running)\nusers                     # Just usernames\nid                        # Current user's UID, GID, groups\nid kallol                 # Specific user's IDs\nfinger kallol             # User info (may need apt install finger)\n\n# === Listing groups ===\ngroups                    # Current user's groups\ngroups kallol             # Specific user's groups\ngetent group sudo         # Members of 'sudo' group\nlid -g sudo               # List members (may need apt install libuser)"
     },
     {
       "title": "sudo: Delegated Privilege",
-      "description": "sudo allows authorized users to run commands as another user (typically root). <strong>At FAANG, sudo is the primary mechanism for privileged access — root login is disabled.</strong> The sudoers file (<code>/etc/sudoers</code>) is a critical security boundary and must be edited with <code>visudo</code> to prevent syntax errors that could lock you out.",
+      "description": "sudo allows authorized users to run commands as another user (typically root). <strong>At Enterprise, sudo is the primary mechanism for privileged access — root login is disabled.</strong> The sudoers file (<code>/etc/sudoers</code>) is a critical security boundary and must be edited with <code>visudo</code> to prevent syntax errors that could lock you out.",
       "codeBlock": "# === /etc/sudoers basics (edit with visudo!) ===\n\n# Simple rules:\nkallol ALL=(ALL:ALL) ALL              # kallol can do anything\nkallol ALL=(ALL:ALL) NOPASSWD: ALL    # No password prompt (dev VMs only)\n\n# Command-level restrictions:\nkallol ALL=(root) /usr/bin/systemctl restart nginx\nkallol ALL=(root) /usr/bin/journalctl\n\n# Group-based:\n%sudo  ALL=(ALL:ALL) ALL              # sudo group members have full access\n%admin ALL=(ALL) ALL                  # admin group\n\n# === sudo command usage ===\nsudo -l                                # List allowed commands for current user\nsudo -u www-data whoami               # Run as www-data\nsudo -s                                # Root shell (not recommended)\nsudo -i                                # Root login shell (loads root's profile)\nsudo -E                                # Preserve environment variables\n\n# === /etc/sudoers.d/ — Drop-in files ===\n# Better than editing /etc/sudoers directly:\n# /etc/sudoers.d/deploy\n%deploy ALL=(root) /usr/local/bin/deploy.sh\n\n# === Security best practices ===\n# 1. Defaults: !root_sudo         — root should use sudo too (for audit trail)\n# 2. Defaults: log_output         — log all sudo commands\n# 3. Defaults: timestamp_timeout=5  — re-authenticate after 5 min\n# 4. Cmnd_Alias for command groups\n\nCmnd_Alias NETWORKING = /sbin/ip, /sbin/ss, /sbin/tcpdump\nCmnd_Alias SERVICES = /usr/bin/systemctl *\nkallol ALL=(root) NETWORKING, SERVICES"
     },
     {
       "title": "PAM: Pluggable Authentication Modules",
-      "description": "PAM separates authentication logic from applications. When you SSH in, log in on a TTY, or run <code>sudo</code>, the application uses PAM modules to authenticate. <strong>At FAANG, PAM is configured to enforce multi-factor authentication (MFA), LDAP/SSO integration, and hardware key requirements.</strong>",
+      "description": "PAM separates authentication logic from applications. When you SSH in, log in on a TTY, or run <code>sudo</code>, the application uses PAM modules to authenticate. <strong>At Enterprise, PAM is configured to enforce multi-factor authentication (MFA), LDAP/SSO integration, and hardware key requirements.</strong>",
       "codeBlock": "# === PAM configuration files ===\nls /etc/pam.d/\n# common-auth        — Authentication methods\n# common-account     — Account restrictions (expiry, time)\n# common-password    — Password quality rules\n# common-session     — Session setup (environment, limits)\n\n# === PAM module types ===\n# auth     — Verify identity (password, MFA, SSH key)\n# account  — Check account status (expired, locked, time-based)\n# password — Update authentication tokens\n# session  — Set up environment (open sessions, mount home)\n\n# === Control flags ===\n# requisite  — Fail immediately if this module fails\n# required   — Fail after all modules run (don't reveal which failed)\n# sufficient — If this passes, skip remaining modules\n# optional   — Used only if no other module succeeds\n\n# === Example: /etc/pam.d/common-auth ===\nauth    [success=1 default=ignore]      pam_unix.so nullok\nauth    requisite                       pam_deny.so\nauth    required                        pam_permit.so\n\n# === /etc/security/limits.conf (PAM limits) ===\n# These apply to PAM sessions (SSH, login, etc.)\nkallol soft nofile 65536\nkallol hard nofile 65536\n@deploy soft nproc 4096\n\n# === Check PAM config ===\nsudo pam-auth-update           # Ubuntu: enable/disable modules\npam_tally2 --user kallol       # Show failed login count\nsudo pam_tally2 --user kallol --reset  # Reset failed count"
     },
     {
       "title": "Service Accounts & Least Privilege",
-      "description": "Every daemon should run as its own dedicated user with minimum required permissions. <strong>At FAANG, 'root in containers' is a common security finding — each service must have a dedicated non-root user.</strong> The principle of least privilege (PoLP) means: no process should have access rights beyond what it strictly needs.",
+      "description": "Every daemon should run as its own dedicated user with minimum required permissions. <strong>At Enterprise, 'root in containers' is a common security finding — each service must have a dedicated non-root user.</strong> The principle of least privilege (PoLP) means: no process should have access rights beyond what it strictly needs.",
       "codeBlock": "# === Creating a service account (best practices) ===\nsudo useradd \\\n    --system \\\n    --no-create-home \\\n    --shell /usr/sbin/nologin \\\n    --user-group \\\n    myapp\n\n# Verify:\ngrep myapp /etc/passwd\n# myapp:x:998:998::/nonexistent:/usr/sbin/nologin\n\n# === Grant minimum permissions ===\n# Give service account access to specific directories\nsudo mkdir -p /var/log/myapp /var/lib/myapp /etc/myapp\nsudo chown myapp:myapp /var/log/myapp /var/lib/myapp /etc/myapp\nsudo chmod 750 /var/log/myapp /var/lib/myapp /etc/myapp\n\n# === Capabilities (fine-grained root privileges) ===\n# Instead of running as root, grant specific capabilities:\n# CAP_NET_BIND_SERVICE  — bind to ports < 1024\n# CAP_SYS_TIME          — change system clock\n# CAP_DAC_OVERRIDE      — bypass file permission checks\n\n# In systemd unit:\n[Service]\nUser=myapp\nAmbientCapabilities=CAP_NET_BIND_SERVICE\nCapabilityBoundingSet=CAP_NET_BIND_SERVICE\n\n# === Docker: running as non-root ===\nFROM node:22-alpine\nRUN addgroup -S myapp && adduser -S myapp -G myapp\nUSER myapp\nCOPY --chown=myapp:myapp . /app\n\n# === /etc/login.defs ===\n# Global user creation defaults:\n# UID_MIN 1000\n# UID_MAX 60000\n# SYS_UID_MIN 100\n# SYS_UID_MAX 999\n# PASS_MAX_DAYS 90"
     },
     {
-      "title": "FAANG Interview Q&A",
-      "description": "<strong>Q:</strong> 'You SSH into a server and get Permission denied (publickey). What do you check?'<br><br><strong>A:</strong> 'First, verify my SSH key is in <code>~/.ssh/authorized_keys</code> on the server with correct permissions (600). Check <code>/etc/ssh/sshd_config</code>: PubkeyAuthentication yes, PasswordAuthentication no (usually). Check <code>~/.ssh</code> permissions (700) and that the user's home directory is not group-writable. Check <code>/etc/security/access.conf</code> and PAM config in <code>/etc/pam.d/sshd</code>. Also check SELinux/AppArmor status with <code>getenforce</code>. At FAANG, SSH key rotation is automated, but manual troubleshooting still requires knowing these checks.'<br><br><strong>Q:</strong> 'What's the difference between su and sudo?'<br><br><strong>A:</strong> '<code>su</code> switches to another user completely (requires their password), starting a new shell. <code>sudo</code> runs a single command as another user (requires your password). sudo is preferred because: (1) it creates an audit trail, (2) it grants specific commands, not full access, (3) it doesn't require sharing the root password. At FAANG, su is effectively banned — all privilege elevation goes through sudo with centralized audit logging.'<br><br><strong>Q:</strong> 'A user left the company. What steps do you take?'<br><br><strong>A:</strong> 'Immediately disable their account: <code>sudo usermod -L username</code> (lock password) and remove SSH keys. Revoke sudo access: remove from sudoers. Kill their active sessions: <code>pkill -u username</code>. Archive their home directory for compliance. Remove the account after the compliance retention period. At FAANG, this is automated in the HR → IT pipeline — when an employee is terminated in Workday, their accounts are deprovisioned within minutes across all systems.'",
+      "title": "Interview Q&A",
+      "description": "<strong>Q:</strong> 'You SSH into a server and get Permission denied (publickey). What do you check?'<br><br><strong>A:</strong> 'First, verify my SSH key is in <code>~/.ssh/authorized_keys</code> on the server with correct permissions (600). Check <code>/etc/ssh/sshd_config</code>: PubkeyAuthentication yes, PasswordAuthentication no (usually). Check <code>~/.ssh</code> permissions (700) and that the user's home directory is not group-writable. Check <code>/etc/security/access.conf</code> and PAM config in <code>/etc/pam.d/sshd</code>. Also check SELinux/AppArmor status with <code>getenforce</code>. At Enterprise, SSH key rotation is automated, but manual troubleshooting still requires knowing these checks.'<br><br><strong>Q:</strong> 'What's the difference between su and sudo?'<br><br><strong>A:</strong> '<code>su</code> switches to another user completely (requires their password), starting a new shell. <code>sudo</code> runs a single command as another user (requires your password). sudo is preferred because: (1) it creates an audit trail, (2) it grants specific commands, not full access, (3) it doesn't require sharing the root password. At Enterprise, su is effectively banned — all privilege elevation goes through sudo with centralized audit logging.'<br><br><strong>Q:</strong> 'A user left the company. What steps do you take?'<br><br><strong>A:</strong> 'Immediately disable their account: <code>sudo usermod -L username</code> (lock password) and remove SSH keys. Revoke sudo access: remove from sudoers. Kill their active sessions: <code>pkill -u username</code>. Archive their home directory for compliance. Remove the account after the compliance retention period. At Enterprise, this is automated in the HR → IT pipeline — when an employee is terminated in Workday, their accounts are deprovisioned within minutes across all systems.'",
       "codeBlock": ""
     },
     {
@@ -38,6 +41,169 @@
       "codeBlock": ""
     }
   ],
-  "details": "<p class=\"mb-3\"><strong>FAANG Architect's Note:</strong> User management is often overlooked by engineers focused on 'the fun stuff' — distributed systems, ML pipelines, Kubernetes. But as a production engineer, you will spend significant time on access control. Every service needs a service account. Every human needs just enough access to do their job. Every SSH key and IAM role must be auditable. The teams that ignore user management are the teams that get paged at 3 AM because someone accidentally ran 'rm -rf' as root on a shared filesystem.</p><p><strong>Production Tip:</strong> Never, ever disable password expiry for human accounts. Use <code>chage -M 90 username</code> to enforce 90-day password rotation. For service accounts, use SSH keys with: (1) no passphrase (script-friendly), (2) from= restriction in authorized_keys (limit to specific source IPs), (3) command= restriction (limit to specific commands). Example: <code>from=\"10.0.0.0/8\" command=\"/usr/local/bin/deploy\" ssh-rsa AAA...</code></p>",
-  "tags": ["FAANG", "Linux", "users", "groups", "sudo", "PAM", "authentication", "security"]
+  "tags": [
+    "faang-insight",
+    "Linux",
+    "users",
+    "groups",
+    "sudo",
+    "PAM",
+    "authentication",
+    "security"
+  ],
+  "difficulty": "advanced",
+  "readingTime": 14,
+  "practiceTime": 11,
+  "prerequisites": [
+    "linux-permissions",
+    "linux-filesystem"
+  ],
+  "learningObjectives": [
+    "Understand user & Group Fundamentals",
+    "Understand sudo: Delegated Privilege",
+    "Understand pAM: Pluggable Authentication Modules",
+    "Understand service Accounts & Least Privilege"
+  ],
+  "analogy": {
+    "title": "Users as Club Members",
+    "description": "Each user has a membership card (UID). Groups are clubs - members share access to club resources (files). Root is the club owner with master keys. sudo is a temporary VIP pass. The /etc/passwd is the member directory; /etc/shadow holds the secret handshakes."
+  },
+  "commonMistakes": [
+    {
+      "mistake": "Ignoring log rotation until disk fills up",
+      "solution": "Configure logrotate before deploying; monitor /var/log usage"
+    },
+    {
+      "mistake": "Disabling SELinux/AppArmor instead of fixing policies",
+      "solution": "Use `audit2allow` to generate policies from denials; keep MAC enabled"
+    },
+    {
+      "mistake": "Running containers as root",
+      "solution": "Add `USER nonroot` in Dockerfile; use `--user` flag at runtime"
+    },
+    {
+      "mistake": "Not setting resource limits on containers",
+      "solution": "Always set `--cpus` and `--memory`; configure cgroup limits in Kubernetes"
+    },
+    {
+      "mistake": "Checking /proc/meminfo inside containers for memory",
+      "solution": "Use cgroup v2 files: /sys/fs/cgroup/memory.current, memory.events"
+    }
+  ],
+  "practiceLabs": [
+    {
+      "title": "Explore: User & Group Fundamentals",
+      "task": "Run `cat` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man cat` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: sudo: Delegated Privilege",
+      "task": "Run `sudo` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man sudo` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: PAM: Pluggable Authentication Modules",
+      "task": "Run `who` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man who` to see all available flags and understand the output columns."
+    }
+  ],
+  "quickReference": {
+    "title": "Quick Reference",
+    "content": "| Command | Description |\n|---|---|\n| `cat` | User & Group Fundamentals |\n| `sudo` | User & Group Fundamentals |\n| `who` | User & Group Fundamentals |\n| `kallol` | sudo: Delegated Privilege |\n| `sudo` | sudo: Delegated Privilege |\n| `Cmnd_Alias` | sudo: Delegated Privilege |\n| `ls` | PAM: Pluggable Authentication Modules |\n| `auth` | PAM: Pluggable Authentication Modules |\n| `kallol` | PAM: Pluggable Authentication Modules |\n| `sudo` | Service Accounts & Least Privilege |\n| `myapp` | Service Accounts & Least Privilege |\n| `grep` | Service Accounts & Least Privilege |"
+  },
+  "troubleshooting": [
+    {
+      "symptom": "cat returns unexpected output",
+      "cause": "Incorrect arguments, wrong working directory, or stale cached data",
+      "solution": "Verify arguments with `man cat`; check current path with `pwd`; clear cache if applicable"
+    },
+    {
+      "symptom": "Configuration changes not taking effect",
+      "cause": "Service not reloaded or syntax error in config file",
+      "solution": "Validate config syntax with built-in test flag; reload service with `systemctl reload` or `restart`"
+    },
+    {
+      "symptom": "users operation slow or timing out",
+      "cause": "Resource exhaustion (disk I/O, memory pressure, or lock contention)",
+      "solution": "Check `iostat`, `free -m`, and `top`; look for stuck processes with `ps aux --sort=-%cpu`"
+    },
+    {
+      "symptom": "Permission issues accessing users resources",
+      "cause": "Incorrect file ownership or overly restrictive permissions",
+      "solution": "Inspect with `ls -la`; fix with `chown`/ `chmod`; check ACLs with `getfacl`"
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is User & Group Fundamentals?",
+      "options": [
+        "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+        "A tool for managing disk partitions",
+        "A network configuration protocol",
+        "A user authentication system"
+      ],
+      "answer": "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+      "explanation": "The User & Group Fundamentals is the foundation of the Linux filesystem — everything in the system is organized under this structure."
+    },
+    {
+      "question": "What does `cat` do?",
+      "options": [
+        "Lists information about users",
+        "Creates a new directory",
+        "Removes files",
+        "Copies files between directories"
+      ],
+      "answer": "Lists files and directories in the current or specified path",
+      "explanation": "Use `ls` to explore directory contents. Combine with flags like `-l` (long format), `-a` (hidden files), and `-h` (human-readable sizes)."
+    },
+    {
+      "question": "Which command would you use to view disk usage of the users directory?",
+      "options": [
+        "du -sh /path/to/directory",
+        "cat /path/to/directory",
+        "cp -r /path/to/directory",
+        "chmod /path/to/directory"
+      ],
+      "answer": "du -sh /path/to/directory",
+      "explanation": "`du -sh` (disk usage, summary, human-readable) shows the total size of a directory and its contents."
+    },
+    {
+      "question": "A user reports \"Permission denied\" when trying to access a users directory. What is the first command you should run?",
+      "options": [
+        "ls -ld /path/to/directory",
+        "chmod 777 /path/to/directory",
+        "rm -rf /path/to/directory",
+        "systemctl restart sshd"
+      ],
+      "answer": "ls -ld /path/to/directory",
+      "explanation": "`ls -ld` shows the directory's permissions and ownership. Always inspect before making changes — starting with `chmod 777` is a security anti-pattern."
+    },
+    {
+      "question": "In a users scenario, your monitoring alerts show cat failing intermittently. What is the correct debugging workflow?",
+      "options": [
+        "Check logs → verify configuration → test in staging → apply fix → monitor",
+        "Reboot the server immediately",
+        "Reinstall the operating system",
+        "Ignore the alert and wait for it to resolve"
+      ],
+      "answer": "Check logs → verify configuration → test in staging → apply fix → monitor",
+      "explanation": "A structured debugging workflow prevents cascading failures. Always diagnose before acting, especially in production environments where downtime has direct business impact."
+    }
+  ],
+  "interviewTips": [
+    "FAANG Architect's Note:  User management is often overlooked by engineers focused on 'the fun stuff' — distributed systems, ML pipelines, Kubernetes"
+  ],
+  "productionTips": [
+    "production engineer, you will spend significant time on access control",
+    "Production Tip:  Never, ever disable password expiry for human accounts"
+  ],
+  "bestPractices": [
+    "sudo: Delegated Privilege",
+    "Service Accounts & Least Privilege"
+  ],
+  "enterprisePerspective": "In enterprise environments, users, groups & authentication is managed through automation (Ansible, Terraform), monitored centrally (Prometheus, Datadog), and governed by compliance policies (CIS benchmarks, SOC2). Changes go through change advisory boards with rollback procedures documented.",
+  "visualHint": "user_group_hierarchy"
 }

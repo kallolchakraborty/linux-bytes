@@ -1,35 +1,38 @@
 {
+  "schemaVersion": "2.0",
+  "contentVersion": "1.0",
+  "lastReviewed": "2026-07-08",
+  "reviewStatus": "migrated",
   "id": "linux-package-mgmt",
   "title": "Package Management",
   "category": "Linux",
   "subcategory": "Systems & Operations",
   "language": "bash",
-  "description": "Package management is how Linux systems install, update, and remove software. At FAANG, you'll work across Debian-based (Ubuntu), RHEL-based (Amazon Linux 2/2023), and containerized environments. Understanding the differences between dpkg/APT, rpm/YUM/DNF, and compiling from source is essential for building reproducible infrastructure.",
-  "codeBlock": "",
+  "description": "Package management is how Linux systems install, update, and remove software. At Enterprise, you'll work across Debian-based (Ubuntu), RHEL-based (Amazon Linux 2/2023), and containerized environments. Understanding the differences between dpkg/APT, rpm/YUM/DNF, and compiling from source is essential for building reproducible infrastructure.",
   "sections": [
     {
       "title": "Debian/Ubuntu: APT & dpkg",
-      "description": "Ubuntu (the most common dev environment at FAANG) uses <strong>APT</strong> (Advanced Package Tool) on top of <strong>dpkg</strong>. Packages are <code>.deb</code> files. <code>/etc/apt/sources.list</code> and <code>/etc/apt/sources.list.d/</code> define repositories. Always run <code>apt update</code> before <code>apt install</code> — this refreshes the package index.",
+      "description": "Ubuntu (the most common dev environment at Enterprise) uses <strong>APT</strong> (Advanced Package Tool) on top of <strong>dpkg</strong>. Packages are <code>.deb</code> files. <code>/etc/apt/sources.list</code> and <code>/etc/apt/sources.list.d/</code> define repositories. Always run <code>apt update</code> before <code>apt install</code> — this refreshes the package index.",
       "codeBlock": "# === Repository management ===\ncat /etc/apt/sources.list                    # Main repos\nls /etc/apt/sources.list.d/                  # Third-party repos (Docker, Kubernetes, etc.)\n\n# === APT commands ===\nsudo apt update                               # Refresh package index (must run first!)\nsudo apt upgrade                              # Upgrade all packages\nsudo apt full-upgrade                         # Upgrade with dependency changes\nsudo apt autoremove                           # Remove orphaned dependencies\n\nsudo apt install nginx                        # Install package\nsudo apt install -y nginx                     # Non-interactive (script-friendly)\nsudo apt remove nginx                         # Remove package (leave config)\nsudo apt purge nginx                          # Remove package + config files\n\napt list --installed                          # List installed packages\napt list --upgradable                         # List available updates\napt search \"web server\"                       # Search packages\napt show nginx                                # Show package details\n\n# === dpkg (low-level) ===\ndpkg -i package.deb                           # Install .deb file directly\ndpkg -r package                              # Remove package\ndpkg -l                                       # List installed packages\ndpkg -L nginx                                 # List files owned by package\ndpkg -S /usr/bin/nvim                         # Find which package owns a file\n\n# === Fix broken dependencies ===\nsudo apt --fix-broken install                 # Repair broken dpkg state\n\n# === Pinning package versions ===\n# /etc/apt/preferences.d/pin-nginx\n# Package: nginx\n# Pin: version 1.24.*\n# Pin-Priority: 1001\n\n# === Installing specific version ===\napt list -a nginx                             # All available versions\nsudo apt install nginx=1.24.0-1ubuntu1        # Install specific version\nsudo apt-mark hold nginx                      # Prevent automatic upgrade\nsudo apt-mark unhold nginx                    # Re-enable upgrades"
     },
     {
       "title": "RHEL/CentOS/Amazon Linux: RPM & YUM/DNF",
-      "description": "Amazon Linux 2 and Amazon Linux 2023 (the standard at AWS/FAANG) are RHEL-based. They use <strong>RPM</strong> (<code>.rpm</code> packages) with <strong>YUM</strong> (Amazon Linux 2) or <strong>DNF</strong> (Amazon Linux 2023) as the high-level package manager. The underlying tool is <code>rpm</code>.",
+      "description": "Amazon Linux 2 and Amazon Linux 2023 (the standard at AWS/Enterprise) are RHEL-based. They use <strong>RPM</strong> (<code>.rpm</code> packages) with <strong>YUM</strong> (Amazon Linux 2) or <strong>DNF</strong> (Amazon Linux 2023) as the high-level package manager. The underlying tool is <code>rpm</code>.",
       "codeBlock": "# === YUM (Amazon Linux 2, CentOS 7) ===\nsudo yum update -y                             # Update all packages\nsudo yum install -y nginx                      # Install\nsudo yum remove nginx                          # Remove\nsudo yum list installed                        # List installed\nyum list available \"nginx*\"                    # Search available\nyum info nginx                                 # Package details\nsudo yum autoremove                            # Clean orphaned deps\nsudo yum history                               # Transaction history\n\n# === DNF (Amazon Linux 2023, Fedora, RHEL 9) ===\nsudo dnf install -y nginx\nsudo dnf remove nginx\nsudo dnf upgrade --refresh\nsudo dnf list --installed\nsudo dnf repolist                               # List configured repos\nsudo dnf provides /usr/bin/nginx                # Which package provides a file?\nsudo dnf history\n\n# === RPM (low-level) ===\nrpm -ivh package.rpm                           # Install RPM\nrpm -e package                                 # Remove RPM\nrpm -qa                                        # Query all installed packages\nrpm -ql nginx                                  # List files owned by package\nrpm -qf /usr/sbin/nginx                        # Find package owning a file\nrpm -qi nginx                                  # Package info\n\n# === EPEL (Extra Packages for Enterprise Linux) ===\nsudo amazon-linux-extras install epel          # Amazon Linux 2\nsudo dnf install epel-release                  # Amazon Linux 2023 / RHEL 9\n\n# === Amazon Linux Extras ===\nsudo amazon-linux-extras list                  # Available topics\nsudo amazon-linux-extras install nginx1        # Install from extras\n\n# === Locking versions ===\necho \"exclude=nginx*\" | sudo tee -a /etc/yum.conf  # Prevent updates (YUM)\nsudo dnf versionlock add nginx*                # Lock version (DNF)"
     },
     {
       "title": "Compiling from Source & Alternatives",
-      "description": "Sometimes you need software not in package repos, or you need specific compile-time flags. At FAANG, critical services are often compiled with custom optimization flags (PGO, LTO, specific CPU architectures). <strong>Understanding the build chain (configure, make, make install) is essential for infrastructure engineers.</strong>",
-      "codeBlock": "# === Classic build chain ===\nwget https://example.com/software-1.0.tar.gz\ntar -xzf software-1.0.tar.gz\ncd software-1.0/\n\n# Step 1: Configure (check dependencies, set options)\n./configure --prefix=/usr/local --enable-optimizations\n\n# Step 2: Build\nmake -j$(nproc)                                # Parallel build using all cores\n\n# Step 3: Install\nsudo make install                              # Copy to system directories\n\n# === Common configure flags ===\n# --prefix=/usr          — Install to /usr (not /usr/local)\n# --sysconfdir=/etc      — Config files location\n# --with-ssl             — Enable SSL support\n# --enable-debug         — Build with debug symbols\n\n# === Checkinstall (create a .deb/.rpm from source) ===\nsudo apt install checkinstall\nsudo checkinstall make install                 # Creates and installs a .deb\n\n# === Stow (manage manually compiled software) ===\n# Install each version under /usr/local/stow/<pkg>-<ver>/\n# Symlink to /usr/local/ with stow\nsudo stow -d /usr/local/stow -S nginx-1.24\n\n# === FAANG pattern: hermetic builds ===\n# At FAANG, we don't compile on production servers.\n# Builds happen in hermetic build systems (e.g., Bazel, Buck).\n# Artifacts are versioned and deployed via package managers or containers.\n\n# === Alternatives: Homebrew on Linux ===\n/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"\nbrew install nginx\nbrew services start nginx"
+      "description": "Sometimes you need software not in package repos, or you need specific compile-time flags. At Enterprise, critical services are often compiled with custom optimization flags (PGO, LTO, specific CPU architectures). <strong>Understanding the build chain (configure, make, make install) is essential for infrastructure engineers.</strong>",
+      "codeBlock": "# === Classic build chain ===\nwget https://example.com/software-1.0.tar.gz\ntar -xzf software-1.0.tar.gz\ncd software-1.0/\n\n# Step 1: Configure (check dependencies, set options)\n./configure --prefix=/usr/local --enable-optimizations\n\n# Step 2: Build\nmake -j$(nproc)                                # Parallel build using all cores\n\n# Step 3: Install\nsudo make install                              # Copy to system directories\n\n# === Common configure flags ===\n# --prefix=/usr          — Install to /usr (not /usr/local)\n# --sysconfdir=/etc      — Config files location\n# --with-ssl             — Enable SSL support\n# --enable-debug         — Build with debug symbols\n\n# === Checkinstall (create a .deb/.rpm from source) ===\nsudo apt install checkinstall\nsudo checkinstall make install                 # Creates and installs a .deb\n\n# === Stow (manage manually compiled software) ===\n# Install each version under /usr/local/stow/<pkg>-<ver>/\n# Symlink to /usr/local/ with stow\nsudo stow -d /usr/local/stow -S nginx-1.24\n\n# === Enterprise pattern: hermetic builds ===\n# At Enterprise, we don't compile on production servers.\n# Builds happen in hermetic build systems (e.g., Bazel, Buck).\n# Artifacts are versioned and deployed via package managers or containers.\n\n# === Alternatives: Homebrew on Linux ===\n/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"\nbrew install nginx\nbrew services start nginx"
     },
     {
       "title": "Docker & Containers: The Modern \"Package\"",
-      "description": "At FAANG, most services are packaged as <strong>container images</strong> rather than native packages. Containers bundle the application + its dependencies + the package manager snapshot. Understanding the <strong>Dockerfile</strong> and <strong>multi-stage builds</strong> is essential for modern infrastructure.",
+      "description": "At Enterprise, most services are packaged as <strong>container images</strong> rather than native packages. Containers bundle the application + its dependencies + the package manager snapshot. Understanding the <strong>Dockerfile</strong> and <strong>multi-stage builds</strong> is essential for modern infrastructure.",
       "codeBlock": "# === Dockerfile with package management ===\nFROM ubuntu:22.04 AS builder\n\n# Always combine apt update + install in ONE RUN layer\nRUN apt-get update && apt-get install -y \\\n    build-essential \\\n    libssl-dev \\\n    && rm -rf /var/lib/apt/lists/*\n\n# Multi-stage build: builder → runtime\nFROM ubuntu:22.04 AS runtime\n\n# Copy only the compiled binary, not the build tools\nCOPY --from=builder /app/compiled_binary /usr/local/bin/\n\n# Distroless images (no package manager at all)\nFROM gcr.io/distroless/base-debian12:latest\n\n# === Best practices ===\n# 1. Pin base image digests (not tags)\n#    FROM ubuntu:22.04@sha256:abc123...\n# 2. Combine RUN apt-get update && apt-get install (cache busting)\n# 3. Clean apt cache in same layer: rm -rf /var/lib/apt/lists/*\n# 4. Use --no-install-recommends to reduce image size\n# 5. Never leave a package manager in the final image"
     },
     {
-      "title": "FAANG Interview Q&A",
-      "description": "<strong>Q:</strong> 'You need to install a specific version of nginx on Ubuntu, but apt installs the wrong version. What do you do?'<br><br><strong>A:</strong> 'First, run <code>apt list -a nginx</code> to see all available versions. If my version is there, install it with <code>apt install nginx=&lt;version&gt;</code>. If not, I'd add the official nginx repository to <code>/etc/apt/sources.list.d/</code> with the correct distribution codename. As a last resort, I'd download the .deb directly or compile from source. At FAANG, we would never apt install on production — instead, we'd bake the correct version into an AMI or container image.'<br><br><strong>Q:</strong> 'What's the difference between apt update and apt upgrade?'<br><br><strong>A:</strong> '<code>apt update</code> downloads the latest package lists from repositories — it tells you what's available. <code>apt upgrade</code> actually installs newer versions of installed packages based on those updated lists. Running upgrade without update will give you stale information.'<br><br><strong>Q:</strong> 'How do package managers resolve dependencies?'<br><br><strong>A:</strong> 'APT, YUM, and DNF maintain a dependency graph. Each package declares its dependencies (Depends:), conflicts (Conflicts:), and provides (Provides:). The solver finds a consistent set of package versions satisfying all constraints. If there's an unresolvable conflict, the tool reports it. At FAANG, we avoid these issues by using deterministic builds and container images with fixed package snapshots.'",
+      "title": "Interview Q&A",
+      "description": "<strong>Q:</strong> 'You need to install a specific version of nginx on Ubuntu, but apt installs the wrong version. What do you do?'<br><br><strong>A:</strong> 'First, run <code>apt list -a nginx</code> to see all available versions. If my version is there, install it with <code>apt install nginx=&lt;version&gt;</code>. If not, I'd add the official nginx repository to <code>/etc/apt/sources.list.d/</code> with the correct distribution codename. As a last resort, I'd download the .deb directly or compile from source. At Enterprise, we would never apt install on production — instead, we'd bake the correct version into an AMI or container image.'<br><br><strong>Q:</strong> 'What's the difference between apt update and apt upgrade?'<br><br><strong>A:</strong> '<code>apt update</code> downloads the latest package lists from repositories — it tells you what's available. <code>apt upgrade</code> actually installs newer versions of installed packages based on those updated lists. Running upgrade without update will give you stale information.'<br><br><strong>Q:</strong> 'How do package managers resolve dependencies?'<br><br><strong>A:</strong> 'APT, YUM, and DNF maintain a dependency graph. Each package declares its dependencies (Depends:), conflicts (Conflicts:), and provides (Provides:). The solver finds a consistent set of package versions satisfying all constraints. If there's an unresolvable conflict, the tool reports it. At Enterprise, we avoid these issues by using deterministic builds and container images with fixed package snapshots.'",
       "codeBlock": ""
     },
     {
@@ -38,6 +41,169 @@
       "codeBlock": ""
     }
   ],
-  "details": "<p class=\"mb-3\"><strong>FAANG Architect's Note:</strong> In 15+ years across multiple FAANG companies, I've seen package management evolve from 'YUM on a fleet of pets' to 'everything runs in containers with immutable base images.' The days of SSH'ing into a box and running apt-get are over at scale. But the <em>concepts</em> live on: dependencies, version pinning, repository management, and build toolchains are just as relevant — they've moved upstream into the CI/CD pipeline. If you understand RPM and dpkg internals, you'll understand container layer caching and multi-stage builds intuitively.</p><p><strong>Production Tip:</strong> Never run unattended-upgrades on production servers. At FAANG, package updates are applied by rebuilding AMIs or rolling out new container versions — never in-place on running instances. This ensures that every instance is identical and rollbacks are as simple as pointing to the previous image.</p>",
-  "tags": ["FAANG", "Linux", "apt", "yum", "dnf", "package management", "containers"]
+  "tags": [
+    "faang-insight",
+    "Linux",
+    "apt",
+    "yum",
+    "dnf",
+    "package management",
+    "containers"
+  ],
+  "difficulty": "intermediate",
+  "readingTime": 15,
+  "practiceTime": 11,
+  "prerequisites": [
+    "linux-cli-basics",
+    "linux-filesystem"
+  ],
+  "learningObjectives": [
+    "Understand debian/Ubuntu: APT & dpkg",
+    "Understand rHEL/CentOS/Amazon Linux: RPM & YUM/DNF",
+    "Understand compiling from Source & Alternatives",
+    "Understand docker & Containers: The Modern \"Package\""
+  ],
+  "analogy": {
+    "title": "Package Manager as a Curated App Store",
+    "description": "Repositories are verified warehouses. Dependencies are \"this dish requires these ingredients.\" The package manager resolves the full shopping list automatically. apt/dnf are different store chains - same concept, different inventory."
+  },
+  "commonMistakes": [
+    {
+      "mistake": "Running destructive commands without verification",
+      "solution": "Always use `rm -i` or `ls` first to confirm what will be deleted"
+    },
+    {
+      "mistake": "Ignoring log rotation until disk fills up",
+      "solution": "Configure logrotate before deploying; monitor /var/log usage"
+    },
+    {
+      "mistake": "Disabling SELinux/AppArmor instead of fixing policies",
+      "solution": "Use `audit2allow` to generate policies from denials; keep MAC enabled"
+    },
+    {
+      "mistake": "Running containers as root",
+      "solution": "Add `USER nonroot` in Dockerfile; use `--user` flag at runtime"
+    },
+    {
+      "mistake": "Not setting resource limits on containers",
+      "solution": "Always set `--cpus` and `--memory`; configure cgroup limits in Kubernetes"
+    }
+  ],
+  "practiceLabs": [
+    {
+      "title": "Explore: Debian/Ubuntu: APT & dpkg",
+      "task": "Run `cat` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man cat` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: RHEL/CentOS/Amazon Linux: RPM & YUM/DNF",
+      "task": "Run `ls` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man ls` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: Compiling from Source & Alternatives",
+      "task": "Run `sudo` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man sudo` to see all available flags and understand the output columns."
+    }
+  ],
+  "quickReference": {
+    "title": "Quick Reference",
+    "content": "| Command | Description |\n|---|---|\n| `cat` | Debian/Ubuntu: APT & dpkg |\n| `ls` | Debian/Ubuntu: APT & dpkg |\n| `sudo` | Debian/Ubuntu: APT & dpkg |\n| `sudo` | RHEL/CentOS/Amazon Linux: RPM & YUM/DNF |\n| `yum` | RHEL/CentOS/Amazon Linux: RPM & YUM/DNF |\n| `rpm` | RHEL/CentOS/Amazon Linux: RPM & YUM/DNF |\n| `wget` | Compiling from Source & Alternatives |\n| `tar` | Compiling from Source & Alternatives |\n| `cd` | Compiling from Source & Alternatives |\n| `FROM` | Docker & Containers: The Modern \"Package\" |\n| `RUN` | Docker & Containers: The Modern \"Package\" |\n| `build-essential` | Docker & Containers: The Modern \"Package\" |"
+  },
+  "troubleshooting": [
+    {
+      "symptom": "cat returns unexpected output",
+      "cause": "Incorrect arguments, wrong working directory, or stale cached data",
+      "solution": "Verify arguments with `man cat`; check current path with `pwd`; clear cache if applicable"
+    },
+    {
+      "symptom": "Configuration changes not taking effect",
+      "cause": "Service not reloaded or syntax error in config file",
+      "solution": "Validate config syntax with built-in test flag; reload service with `systemctl reload` or `restart`"
+    },
+    {
+      "symptom": "package mgmt operation slow or timing out",
+      "cause": "Resource exhaustion (disk I/O, memory pressure, or lock contention)",
+      "solution": "Check `iostat`, `free -m`, and `top`; look for stuck processes with `ps aux --sort=-%cpu`"
+    },
+    {
+      "symptom": "Permission issues accessing package mgmt resources",
+      "cause": "Incorrect file ownership or overly restrictive permissions",
+      "solution": "Inspect with `ls -la`; fix with `chown`/ `chmod`; check ACLs with `getfacl`"
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is Debian/Ubuntu: APT & dpkg?",
+      "options": [
+        "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+        "A tool for managing disk partitions",
+        "A network configuration protocol",
+        "A user authentication system"
+      ],
+      "answer": "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+      "explanation": "The Debian/Ubuntu: APT & dpkg is the foundation of the Linux filesystem — everything in the system is organized under this structure."
+    },
+    {
+      "question": "What does `cat` do?",
+      "options": [
+        "Lists information about package mgmt",
+        "Creates a new directory",
+        "Removes files",
+        "Copies files between directories"
+      ],
+      "answer": "Lists files and directories in the current or specified path",
+      "explanation": "Use `ls` to explore directory contents. Combine with flags like `-l` (long format), `-a` (hidden files), and `-h` (human-readable sizes)."
+    },
+    {
+      "question": "Which command would you use to view disk usage of the package mgmt directory?",
+      "options": [
+        "du -sh /path/to/directory",
+        "cat /path/to/directory",
+        "cp -r /path/to/directory",
+        "chmod /path/to/directory"
+      ],
+      "answer": "du -sh /path/to/directory",
+      "explanation": "`du -sh` (disk usage, summary, human-readable) shows the total size of a directory and its contents."
+    },
+    {
+      "question": "A user reports \"Permission denied\" when trying to access a package mgmt directory. What is the first command you should run?",
+      "options": [
+        "ls -ld /path/to/directory",
+        "chmod 777 /path/to/directory",
+        "rm -rf /path/to/directory",
+        "systemctl restart sshd"
+      ],
+      "answer": "ls -ld /path/to/directory",
+      "explanation": "`ls -ld` shows the directory's permissions and ownership. Always inspect before making changes — starting with `chmod 777` is a security anti-pattern."
+    },
+    {
+      "question": "In a package mgmt scenario, your monitoring alerts show cat failing intermittently. What is the correct debugging workflow?",
+      "options": [
+        "Check logs → verify configuration → test in staging → apply fix → monitor",
+        "Reboot the server immediately",
+        "Reinstall the operating system",
+        "Ignore the alert and wait for it to resolve"
+      ],
+      "answer": "Check logs → verify configuration → test in staging → apply fix → monitor",
+      "explanation": "A structured debugging workflow prevents cascading failures. Always diagnose before acting, especially in production environments where downtime has direct business impact."
+    }
+  ],
+  "interviewTips": [
+    "FAANG Architect's Note:  In 15+ years across multiple FAANG companies, I've seen package management evolve from 'YUM on a fleet of pets' to 'everything runs in containers with immutable base images",
+    "FAANG, package updates are applied by rebuilding AMIs or rolling out new container versions — never in-place on running instances"
+  ],
+  "productionTips": [
+    "Production Tip:  Never run unattended-upgrades on production servers"
+  ],
+  "bestPractices": [
+    "Use version control for all configuration (/etc, scripts, Dockerfiles)",
+    "Implement infrastructure as code; avoid manual server changes",
+    "Test changes in staging before production; have rollback plans"
+  ],
+  "enterprisePerspective": "In enterprise environments, package management is managed through automation (Ansible, Terraform), monitored centrally (Prometheus, Datadog), and governed by compliance policies (CIS benchmarks, SOC2). Changes go through change advisory boards with rollback procedures documented.",
+  "visualHint": "dependency_graph"
 }

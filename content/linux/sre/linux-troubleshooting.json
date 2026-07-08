@@ -1,35 +1,38 @@
 {
+  "schemaVersion": "2.0",
+  "contentVersion": "1.0",
+  "lastReviewed": "2026-07-08",
+  "reviewStatus": "migrated",
   "id": "linux-troubleshooting",
   "title": "Production Troubleshooting",
   "category": "Linux",
   "subcategory": "Containers & SRE",
   "language": "bash",
-  "description": "Production troubleshooting is the art of diagnosing and resolving issues in live systems under pressure. At FAANG, the expectation is that you can SSH into any server (or use equivalent remote access) and systematically identify the root cause of an issue — whether it's a performance degradation, a crash, a network partition, or a resource exhaustion. This guide covers the systematic approach and essential techniques.",
-  "codeBlock": "",
+  "description": "Production troubleshooting is the art of diagnosing and resolving issues in live systems under pressure. At Enterprise, the expectation is that you can SSH into any server (or use equivalent remote access) and systematically identify the root cause of an issue — whether it's a performance degradation, a crash, a network partition, or a resource exhaustion. This guide covers the systematic approach and essential techniques.",
   "sections": [
     {
       "title": "Incident Response: The First 5 Minutes",
-      "description": "When a page comes in, the first 5 minutes set the tone for the entire incident. <strong>Stay calm, follow the runbook, and gather data before making changes.</strong> At FAANG, the incident response protocol is: acknowledge → assess → assemble → act. The cardinal rule: <strong>don't make things worse.</strong>",
+      "description": "When a page comes in, the first 5 minutes set the tone for the entire incident. <strong>Stay calm, follow the runbook, and gather data before making changes.</strong> At Enterprise, the incident response protocol is: acknowledge → assess → assemble → act. The cardinal rule: <strong>don't make things worse.</strong>",
       "codeBlock": "# === The 60-second triage (Brendan Gregg's checklist) ===\n\n# 1. uptime — load averages\necho \"=== UPTIME ===\"\nuptime\n\n# 2. dmesg — kernel errors\necho \"=== KERNEL ===\"\ndmesg | tail -20\n\n# 3. vmstat — system-level CPU/memory/swap\necho \"=== VMSTAT ===\"\nvmstat 1 3\n\n# 4. mpstat — per-CPU balance\necho \"=== PER-CPU ===\"\nmpstat -P ALL 1 1\n\n# 5. pidstat — per-process CPU\necho \"=== TOP CPU PROCESSES ===\"\npidstat 1 3 | tail -10\n\n# 6. iostat — disk I/O\necho \"=== DISK I/O ===\"\niostat -xz 1 2\n\n# 7. free -m — memory\necho \"=== MEMORY ===\"\nfree -h\n\n# 8. sar -n DEV — network\necho \"=== NETWORK ===\"\nsar -n DEV 1 2 | grep -E \"(Interface|eth|ens|bond)\"\n\n# 9. sar -n TCP,ETCP — TCP stats\necho \"=== TCP ===\"\nsar -n TCP,ETCP 1 1\n\n# 10. top — overview\necho \"=== TOP ===\"\ntop -b -n 1 | head -20\n\n# === Before making any change ===\n# 1. Confirm the issue: is this an alert false positive?\n# 2. Check if a recent deploy/change caused it\n# 3. Is this a known issue? Check the runbook\n# 4. Communicate: 'I'm investigating, ETA unknown'\n# 5. If risky: 'What's the rollback plan?'"
     },
     {
       "title": "Diagnosing High CPU & Memory Issues",
-      "description": "CPU and memory issues are the most common production problems. <strong>The key question: is this a traffic increase (legitimate high usage) or a code issue (infinite loop, memory leak)?</strong> At FAANG, we use perf, heap dumps, and continuous profiling to answer this question in minutes, not hours.",
+      "description": "CPU and memory issues are the most common production problems. <strong>The key question: is this a traffic increase (legitimate high usage) or a code issue (infinite loop, memory leak)?</strong> At Enterprise, we use perf, heap dumps, and continuous profiling to answer this question in minutes, not hours.",
       "codeBlock": "# === High CPU ===\n# 1. Identify the process:\nps aux --sort=-%cpu | head -10\n\n# 2. Check threads:\ntop -H -p <PID>\n\n# 3. Sample the hot function:\nperf top -p <PID>\n\n# 4. Capture stack samples:\nperf record -F 99 -p <PID> -g --sleep 30\nperf report -g --stdio | head -40\n\n# 5. Check for common patterns:\n# - Infinite loop: check application logs for repeated log messages\n# - GC storm (Java/Go): check GC metrics\n# - Event loop blocked (Node/Python): check event loop lag\n# - Contention: check thread dumps (jstack, pstack, gdb)\n\n# === Java thread dump (blocked threads) ===\njstack <PID>                          # Full thread dump\njstack <PID> | grep -A 20 \"BLOCKED\"   # Find blocked threads\n\n# === Memory leak ===\n# 1. Confirm leak (RSS grows over time):\nps -p <PID> -o rss,vsz,pmem\n\n# 2. Check /proc/<PID>/status for memory breakdown:\ncat /proc/<PID>/status | grep -E \"(VmRSS|VmSize|VmPeak|VmSwap)\"\n\n# 3. Check page fault rate (major faults = swapping):\ncat /proc/<PID>/status | grep -i fault\n\n# 4. Java heap analysis:\n# Capture heap dump:\njmap -dump:live,format=b,file=heap.hprof <PID>\n# Analyze with Eclipse MAT or jhat\n\n# 5. Native memory leak (Valgrind):\nvalgrind --tool=memcheck --leak-check=full ./myapp\n\n# 6. Python memory profiling:\npip install memory_profiler\npython -m memory_profiler myapp.py\n\n# === Node.js memory ===\n# Take heap snapshot (need --inspect):\nkill -USR2 <PID>                       # Toggle inspector\n# Then connect Chrome DevTools or use node --inspect\n\n# === Go memory ===\ncurl http://localhost:6060/debug/pprof/heap > heap.out\ngo tool pprof heap.out"
     },
     {
       "title": "Diagnosing Disk & I/O Issues",
-      "description": "Disk issues manifest as: 'disk full', 'slow I/O', 'filesystem errors', or 'process stuck in D state'. <strong>The most common cause of disk-full incidents is log files that weren't rotated.</strong> At FAANG, disk monitoring is automated but engineers still need to diagnose root cause when the alert fires.",
+      "description": "Disk issues manifest as: 'disk full', 'slow I/O', 'filesystem errors', or 'process stuck in D state'. <strong>The most common cause of disk-full incidents is log files that weren't rotated.</strong> At Enterprise, disk monitoring is automated but engineers still need to diagnose root cause when the alert fires.",
       "codeBlock": "# === Disk full ===\ndf -h                                 # Check space\ndf -i                                 # Check inodes (filesystem can be full even with free space!)\n\n# Find the culprit:\ndu -sh /* | sort -rh | head -10       # Top-level directories\ndu -sh /var/log/* | sort -rh | head -10  # Log directories\nfind /var/log -type f -size +100M     # Large files > 100MB\n\n# Common space hogs:\n# - Log files: /var/log/, /var/log/journal/\n# - Docker: /var/lib/docker/, docker system prune -a\n# - Package cache: apt-get clean, yum clean all\n# - Core dumps: /var/crash/, /var/lib/systemd/coredump/\n# - Old kernels: /boot/, apt-get autoremove --purge\n\n# === Filesystem corruption ===\n# If disk errors appear:\ndmesg | grep -i \"I/O error\\|buffer I/O\"\n\n# Check filesystem (unmounted):\nsudo fsck.ext4 -f /dev/sdb1\n\n# XFS repair:\nsudo xfs_repair /dev/sdb1\n\n# === Slow I/O ===\niostat -x 1 5                         # Check %util, await, aqu-sz\niotop -oP                             # Which process is doing I/O?\n\n# Check for I/O throttling:\ncat /sys/fs/cgroup/system.slice/*.service/io.stat 2>/dev/null\n\n# === Process stuck in D (uninterruptible sleep) ===\nps aux | grep \" D\"\n# D state = waiting for I/O in kernel (can't be killed)\ncat /proc/<PID>/stack                 # Show kernel stack (what's it waiting for?)\ncat /proc/<PID>/wchan                 # Kernel function it's blocked in\n\n# === NFS issues ===\nmount | grep nfs                     # Check NFS mounts\n# If NFS server is down, processes hang in D state\n# Fix: remount with 'soft' option (but risk of data corruption)\n# Better: fix the NFS server or use 'hard,intr' with reasonable timeo"
     },
     {
       "title": "Diagnosing Network Issues",
-      "description": "Network issues can be: '<strong>connection refused</strong>' (service not listening), '<strong>connection timed out</strong>' (firewall or routing), '<strong>connection reset</strong>' (service crashed or overloaded), or '<strong>intermittent failures</strong>' (packet loss, DNS issues). At FAANG, network troubleshooting is a layered skill — you start with basic connectivity tests and escalate to packet captures.",
+      "description": "Network issues can be: '<strong>connection refused</strong>' (service not listening), '<strong>connection timed out</strong>' (firewall or routing), '<strong>connection reset</strong>' (service crashed or overloaded), or '<strong>intermittent failures</strong>' (packet loss, DNS issues). At Enterprise, network troubleshooting is a layered skill — you start with basic connectivity tests and escalate to packet captures.",
       "codeBlock": "# === Layer 1: Is the port open? ===\nss -tlnp | grep :80                  # Is something listening on port 80?\nnc -zv localhost 80                  # Local connectivity test\n\n# Layer 2: Is the network reachable?\nping -c 3 10.0.0.1                  # Basic ICMP test\nmtr 10.0.0.1                         # Path analysis (traceroute + ping)\n\n# Layer 3: Is the firewall blocking?\nsudo iptables -L -n | grep :80       # Check iptables rules\n# Cloud: check security groups / network ACLs\n\n# Layer 4: Socket state\nss -tanp | grep :80                   # Connection state\n# TIME_WAIT high: normal for proxies, but can exhaust ports\n# CLOSE_WAIT high: application bug (not closing sockets)\n\n# Layer 5: Application-level\ncurl -v http://localhost:80           # HTTP headers + timing\ncurl -w \"@curl-format.txt\" -o /dev/null -s http://localhost:80\n# Custom timing format:\ncat > curl-format.txt << 'EOF'\n    time_namelookup:  %{time_namelookup}s\n       time_connect:  %{time_connect}s\n    time_appconnect:  %{time_appconnect}s\n   time_pretransfer:  %{time_pretransfer}s\n      time_redirect:  %{time_redirect}s\n time_starttransfer:  %{time_starttransfer}s\n                    ----------\n         time_total:  %{time_total}s\nEOF\n\n# === DNS issues ===\ndig google.com +short                # Quick DNS check\ndig @8.8.8.8 myapp.internal          # Bypass local DNS resolver\ngetent hosts myapp.internal          # System resolver (respects /etc/hosts)\n\n# === Packet capture for deep debugging ===\nsudo tcpdump -ni any port 80 -c 100  # Capture 100 packets on port 80\nsudo tcpdump -ni any 'tcp[tcpflags] & (tcp-syn) != 0'  # SYN packets only\n\n# === TCP retransmit check ===\nnetstat -s | grep -i \"retrans\\|segments\"   # TCP retransmit count\n# Compare to total segments: retransmits > 1% indicates packet loss\n\n# === Connection tracking ===\ncat /proc/net/nf_conntrack | wc -l     # Connection tracking table size\ncat /proc/sys/net/netfilter/nf_conntrack_max  # Max connections tracked\n# If connection table is full, new connections are dropped!"
     },
     {
-      "title": "FAANG Interview Q&A",
-      "description": "<strong>Q:</strong> 'Walk me through debugging 'It doesn't work' from a production system.'<br><br><strong>A:</strong> 'First, I need specifics — 'doesn't work' is not actionable. What exactly is failing? What's the error? Which users are affected? When did it start? Was there a recent deploy? With that information: (1) Check the service's health endpoint. (2) Check the four golden signals: latency, traffic, errors, saturation. (3) Check the application logs for error messages. (4) Check the load balancer metrics — is traffic being evenly distributed? (5) Check upstream dependencies — is the database responding? Is the cache hot? (6) Check the host metrics — CPU, memory, disk, network. (7) If everything looks normal, I'd look at recent changes — a deploy, a config change, or a dependency upgrade. At FAANG, the first question in any incident is always: 'What changed?' because 90% of incidents are caused by changes.'<br><br><strong>Q:</strong> 'What's the difference between a crash and a hang?'<br><br><strong>A:</strong> 'A crash is when the process terminates unexpectedly (segfault, OOM kill, uncaught exception). You can restart it and move on — but you need to find the root cause to prevent recurrence. Look at core dumps, application logs, and crash logs. A hang is when the process is still running but not making progress (deadlock, infinite loop, waiting on a resource that never comes). The process is alive but not serving. Debug with thread dumps (jstack, pstack, gdb), strace to see what syscall it's stuck on, and /proc/<PID>/stack to see the kernel function it's blocked in. Hangs are harder to debug than crashes because the process is still alive — you need to inspect its state without killing it.'<br><br><strong>Q:</strong> 'A service was working yesterday and is broken today. What's your troubleshooting approach?'<br><br><strong>A:</strong> 'This is the classic 'it was working' scenario. Approach: (1) Change detection — what changed since it was working? Deploy? Config change? DNS change? Dependency update? Certificate expiry? (2) Isolation — can I reproduce the issue in a non-production environment? Can I rollback the most recent change? (3) Compare — compare the working config (git history) to the current config. Compare the working version to the broken version. (4) Temporal correlation — did the issue start at the same time as another event (cron job, backup, traffic spike, upstream degradation)? At FAANG, we practice 'immutable deployments' — we never modify running servers, so 'it was working yesterday' means the issue is either a new deployment, a change in traffic patterns, a dependency failure, or a time-based condition (cert expiry, rate limit, database full). The rollback is almost always the fastest fix — then investigate why the new version broke things.'",
+      "title": "Interview Q&A",
+      "description": "<strong>Q:</strong> 'Walk me through debugging 'It doesn't work' from a production system.'<br><br><strong>A:</strong> 'First, I need specifics — 'doesn't work' is not actionable. What exactly is failing? What's the error? Which users are affected? When did it start? Was there a recent deploy? With that information: (1) Check the service's health endpoint. (2) Check the four golden signals: latency, traffic, errors, saturation. (3) Check the application logs for error messages. (4) Check the load balancer metrics — is traffic being evenly distributed? (5) Check upstream dependencies — is the database responding? Is the cache hot? (6) Check the host metrics — CPU, memory, disk, network. (7) If everything looks normal, I'd look at recent changes — a deploy, a config change, or a dependency upgrade. At Enterprise, the first question in any incident is always: 'What changed?' because 90% of incidents are caused by changes.'<br><br><strong>Q:</strong> 'What's the difference between a crash and a hang?'<br><br><strong>A:</strong> 'A crash is when the process terminates unexpectedly (segfault, OOM kill, uncaught exception). You can restart it and move on — but you need to find the root cause to prevent recurrence. Look at core dumps, application logs, and crash logs. A hang is when the process is still running but not making progress (deadlock, infinite loop, waiting on a resource that never comes). The process is alive but not serving. Debug with thread dumps (jstack, pstack, gdb), strace to see what syscall it's stuck on, and /proc/<PID>/stack to see the kernel function it's blocked in. Hangs are harder to debug than crashes because the process is still alive — you need to inspect its state without killing it.'<br><br><strong>Q:</strong> 'A service was working yesterday and is broken today. What's your troubleshooting approach?'<br><br><strong>A:</strong> 'This is the classic 'it was working' scenario. Approach: (1) Change detection — what changed since it was working? Deploy? Config change? DNS change? Dependency update? Certificate expiry? (2) Isolation — can I reproduce the issue in a non-production environment? Can I rollback the most recent change? (3) Compare — compare the working config (git history) to the current config. Compare the working version to the broken version. (4) Temporal correlation — did the issue start at the same time as another event (cron job, backup, traffic spike, upstream degradation)? At Enterprise, we practice 'immutable deployments' — we never modify running servers, so 'it was working yesterday' means the issue is either a new deployment, a change in traffic patterns, a dependency failure, or a time-based condition (cert expiry, rate limit, database full). The rollback is almost always the fastest fix — then investigate why the new version broke things.'",
       "codeBlock": ""
     },
     {
@@ -38,6 +41,170 @@
       "codeBlock": ""
     }
   ],
-  "details": "<p class=\"mb-3\"><strong>FAANG Architect's Note:</strong> Troubleshooting is a skill that improves with practice, but the best engineers follow a systematic method. They don't guess — they gather data, form hypotheses, and test them. The USE method (Utilization, Saturation, Errors) gives you a framework that works for any resource. The key mental shift: don't ask 'what's broken?', ask 'what changed?' Production systems fail when something changes — a deploy, a config, a traffic pattern, a dependency. Find the change, and you've found the root cause.</p><p><strong>Production Tip:</strong> Before troubleshooting any issue, run the 60-second checklist. It takes one minute and gives you a complete picture of system health. I've lost count of how many times someone said 'the database is slow' and the 60-second check revealed it was actually a CPU issue on the application server, or a network bandwidth issue, or the database was just fine but the application had a connection pool leak. The checklist prevents wasted time going down the wrong path.</p>",
-  "tags": ["FAANG", "Linux", "troubleshooting", "incident response", "debugging", "SRE"]
+  "tags": [
+    "faang-insight",
+    "Linux",
+    "troubleshooting",
+    "incident response",
+    "debugging",
+    "SRE"
+  ],
+  "difficulty": "advanced",
+  "readingTime": 17,
+  "practiceTime": 13,
+  "prerequisites": [
+    "linux-processes",
+    "linux-networking",
+    "linux-storage",
+    "linux-systemd"
+  ],
+  "learningObjectives": [
+    "Understand incident Response: The First 5 Minutes",
+    "Understand diagnosing High CPU & Memory Issues",
+    "Understand diagnosing Disk & I/O Issues",
+    "Understand diagnosing Network Issues"
+  ],
+  "analogy": {
+    "title": "Troubleshooting as Differential Diagnosis",
+    "description": "Symptoms (high CPU, latency) are not the disease. Check vitals first (top, vmstat, iostat). Narrow scope: is it the app, the kernel, the network, the disk? Use the scientific method: hypothesize, test, eliminate. The runbook is your medical textbook."
+  },
+  "commonMistakes": [
+    {
+      "mistake": "Ignoring log rotation until disk fills up",
+      "solution": "Configure logrotate before deploying; monitor /var/log usage"
+    },
+    {
+      "mistake": "Disabling SELinux/AppArmor instead of fixing policies",
+      "solution": "Use `audit2allow` to generate policies from denials; keep MAC enabled"
+    },
+    {
+      "mistake": "Running containers as root",
+      "solution": "Add `USER nonroot` in Dockerfile; use `--user` flag at runtime"
+    },
+    {
+      "mistake": "Not setting resource limits on containers",
+      "solution": "Always set `--cpus` and `--memory`; configure cgroup limits in Kubernetes"
+    },
+    {
+      "mistake": "Checking /proc/meminfo inside containers for memory",
+      "solution": "Use cgroup v2 files: /sys/fs/cgroup/memory.current, memory.events"
+    }
+  ],
+  "practiceLabs": [
+    {
+      "title": "Explore: Incident Response: The First 5 Minutes",
+      "task": "Run `echo` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man echo` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: Diagnosing High CPU & Memory Issues",
+      "task": "Run `uptime` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man uptime` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: Diagnosing Disk & I/O Issues",
+      "task": "Run `dmesg` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man dmesg` to see all available flags and understand the output columns."
+    }
+  ],
+  "quickReference": {
+    "title": "Quick Reference",
+    "content": "| Command | Description |\n|---|---|\n| `echo` | Incident Response: The First 5 Minutes |\n| `uptime` | Incident Response: The First 5 Minutes |\n| `dmesg` | Incident Response: The First 5 Minutes |\n| `ps` | Diagnosing High CPU & Memory Issues |\n| `top` | Diagnosing High CPU & Memory Issues |\n| `perf` | Diagnosing High CPU & Memory Issues |\n| `df` | Diagnosing Disk & I/O Issues |\n| `du` | Diagnosing Disk & I/O Issues |\n| `find` | Diagnosing Disk & I/O Issues |\n| `ss` | Diagnosing Network Issues |\n| `nc` | Diagnosing Network Issues |\n| `ping` | Diagnosing Network Issues |"
+  },
+  "troubleshooting": [
+    {
+      "symptom": "echo returns unexpected output",
+      "cause": "Incorrect arguments, wrong working directory, or stale cached data",
+      "solution": "Verify arguments with `man echo`; check current path with `pwd`; clear cache if applicable"
+    },
+    {
+      "symptom": "Configuration changes not taking effect",
+      "cause": "Service not reloaded or syntax error in config file",
+      "solution": "Validate config syntax with built-in test flag; reload service with `systemctl reload` or `restart`"
+    },
+    {
+      "symptom": "troubleshooting operation slow or timing out",
+      "cause": "Resource exhaustion (disk I/O, memory pressure, or lock contention)",
+      "solution": "Check `iostat`, `free -m`, and `top`; look for stuck processes with `ps aux --sort=-%cpu`"
+    },
+    {
+      "symptom": "Permission issues accessing troubleshooting resources",
+      "cause": "Incorrect file ownership or overly restrictive permissions",
+      "solution": "Inspect with `ls -la`; fix with `chown`/ `chmod`; check ACLs with `getfacl`"
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is Incident Response: The First 5 Minutes?",
+      "options": [
+        "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+        "A tool for managing disk partitions",
+        "A network configuration protocol",
+        "A user authentication system"
+      ],
+      "answer": "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+      "explanation": "The Incident Response: The First 5 Minutes is the foundation of the Linux filesystem — everything in the system is organized under this structure."
+    },
+    {
+      "question": "What does `echo` do?",
+      "options": [
+        "Lists information about troubleshooting",
+        "Creates a new directory",
+        "Removes files",
+        "Copies files between directories"
+      ],
+      "answer": "Lists files and directories in the current or specified path",
+      "explanation": "Use `ls` to explore directory contents. Combine with flags like `-l` (long format), `-a` (hidden files), and `-h` (human-readable sizes)."
+    },
+    {
+      "question": "Which command would you use to view disk usage of the troubleshooting directory?",
+      "options": [
+        "du -sh /path/to/directory",
+        "cat /path/to/directory",
+        "cp -r /path/to/directory",
+        "chmod /path/to/directory"
+      ],
+      "answer": "du -sh /path/to/directory",
+      "explanation": "`du -sh` (disk usage, summary, human-readable) shows the total size of a directory and its contents."
+    },
+    {
+      "question": "A user reports \"Permission denied\" when trying to access a troubleshooting directory. What is the first command you should run?",
+      "options": [
+        "ls -ld /path/to/directory",
+        "chmod 777 /path/to/directory",
+        "rm -rf /path/to/directory",
+        "systemctl restart sshd"
+      ],
+      "answer": "ls -ld /path/to/directory",
+      "explanation": "`ls -ld` shows the directory's permissions and ownership. Always inspect before making changes — starting with `chmod 777` is a security anti-pattern."
+    },
+    {
+      "question": "In a troubleshooting scenario, your monitoring alerts show echo failing intermittently. What is the correct debugging workflow?",
+      "options": [
+        "Check logs → verify configuration → test in staging → apply fix → monitor",
+        "Reboot the server immediately",
+        "Reinstall the operating system",
+        "Ignore the alert and wait for it to resolve"
+      ],
+      "answer": "Check logs → verify configuration → test in staging → apply fix → monitor",
+      "explanation": "A structured debugging workflow prevents cascading failures. Always diagnose before acting, especially in production environments where downtime has direct business impact."
+    }
+  ],
+  "interviewTips": [
+    "FAANG Architect's Note:  Troubleshooting is a skill that improves with practice, but the best engineers follow a systematic method"
+  ],
+  "productionTips": [
+    "Production systems fail when something changes — a deploy, a config, a traffic pattern, a dependency",
+    "Production Tip:  Before troubleshooting any issue, run the 60-second checklist"
+  ],
+  "bestPractices": [
+    "Use version control for all configuration (/etc, scripts, Dockerfiles)",
+    "Implement infrastructure as code; avoid manual server changes",
+    "Test changes in staging before production; have rollback plans"
+  ],
+  "enterprisePerspective": "In enterprise environments, production troubleshooting is managed through automation (Ansible, Terraform), monitored centrally (Prometheus, Datadog), and governed by compliance policies (CIS benchmarks, SOC2). Changes go through change advisory boards with rollback procedures documented.",
+  "visualHint": "debugging_flowchart"
 }

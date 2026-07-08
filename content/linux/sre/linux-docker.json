@@ -1,35 +1,38 @@
 {
+  "schemaVersion": "2.0",
+  "contentVersion": "1.0",
+  "lastReviewed": "2026-07-08",
+  "reviewStatus": "migrated",
   "id": "linux-docker",
   "title": "Docker & Container Lifecycle",
   "category": "Linux",
   "subcategory": "Containers & SRE",
   "language": "bash",
-  "description": "Docker is the most widely used container runtime, built on Linux cgroups and namespaces. At FAANG, Docker (or its OCI-compatible alternatives like containerd) is the standard unit of deployment. Understanding the container lifecycle — from building to running to debugging — is essential for any infrastructure engineer.",
-  "codeBlock": "",
+  "description": "Docker is the most widely used container runtime, built on Linux cgroups and namespaces. At Enterprise, Docker (or its OCI-compatible alternatives like containerd) is the standard unit of deployment. Understanding the container lifecycle — from building to running to debugging — is essential for any infrastructure engineer.",
   "sections": [
     {
       "title": "Container Images: Layers & Build Caching",
-      "description": "A Docker image is a stack of read-only layers, each representing a change to the filesystem. <strong>Layers are cached and shared between images — this is why pulling updates is fast (only new layers are downloaded).</strong> At FAANG, image layer optimization is critical for deployment speed: minimizing layers, caching dependencies, and using distroless base images reduce both build time and attack surface.",
+      "description": "A Docker image is a stack of read-only layers, each representing a change to the filesystem. <strong>Layers are cached and shared between images — this is why pulling updates is fast (only new layers are downloaded).</strong> At Enterprise, image layer optimization is critical for deployment speed: minimizing layers, caching dependencies, and using distroless base images reduce both build time and attack surface.",
       "codeBlock": "# === Dockerfile best practices ===\n\n# 1. Use specific base image versions (not 'latest')\nFROM ubuntu:22.04@sha256:abc123...\n\n# 2. Combine RUN commands to minimize layers\nRUN apt-get update && apt-get install -y \\\\\n    python3 python3-pip \\\\\n    && rm -rf /var/lib/apt/lists/*\n\n# 3. Use .dockerignore (like .gitignore for builds)\n# .dockerignore:\n# node_modules\n# .git\n# *.log\n\n# 4. Multi-stage builds (separate build deps from runtime)\nFROM node:22 AS builder\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci --only=production\n\nFROM node:22-alpine AS runtime\nCOPY --from=builder /app /app\nUSER node\nCMD [\"node\", \"server.js\"]\n\n# 5. Use distroless or alpine for smaller images\n# Distroless: gcr.io/distroless/nodejs22-debian12\n# Alpine: node:22-alpine (much smaller, but uses musl libc)\n\n# 6. Don't run as root inside the container\nRUN addgroup -S myapp && adduser -S myapp -G myapp\nUSER myapp\n\n# === Build optimization ===\n# Cache layers that change infrequently (package.json → deps first, then source)\nCOPY package*.json ./\nRUN npm ci            # This layer only rebuilds when package.json changes\nCOPY . .              # This layer rebuilds every time (frequent changes)\n\n# === Layer inspection ===\ndocker history nginx              # Show layer sizes and commands\ndocker inspect nginx              # Detailed image metadata (layers, env, ports)\n\n# === Image size commands ===\ndocker images --format \"table {{.Repository}}\\t{{.Tag}}\\t{{.Size}}\"\ndocker system df                  # Total disk usage of Docker"
     },
     {
       "title": "Container Runtime & Lifecycle",
-      "description": "When Docker runs a container, it goes through: <strong>pull image → create container → create namespaces → set up cgroups → mount rootfs → apply seccomp → exec CMD.</strong> Understanding this sequence helps you debug startup failures and performance issues. At FAANG, the container runtime is usually containerd (the industry-standard OCI runtime) with runc as the low-level runtime.",
+      "description": "When Docker runs a container, it goes through: <strong>pull image → create container → create namespaces → set up cgroups → mount rootfs → apply seccomp → exec CMD.</strong> Understanding this sequence helps you debug startup failures and performance issues. At Enterprise, the container runtime is usually containerd (the industry-standard OCI runtime) with runc as the low-level runtime.",
       "codeBlock": "# === Container lifecycle commands ===\n# Build:\ndocker build -t myapp:latest .       # Build image from Dockerfile\ndocker build --no-cache -t myapp .   # Force rebuild (ignore cache)\n\n# Run:\ndocker run -d --name myapp -p 8080:80 myapp:latest\ndocker run -it --rm ubuntu:22.04 bash  # Interactive, auto-remove\n\n# Stop/start:\ndocker stop myapp                    # SIGTERM + wait + SIGKILL\ndocker start myapp                   # Restart stopped container\ndocker restart myapp                 # Stop + start\ndocker kill myapp                    # SIGKILL immediately\n\n# Inspect:\ndocker ps                            # Running containers\ndocker ps -a                         # All containers (including stopped)\ndocker logs -f myapp                 # Follow logs\ndocker logs --tail 100 myapp         # Last 100 lines\ndocker inspect myapp                 # Full container metadata (JSON)\n\n# Execute in running container:\ndocker exec -it myapp bash           # Start shell in container\ndocker exec myapp ps aux             # Run command in container\n\n# === Resource limits ===\ndocker run -d --name db \\\n  --memory=512M \\\n  --memory-reservation=256M \\\n  --cpus=0.5 \\\n  --pids-limit=200 \\\n  --ulimit nofile=65536:65536 \\\n  postgres:16\n\n# === Health checks ===\n# In Dockerfile:\nHEALTHCHECK --interval=30s --timeout=3s --retries=3 \\\n  CMD curl -f http://localhost:8080/health || exit 1\n\n# Manual check:\ndocker inspect --format='{{.State.Health.Status}}' myapp\n\n# === Copy files ===\ndocker cp myapp:/var/log/app.log ./local.log\ndocker cp ./config.yaml myapp:/etc/app/config.yaml\n\n# === Cleanup ===\ndocker rm myapp                      # Remove container\ndocker rmi myapp:latest              # Remove image\ndocker system prune -a               # Remove ALL unused containers, images, networks"
     },
     {
       "title": "Networking & Storage in Docker",
-      "description": "Docker provides several network drivers (<strong>bridge</strong> for single-host, <strong>overlay</strong> for multi-host, <strong>host</strong> for performance, <strong>macvlan</strong> for direct MAC assignment) and storage options (<strong>volumes</strong> for persistent data, <strong>bind mounts</strong> for host directories, <strong>tmpfs</strong> for temporary memory-backed storage). At FAANG, overlay networks (Cilium, Flannel, Calico) handle container networking, and cloud block storage (EBS volumes) is mounted via bind mounts.",
+      "description": "Docker provides several network drivers (<strong>bridge</strong> for single-host, <strong>overlay</strong> for multi-host, <strong>host</strong> for performance, <strong>macvlan</strong> for direct MAC assignment) and storage options (<strong>volumes</strong> for persistent data, <strong>bind mounts</strong> for host directories, <strong>tmpfs</strong> for temporary memory-backed storage). At Enterprise, overlay networks (Cilium, Flannel, Calico) handle container networking, and cloud block storage (EBS volumes) is mounted via bind mounts.",
       "codeBlock": "# === Network drivers ===\n# Bridge (default): containers connect via docker0 bridge\ndocker network create mynet          # Create custom bridge network\ndocker run --network=mynet nginx\n\n# Host: container uses host's network stack (no isolation, best performance)\ndocker run --network=host nginx\n\n# Overlay: multi-host networking (Docker Swarm or Kubernetes)\ndocker network create -d overlay myoverlay\n\n# === Port mapping ===\ndocker run -p 8080:80 nginx          # host:8080 → container:80\n\n# === DNS within Docker ===\n# Containers on same user-defined bridge can resolve each other by name\n# docker run --name web --network=mynet nginx\n# docker run --network=mynet alpine ping web  # Works!\n\n# === Volumes ===\ndocker volume create mydata           # Create volume\ndocker run -v mydata:/var/lib/data postgres  # Mount volume\n\n# Bind mount:\ndocker run -v /host/path:/container/path nginx\n\n# tmpfs (RAM storage):\ndocker run --tmpfs /tmp:size=100M nginx\n\n# === Backup volume ===\ndocker run --rm -v mydata:/source -v $(pwd):/backup alpine tar czf /backup/mydata.tar.gz -C /source .\n\n# === Storage drivers ===\n# overlay2 (default, modern) — Copy-on-Write, fast\n# aufs (legacy) — Older Ubuntu default\n# devicemapper — RHEL legacy (slow, avoid)\ndocker info | grep Storage\n\n# === Container resource inspection ===\ndocker stats                        # Live resource usage\n# CPU%, MEM%, MEM USAGE/LIMIT, NET I/O, BLOCK I/O, PIDS\n\ndocker stats --no-stream --format \"table {{.Name}}\\t{{.CPUPerc}}\\t{{.MemUsage}}\""
     },
     {
       "title": "Debugging Containers",
-      "description": "Containers introduce debugging challenges: you're running in an isolated environment with limited tools. <strong>At FAANG, debugging containers requires understanding both the application inside and the host outside.</strong> Key tools: docker exec for inside, nsenter for entering namespaces from host, and cgroup inspections for resource issues.",
+      "description": "Containers introduce debugging challenges: you're running in an isolated environment with limited tools. <strong>At Enterprise, debugging containers requires understanding both the application inside and the host outside.</strong> Key tools: docker exec for inside, nsenter for entering namespaces from host, and cgroup inspections for resource issues.",
       "codeBlock": "# === Inside-container debugging ===\ndocker exec -it myapp bash            # Shell inside container\n\n# Install debugging tools (temporary container):\ndocker run --rm -it --net=container:myapp --pid=container:myapp \\\n  nicolaka/netshoot:latest            # Network troubleshooting toolbox\n\n# === Host-level debugging ===\n# Find container PID:\nCONTAINER_PID=$(docker inspect --format '{{.State.Pid}}' myapp)\necho $CONTAINER_PID\n\n# Enter container namespaces from host:\nsudo nsenter -t $CONTAINER_PID -n ip addr  # Network namespace\nsudo nsenter -t $CONTAINER_PID -p ps aux   # PID namespace\nsudo nsenter -t $CONTAINER_PID -a bash     # All namespaces\n\n# Check container cgroup:\nCGROUP_PATH=$(cat /proc/$CONTAINER_PID/cgroup | grep -oP '/system.slice/docker-.*\\.scope')\ncat /sys/fs/cgroup$CGROUP_PATH/memory.events\n\n# === Container logs ===\ndocker logs myapp                     # All logs\ndocker logs --tail 50 --follow --timestamps myapp\n\n# === Check container filesystem ===\ndocker diff myapp                     # Show changed files (A=added, C=changed, D=deleted)\n\n# === Export container filesystem ===\ndocker export myapp > container.tar   # Export as tar archive\ndocker import container.tar           # Import as image\n\n# === Debug entrypoint/cmd ===\n# Override entrypoint to debug:\ndocker run -it --entrypoint sh myapp:latest\n\n# === Common issues ===\n# 1. Container exits immediately: check CMD/ENTRYPOINT and logs\n# 2. Port already in use: change host port mapping\n# 3. Out of disk space: docker system prune -a\n# 4. Permission denied inside: check USER directive and volume permissions\n# 5. DNS resolution fails: check --dns or /etc/docker/daemon.json"
     },
     {
-      "title": "FAANG Interview Q&A",
-      "description": "<strong>Q:</strong> 'Your containerized application is running slow in production. How do you debug?'<br><br><strong>A:</strong> 'First, rule out resource limits. Check <code>docker stats</code> or the cgroup metrics: <code>cat /sys/fs/cgroup/cpu.stat</code> (throttling), <code>memory.events</code> (OOM), <code>io.stat</code> (I/O throttling). If the container is hitting limits, increase them or optimize the app. Next, check the host: <code>top</code> for CPU, <code>iostat</code> for disk, <code>free -h</code> for memory. If the host is fine, debug inside the container: <code>docker exec -it myapp bash</code>, then use standard Linux tools (top, strace, lsof). If the container lacks tools, use nsenter from the host. At FAANG, we use ephemeral debug containers — a sidecar with network and PID namespace sharing that contains all debugging tools, without modifying the production container.'<br><br><strong>Q:</strong> 'How would you design a container image for production?'<br><br><strong>A:</strong> 'Production container image requirements: (1) Use a specific base image version, pinned by digest, not tag. (2) Multi-stage build: builder stage with build tools, runtime stage with only the binary and minimal dependencies. (3) Non-root user — never run as root. (4) HEALTHCHECK instruction. (5) No secrets in the image — use Docker build secrets or runtime secrets injection. (6) Minimal size: use distroless or Alpine base, combined RUN layers, clean package manager cache. (7) Reproducible: exact same image for the same git commit. (8) Signed: use Docker Content Trust or cosign for image signing. At FAANG, image compliance is enforced by admission controllers in the container registry — images without a HEALTHCHECK, running as root, or with known vulnerabilities are rejected.'<br><br><strong>Q:</strong> 'What's the difference between CMD and ENTRYPOINT in a Dockerfile?'<br><br><strong>A:</strong> 'ENTRYPOINT defines the executable that always runs. CMD provides default arguments to ENTRYPOINT. <code>ENTRYPOINT [\"nginx\"]</code> + <code>CMD [\"-g\", \"daemon off;\"]</code> = runs <code>nginx -g 'daemon off;'</code>. If you override CMD at runtime (<code>docker run nginx -t</code>), it becomes <code>nginx -t</code> (CMD replaced). If you override ENTRYPOINT (<code>docker run --entrypoint bash nginx</code>), it runs bash instead of nginx. Best practice: use ENTRYPOINT for the fixed binary and CMD for the default arguments — this makes the container behavior predictable while allowing argument customization.'",
+      "title": "Interview Q&A",
+      "description": "<strong>Q:</strong> 'Your containerized application is running slow in production. How do you debug?'<br><br><strong>A:</strong> 'First, rule out resource limits. Check <code>docker stats</code> or the cgroup metrics: <code>cat /sys/fs/cgroup/cpu.stat</code> (throttling), <code>memory.events</code> (OOM), <code>io.stat</code> (I/O throttling). If the container is hitting limits, increase them or optimize the app. Next, check the host: <code>top</code> for CPU, <code>iostat</code> for disk, <code>free -h</code> for memory. If the host is fine, debug inside the container: <code>docker exec -it myapp bash</code>, then use standard Linux tools (top, strace, lsof). If the container lacks tools, use nsenter from the host. At Enterprise, we use ephemeral debug containers — a sidecar with network and PID namespace sharing that contains all debugging tools, without modifying the production container.'<br><br><strong>Q:</strong> 'How would you design a container image for production?'<br><br><strong>A:</strong> 'Production container image requirements: (1) Use a specific base image version, pinned by digest, not tag. (2) Multi-stage build: builder stage with build tools, runtime stage with only the binary and minimal dependencies. (3) Non-root user — never run as root. (4) HEALTHCHECK instruction. (5) No secrets in the image — use Docker build secrets or runtime secrets injection. (6) Minimal size: use distroless or Alpine base, combined RUN layers, clean package manager cache. (7) Reproducible: exact same image for the same git commit. (8) Signed: use Docker Content Trust or cosign for image signing. At Enterprise, image compliance is enforced by admission controllers in the container registry — images without a HEALTHCHECK, running as root, or with known vulnerabilities are rejected.'<br><br><strong>Q:</strong> 'What's the difference between CMD and ENTRYPOINT in a Dockerfile?'<br><br><strong>A:</strong> 'ENTRYPOINT defines the executable that always runs. CMD provides default arguments to ENTRYPOINT. <code>ENTRYPOINT [\"nginx\"]</code> + <code>CMD [\"-g\", \"daemon off;\"]</code> = runs <code>nginx -g 'daemon off;'</code>. If you override CMD at runtime (<code>docker run nginx -t</code>), it becomes <code>nginx -t</code> (CMD replaced). If you override ENTRYPOINT (<code>docker run --entrypoint bash nginx</code>), it runs bash instead of nginx. Best practice: use ENTRYPOINT for the fixed binary and CMD for the default arguments — this makes the container behavior predictable while allowing argument customization.'",
       "codeBlock": ""
     },
     {
@@ -38,6 +41,168 @@
       "codeBlock": ""
     }
   ],
-  "details": "<p class=\"mb-3\"><strong>FAANG Architect's Note:</strong> Docker is the 'hello world' of containers — most FAANG environments use containerd or CRI-compatible runtimes directly, not the Docker CLI. But the concepts are identical: Docker taught the industry how to think about containers. The Dockerfile format, image layering, and the run/build model are universal. Learn Docker first; the transition to containerd/nerdctl/buildkit is straightforward because the underlying principles are the same.</p><p><strong>Production Tip:</strong> Never run 'docker build' on a production server. Build images in your CI/CD pipeline, push them to a registry, and pull them on production nodes. This ensures that: (1) builds are reproducible (same commit = same image), (2) build tools aren't on production servers, (3) images are scanned for vulnerabilities before deployment, (4) rollbacks are instant (just point to the previous image tag). At FAANG, image building and deployment are entirely separate stages — building happens in a hermetic build environment, deployment pulls from a registry.</p>",
-  "tags": ["FAANG", "Linux", "Docker", "containers", "OCI", "container lifecycle"]
+  "tags": [
+    "faang-insight",
+    "Linux",
+    "Docker",
+    "containers",
+    "OCI",
+    "container lifecycle"
+  ],
+  "difficulty": "intermediate",
+  "readingTime": 17,
+  "practiceTime": 13,
+  "prerequisites": [
+    "linux-cgroups",
+    "linux-networking",
+    "linux-filesystem"
+  ],
+  "learningObjectives": [
+    "Understand container Images: Layers & Build Caching",
+    "Understand container Runtime & Lifecycle",
+    "Understand networking & Storage in Docker",
+    "Understand debugging Containers"
+  ],
+  "analogy": {
+    "title": "Docker as a Shipping Container",
+    "description": "The image is a sealed container - same contents everywhere. Layers are stacked pallets - reuse common bases. The Dockerfile is the packing list. The daemon is the port authority. Namespaces isolate \"this container sees only its own cargo.\" "
+  },
+  "commonMistakes": [
+    {
+      "mistake": "Running destructive commands without verification",
+      "solution": "Always use `rm -i` or `ls` first to confirm what will be deleted"
+    },
+    {
+      "mistake": "Ignoring log rotation until disk fills up",
+      "solution": "Configure logrotate before deploying; monitor /var/log usage"
+    },
+    {
+      "mistake": "Disabling SELinux/AppArmor instead of fixing policies",
+      "solution": "Use `audit2allow` to generate policies from denials; keep MAC enabled"
+    },
+    {
+      "mistake": "Running containers as root",
+      "solution": "Add `USER nonroot` in Dockerfile; use `--user` flag at runtime"
+    },
+    {
+      "mistake": "Not setting resource limits on containers",
+      "solution": "Always set `--cpus` and `--memory`; configure cgroup limits in Kubernetes"
+    }
+  ],
+  "practiceLabs": [
+    {
+      "title": "Explore: Container Images: Layers & Build Caching",
+      "task": "Run `python3` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man python3` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: Container Runtime & Lifecycle",
+      "task": "Run `docker` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man docker` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: Networking & Storage in Docker",
+      "task": "Run `postgres` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man postgres` to see all available flags and understand the output columns."
+    }
+  ],
+  "quickReference": {
+    "title": "Quick Reference",
+    "content": "| Command | Description |\n|---|---|\n| `FROM` | Container Images: Layers & Build Caching |\n| `RUN` | Container Images: Layers & Build Caching |\n| `python3` | Container Images: Layers & Build Caching |\n| `docker` | Container Runtime & Lifecycle |\n| `postgres` | Container Runtime & Lifecycle |\n| `HEALTHCHECK` | Container Runtime & Lifecycle |\n| `docker` | Networking & Storage in Docker |\n| `docker` | Debugging Containers |\n| `nicolaka/netshoot` | Debugging Containers |\n| `CONTAINER_PID` | Debugging Containers |"
+  },
+  "troubleshooting": [
+    {
+      "symptom": "python3 returns unexpected output",
+      "cause": "Incorrect arguments, wrong working directory, or stale cached data",
+      "solution": "Verify arguments with `man python3`; check current path with `pwd`; clear cache if applicable"
+    },
+    {
+      "symptom": "Configuration changes not taking effect",
+      "cause": "Service not reloaded or syntax error in config file",
+      "solution": "Validate config syntax with built-in test flag; reload service with `systemctl reload` or `restart`"
+    },
+    {
+      "symptom": "docker operation slow or timing out",
+      "cause": "Resource exhaustion (disk I/O, memory pressure, or lock contention)",
+      "solution": "Check `iostat`, `free -m`, and `top`; look for stuck processes with `ps aux --sort=-%cpu`"
+    },
+    {
+      "symptom": "Permission issues accessing docker resources",
+      "cause": "Incorrect file ownership or overly restrictive permissions",
+      "solution": "Inspect with `ls -la`; fix with `chown`/ `chmod`; check ACLs with `getfacl`"
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is Container Images: Layers & Build Caching?",
+      "options": [
+        "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+        "A tool for managing disk partitions",
+        "A network configuration protocol",
+        "A user authentication system"
+      ],
+      "answer": "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+      "explanation": "The Container Images: Layers & Build Caching is the foundation of the Linux filesystem — everything in the system is organized under this structure."
+    },
+    {
+      "question": "What does `python3` do?",
+      "options": [
+        "Lists information about docker",
+        "Creates a new directory",
+        "Removes files",
+        "Copies files between directories"
+      ],
+      "answer": "Lists files and directories in the current or specified path",
+      "explanation": "Use `ls` to explore directory contents. Combine with flags like `-l` (long format), `-a` (hidden files), and `-h` (human-readable sizes)."
+    },
+    {
+      "question": "Which command would you use to view disk usage of the docker directory?",
+      "options": [
+        "du -sh /path/to/directory",
+        "cat /path/to/directory",
+        "cp -r /path/to/directory",
+        "chmod /path/to/directory"
+      ],
+      "answer": "du -sh /path/to/directory",
+      "explanation": "`du -sh` (disk usage, summary, human-readable) shows the total size of a directory and its contents."
+    },
+    {
+      "question": "A user reports \"Permission denied\" when trying to access a docker directory. What is the first command you should run?",
+      "options": [
+        "ls -ld /path/to/directory",
+        "chmod 777 /path/to/directory",
+        "rm -rf /path/to/directory",
+        "systemctl restart sshd"
+      ],
+      "answer": "ls -ld /path/to/directory",
+      "explanation": "`ls -ld` shows the directory's permissions and ownership. Always inspect before making changes — starting with `chmod 777` is a security anti-pattern."
+    },
+    {
+      "question": "In a docker scenario, your monitoring alerts show python3 failing intermittently. What is the correct debugging workflow?",
+      "options": [
+        "Check logs → verify configuration → test in staging → apply fix → monitor",
+        "Reboot the server immediately",
+        "Reinstall the operating system",
+        "Ignore the alert and wait for it to resolve"
+      ],
+      "answer": "Check logs → verify configuration → test in staging → apply fix → monitor",
+      "explanation": "A structured debugging workflow prevents cascading failures. Always diagnose before acting, especially in production environments where downtime has direct business impact."
+    }
+  ],
+  "interviewTips": [
+    "FAANG Architect's Note:  Docker is the 'hello world' of containers — most FAANG environments use containerd or CRI-compatible runtimes directly, not the Docker CLI",
+    "FAANG, image building and deployment are entirely separate stages — building happens in a hermetic build environment, deployment pulls from a registry"
+  ],
+  "productionTips": [
+    "Production Tip:  Never run 'docker build' on a production server",
+    "production nodes"
+  ],
+  "bestPractices": [
+    "Container Images: Layers & Build Caching"
+  ],
+  "enterprisePerspective": "In enterprise environments, docker & container lifecycle is managed through automation (Ansible, Terraform), monitored centrally (Prometheus, Datadog), and governed by compliance policies (CIS benchmarks, SOC2). Changes go through change advisory boards with rollback procedures documented.",
+  "visualHint": "container_layers"
 }

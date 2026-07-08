@@ -1,11 +1,14 @@
 {
+  "schemaVersion": "2.0",
+  "contentVersion": "1.0",
+  "lastReviewed": "2026-07-08",
+  "reviewStatus": "migrated",
   "id": "linux-cgroups",
   "title": "cgroups & Namespaces",
   "category": "Linux",
   "subcategory": "Containers & SRE",
   "language": "bash",
-  "description": "Control groups (cgroups) and namespaces are the two Linux kernel features that make containers possible. <strong>cgroups limit resource usage (CPU, memory, I/O, PID count); namespaces isolate process views (filesystem, network, PID, user, mount).</strong> At FAANG, every process runs inside cgroups — from individual containers to batch jobs to user shells in shared environments.",
-  "codeBlock": "",
+  "description": "Control groups (cgroups) and namespaces are the two Linux kernel features that make containers possible. <strong>cgroups limit resource usage (CPU, memory, I/O, PID count); namespaces isolate process views (filesystem, network, PID, user, mount).</strong> At Enterprise, every process runs inside cgroups — from individual containers to batch jobs to user shells in shared environments.",
   "sections": [
     {
       "title": "Namespaces: The Illusion of Isolation",
@@ -14,8 +17,8 @@
     },
     {
       "title": "cgroups v2: Resource Accounting & Limiting",
-      "description": "cgroups v2 (unified hierarchy) is the modern cgroup implementation. <strong>Every process belongs to a cgroup, and the kernel enforces resource limits at the cgroup level.</strong> At FAANG, cgroups v2 is the standard on modern Linux distros (Ubuntu 22.04+, Amazon Linux 2023, RHEL 9+). cgroups v1 is legacy but still present for backward compatibility.",
-      "codeBlock": "# === cgroups v2 hierarchy ===\n# Mounted at /sys/fs/cgroup/\nls /sys/fs/cgroup/\n# cpu.max, cpu.stat          — CPU limits\n# memory.max, memory.current — Memory limits\n# io.max, io.stat            — I/O limits\n# pids.max                   — PID limit\n\n# === Create and configure a cgroup ===\n# On systemd-based systems, use systemd:\nsudo systemd-run --unit=testapp --scope -p CPUQuota=50% -p MemoryMax=256M sleep 300\n\n# Or direct cgroup manipulation:\nsudo mkdir /sys/fs/cgroup/myapp\n\n# CPU limit: 50% of one core (50,000/100,000 μs)\necho \"50000 100000\" | sudo tee /sys/fs/cgroup/myapp/cpu.max\n\n# Memory limit: 256 MB\necho \"268435456\" | sudo tee /sys/fs/cgroup/myapp/memory.max\n\n# Memory + swap limit: 512 MB\necho \"536870912\" | sudo tee /sys/fs/cgroup/myapp/memory.swap.max\n\n# PID limit: 100\necho \"100\" | sudo tee /sys/fs/cgroup/myapp/pids.max\n\n# I/O limit: 10MB/s write\necho \"8:0 wbps=10485760\" | sudo tee /sys/fs/cgroup/myapp/io.max\n# 8:0 = major:minor of the block device\n\n# === Add process to cgroup ===\necho $PID | sudo tee /sys/fs/cgroup/myapp/cgroup.procs\n\n# === Check cgroup stats ===\ncat /sys/fs/cgroup/myapp/cpu.stat\n# usage_usec  — CPU time used\n# nr_periods  — number of enforcement periods\n# nr_throttled — periods where tasks were throttled\n# throttled_usec — total throttled time\n\ncat /sys/fs/cgroup/myapp/memory.current\n# Current memory usage in bytes\n\ncat /sys/fs/cgroup/myapp/memory.events\n# low, high, max, oom, oom_kill — event counters\n# If 'max > 0', the cgroup hit its memory limit\n# If 'oom_kill > 0', the OOM killer was triggered\n\n# === Pressure Stall Information (PSI) ===\ncat /sys/fs/cgroup/cpu.pressure       # CPU pressure\ncat /sys/fs/cgroup/memory.pressure    # Memory pressure\ncat /sys/fs/cgroup/io.pressure        # I/O pressure\n# Format: some avg10=0.00 avg60=0.00 avg300=0.00 total=0\n# 'some' — % of time at least one task was stalled\n# 'full' — % of time all tasks were stalled\n# PSI is the key metric for resource contention at FAANG"
+      "description": "cgroups v2 (unified hierarchy) is the modern cgroup implementation. <strong>Every process belongs to a cgroup, and the kernel enforces resource limits at the cgroup level.</strong> At Enterprise, cgroups v2 is the standard on modern Linux distros (Ubuntu 22.04+, Amazon Linux 2023, RHEL 9+). cgroups v1 is legacy but still present for backward compatibility.",
+      "codeBlock": "# === cgroups v2 hierarchy ===\n# Mounted at /sys/fs/cgroup/\nls /sys/fs/cgroup/\n# cpu.max, cpu.stat          — CPU limits\n# memory.max, memory.current — Memory limits\n# io.max, io.stat            — I/O limits\n# pids.max                   — PID limit\n\n# === Create and configure a cgroup ===\n# On systemd-based systems, use systemd:\nsudo systemd-run --unit=testapp --scope -p CPUQuota=50% -p MemoryMax=256M sleep 300\n\n# Or direct cgroup manipulation:\nsudo mkdir /sys/fs/cgroup/myapp\n\n# CPU limit: 50% of one core (50,000/100,000 μs)\necho \"50000 100000\" | sudo tee /sys/fs/cgroup/myapp/cpu.max\n\n# Memory limit: 256 MB\necho \"268435456\" | sudo tee /sys/fs/cgroup/myapp/memory.max\n\n# Memory + swap limit: 512 MB\necho \"536870912\" | sudo tee /sys/fs/cgroup/myapp/memory.swap.max\n\n# PID limit: 100\necho \"100\" | sudo tee /sys/fs/cgroup/myapp/pids.max\n\n# I/O limit: 10MB/s write\necho \"8:0 wbps=10485760\" | sudo tee /sys/fs/cgroup/myapp/io.max\n# 8:0 = major:minor of the block device\n\n# === Add process to cgroup ===\necho $PID | sudo tee /sys/fs/cgroup/myapp/cgroup.procs\n\n# === Check cgroup stats ===\ncat /sys/fs/cgroup/myapp/cpu.stat\n# usage_usec  — CPU time used\n# nr_periods  — number of enforcement periods\n# nr_throttled — periods where tasks were throttled\n# throttled_usec — total throttled time\n\ncat /sys/fs/cgroup/myapp/memory.current\n# Current memory usage in bytes\n\ncat /sys/fs/cgroup/myapp/memory.events\n# low, high, max, oom, oom_kill — event counters\n# If 'max > 0', the cgroup hit its memory limit\n# If 'oom_kill > 0', the OOM killer was triggered\n\n# === Pressure Stall Information (PSI) ===\ncat /sys/fs/cgroup/cpu.pressure       # CPU pressure\ncat /sys/fs/cgroup/memory.pressure    # Memory pressure\ncat /sys/fs/cgroup/io.pressure        # I/O pressure\n# Format: some avg10=0.00 avg60=0.00 avg300=0.00 total=0\n# 'some' — % of time at least one task was stalled\n# 'full' — % of time all tasks were stalled\n# PSI is the key metric for resource contention at Enterprise"
     },
     {
       "title": "Docker & Containers: cgroups + Namespaces in Practice",
@@ -24,12 +27,12 @@
     },
     {
       "title": "Debugging Resource Issues with cgroups",
-      "description": "When a container or service is hitting resource limits, cgroup statistics tell you exactly what's happening. <strong>At FAANG, cgroup-level metrics are the primary source of truth for resource usage — more reliable than /proc/meminfo (which shows host-level data).</strong>",
+      "description": "When a container or service is hitting resource limits, cgroup statistics tell you exactly what's happening. <strong>At Enterprise, cgroup-level metrics are the primary source of truth for resource usage — more reliable than /proc/meminfo (which shows host-level data).</strong>",
       "codeBlock": "# === Is the process being throttled? ===\ncat /sys/fs/cgroup/system.slice/myapp.service/cpu.stat\n# nr_throttled > 0 = CPU throttled (hitting CPU limit)\n# throttled_usec = total time spent throttled\n\n# === Is the process hitting memory limit? ===\ncat /sys/fs/cgroup/system.slice/myapp.service/memory.events\n# low: 0         — hitting memory.low threshold\n# high: 0        — hitting memory.high (reclaiming aggressively)\n# max: 5         — hit memory.max (OOM kill threshold!)\n# oom: 5         — OOM events\n# oom_kill: 5    — processes killed by OOM\n\n# === Current memory breakdown ===\ncat /sys/fs/cgroup/system.slice/myapp.service/memory.stat\n# anon — anonymous (heap, stack)\n# file — file-backed (page cache)\n# kernel — kernel memory (slab, page tables)\n\n# === Is the process hitting PID limit? ===\ncat /sys/fs/cgroup/system.slice/myapp.service/pids.current\ncat /sys/fs/cgroup/system.slice/myapp.service/pids.max\n# If pids.current == pids.max, the process is hitting PID limits\n# Common for: forking servers, thread leaks\n\n# === Is I/O being throttled? ===\ncat /sys/fs/cgroup/system.slice/myapp.service/io.stat\n# rbytes, wbytes — bytes read/written\n# rios, wios — I/O operations\n\n# === PSI (Pressure Stall Info) ===\ncat /sys/fs/cgroup/system.slice/myapp.service/memory.pressure\n# some avg10=5.00 — 5% of time at least one task was stalled on memory\n# If avg10 > 10%, you're under memory pressure\n\n# === One-liner: Check all limits for a container ===\nCONTAINER_CGROUP=$(docker inspect --format '{{.Id}}' $CONTAINER | cut -c1-12)\nCGROUP_PATH=\"/sys/fs/cgroup/system.slice/docker-$CONTAINER_CGROUP.scope\"\necho \"=== CPU ===\"\ncat $CGROUP_PATH/cpu.max\necho \"=== Memory ===\"\ncat $CGROUP_PATH/memory.current\ncat $CGROUP_PATH/memory.events\necho \"=== PIDs ===\"\ncat $CGROUP_PATH/pids.current\ncat $CGROUP_PATH/pids.max"
     },
     {
-      "title": "FAANG Interview Q&A",
-      "description": "<strong>Q:</strong> 'Explain how Docker containers work under the hood.'<br><br><strong>A:</strong> 'Docker containers use Linux namespaces for isolation and cgroups for resource limits. When Docker starts a container: (1) It creates new namespaces (mount, PID, network, IPC, UTS, user) via the clone() syscall. (2) It sets up the container's filesystem using a layered image (overlayfs) and chroots into it (pivot_root). (3) It creates cgroups under /sys/fs/cgroup/system.slice/ and sets CPU, memory, I/O, and PID limits. (4) It sets up the network (veth pair → bridge or overlay). (5) It applies seccomp and LSMA (AppArmor/SELinux) profiles. (6) It execs the container's CMD inside these namespaces. The container doesn't 'contain' anything — it's just a regular Linux process that can't see anything outside its namespaces and can't use more resources than its cgroup allows.'<br><br><strong>Q:</strong> 'A container is running out of memory, but free -h inside the container shows plenty of free memory. Why?'<br><br><strong>A:</strong> 'Because <code>free</code> and <code>/proc/meminfo</code> inside a container show host-level memory, not the cgroup limit — unless the container runtime correctly mounts the cgroup filesystem. On older Docker/Cgroup v1 setups, /proc/meminfo is not virtualized. The container is hitting the cgroup memory limit even though /proc/meminfo says there's free memory. Always check <code>/sys/fs/cgroup/memory.current</code> and <code>/sys/fs/cgroup/memory.events</code> inside the container for the real story. Modern runtimes (containerd, cgroups v2) handle this better, but it's still a common pitfall.'<br><br><strong>Q:</strong> 'How do you troubleshoot a Node.js container that's hitting CPU throttling?'<br><br><strong>A:</strong> 'Check <code>cat /sys/fs/cgroup/cpu.max</code> to see the CPU limit. Check <code>cat /sys/fs/cgroup/cpu.stat</code> for nr_throttled > 0. If throttled, either increase the CPU limit or optimize the application. Use <code>perf top</code> inside the container to identify hot functions. Check if the event loop is blocked — Node.js runs on a single thread, so CPU throttling directly impacts throughput. If the container is a sidecar or batch job, consider that its burstable CPU might be competing with other containers on the same pod/node. At FAANG, we use cgroup-aware CPU metrics for autoscaling decisions — not host CPU metrics.'",
+      "title": "Interview Q&A",
+      "description": "<strong>Q:</strong> 'Explain how Docker containers work under the hood.'<br><br><strong>A:</strong> 'Docker containers use Linux namespaces for isolation and cgroups for resource limits. When Docker starts a container: (1) It creates new namespaces (mount, PID, network, IPC, UTS, user) via the clone() syscall. (2) It sets up the container's filesystem using a layered image (overlayfs) and chroots into it (pivot_root). (3) It creates cgroups under /sys/fs/cgroup/system.slice/ and sets CPU, memory, I/O, and PID limits. (4) It sets up the network (veth pair → bridge or overlay). (5) It applies seccomp and LSMA (AppArmor/SELinux) profiles. (6) It execs the container's CMD inside these namespaces. The container doesn't 'contain' anything — it's just a regular Linux process that can't see anything outside its namespaces and can't use more resources than its cgroup allows.'<br><br><strong>Q:</strong> 'A container is running out of memory, but free -h inside the container shows plenty of free memory. Why?'<br><br><strong>A:</strong> 'Because <code>free</code> and <code>/proc/meminfo</code> inside a container show host-level memory, not the cgroup limit — unless the container runtime correctly mounts the cgroup filesystem. On older Docker/Cgroup v1 setups, /proc/meminfo is not virtualized. The container is hitting the cgroup memory limit even though /proc/meminfo says there's free memory. Always check <code>/sys/fs/cgroup/memory.current</code> and <code>/sys/fs/cgroup/memory.events</code> inside the container for the real story. Modern runtimes (containerd, cgroups v2) handle this better, but it's still a common pitfall.'<br><br><strong>Q:</strong> 'How do you troubleshoot a Node.js container that's hitting CPU throttling?'<br><br><strong>A:</strong> 'Check <code>cat /sys/fs/cgroup/cpu.max</code> to see the CPU limit. Check <code>cat /sys/fs/cgroup/cpu.stat</code> for nr_throttled > 0. If throttled, either increase the CPU limit or optimize the application. Use <code>perf top</code> inside the container to identify hot functions. Check if the event loop is blocked — Node.js runs on a single thread, so CPU throttling directly impacts throughput. If the container is a sidecar or batch job, consider that its burstable CPU might be competing with other containers on the same pod/node. At Enterprise, we use cgroup-aware CPU metrics for autoscaling decisions — not host CPU metrics.'",
       "codeBlock": ""
     },
     {
@@ -38,14 +41,169 @@
       "codeBlock": ""
     }
   ],
-  "details": "<p class=\"mb-3\"><strong>FAANG Architect's Note:</strong> cgroups and namespaces are the most important Linux features you've probably never directly used. If you work with containers (and everyone at FAANG does), you depend on these features every day. Understanding them at the kernel level transforms how you debug container issues: you stop thinking of a container as a 'lightweight VM' and start thinking of it as 'a process with namespaces and cgroups.' This distinction matters when you're debugging a memory issue (check the cgroup, not /proc/meminfo), a network issue (check the namespace), or a performance issue (check the cgroup throttling).</p><p><strong>Production Tip:</strong> Always set memory limits on containers and services. An unlimited container can destabilize the entire host — one container's memory leak can OOM-kill all containers on the node. Set memory limits to ~80-90% of what you expect the process to need, and set up monitoring on cgroup memory.events for the 'max' counter. If 'max > 0', the container is hitting its limit and you need to either increase the limit or find the leak. At FAANG, we never run containers without resource limits — ever.</p>",
   "tags": [
-    "FAANG",
+    "faang-insight",
     "Linux",
     "cgroups",
     "namespaces",
     "containers",
     "Docker",
     "Kubernetes"
-  ]
+  ],
+  "difficulty": "intermediate",
+  "readingTime": 19,
+  "practiceTime": 14,
+  "prerequisites": [
+    "linux-processes",
+    "linux-kernel"
+  ],
+  "learningObjectives": [
+    "Understand namespaces: The Illusion of Isolation",
+    "Understand cgroups v2: Resource Accounting & Limiting",
+    "Understand docker & Containers: cgroups + Namespaces in Practice",
+    "Understand debugging Resource Issues with cgroups"
+  ],
+  "analogy": {
+    "title": "Cgroups as Resource Quotas",
+    "description": "Cgroups are budgets. cpu.max = \"you get this much CPU time.\" memory.max = \"you cannot exceed this RAM.\" pids.max = \"you can only hire this many workers.\" Containers are processes with budgets enforced by the kernel."
+  },
+  "commonMistakes": [
+    {
+      "mistake": "Ignoring log rotation until disk fills up",
+      "solution": "Configure logrotate before deploying; monitor /var/log usage"
+    },
+    {
+      "mistake": "Disabling SELinux/AppArmor instead of fixing policies",
+      "solution": "Use `audit2allow` to generate policies from denials; keep MAC enabled"
+    },
+    {
+      "mistake": "Running containers as root",
+      "solution": "Add `USER nonroot` in Dockerfile; use `--user` flag at runtime"
+    },
+    {
+      "mistake": "Not setting resource limits on containers",
+      "solution": "Always set `--cpus` and `--memory`; configure cgroup limits in Kubernetes"
+    },
+    {
+      "mistake": "Checking /proc/meminfo inside containers for memory",
+      "solution": "Use cgroup v2 files: /sys/fs/cgroup/memory.current, memory.events"
+    }
+  ],
+  "practiceLabs": [
+    {
+      "title": "Explore: Namespaces: The Illusion of Isolation",
+      "task": "Run `ls` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man ls` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: cgroups v2: Resource Accounting & Limiting",
+      "task": "Run `sudo` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man sudo` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: Docker & Containers: cgroups + Namespaces in Practice",
+      "task": "Run `docker` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man docker` to see all available flags and understand the output columns."
+    }
+  ],
+  "quickReference": {
+    "title": "Quick Reference",
+    "content": "| Command | Description |\n|---|---|\n| `ls` | Namespaces: The Illusion of Isolation |\n| `sudo` | Namespaces: The Illusion of Isolation |\n| `docker` | Namespaces: The Illusion of Isolation |\n| `ls` | cgroups v2: Resource Accounting & Limiting |\n| `sudo` | cgroups v2: Resource Accounting & Limiting |\n| `echo` | cgroups v2: Resource Accounting & Limiting |\n| `cat` | Docker & Containers: cgroups + Namespaces in Practice |\n| `CONTAINER_ID` | Docker & Containers: cgroups + Namespaces in Practice |\n| `docker` | Docker & Containers: cgroups + Namespaces in Practice |\n| `cat` | Debugging Resource Issues with cgroups |\n| `CONTAINER_CGROUP` | Debugging Resource Issues with cgroups |\n| `CGROUP_PATH` | Debugging Resource Issues with cgroups |"
+  },
+  "troubleshooting": [
+    {
+      "symptom": "ls returns unexpected output",
+      "cause": "Incorrect arguments, wrong working directory, or stale cached data",
+      "solution": "Verify arguments with `man ls`; check current path with `pwd`; clear cache if applicable"
+    },
+    {
+      "symptom": "Configuration changes not taking effect",
+      "cause": "Service not reloaded or syntax error in config file",
+      "solution": "Validate config syntax with built-in test flag; reload service with `systemctl reload` or `restart`"
+    },
+    {
+      "symptom": "cgroups operation slow or timing out",
+      "cause": "Resource exhaustion (disk I/O, memory pressure, or lock contention)",
+      "solution": "Check `iostat`, `free -m`, and `top`; look for stuck processes with `ps aux --sort=-%cpu`"
+    },
+    {
+      "symptom": "Permission issues accessing cgroups resources",
+      "cause": "Incorrect file ownership or overly restrictive permissions",
+      "solution": "Inspect with `ls -la`; fix with `chown`/ `chmod`; check ACLs with `getfacl`"
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is Namespaces: The Illusion of Isolation?",
+      "options": [
+        "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+        "A tool for managing disk partitions",
+        "A network configuration protocol",
+        "A user authentication system"
+      ],
+      "answer": "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+      "explanation": "The Namespaces: The Illusion of Isolation is the foundation of the Linux filesystem — everything in the system is organized under this structure."
+    },
+    {
+      "question": "What does `ls` do?",
+      "options": [
+        "Lists information about cgroups",
+        "Creates a new directory",
+        "Removes files",
+        "Copies files between directories"
+      ],
+      "answer": "Lists files and directories in the current or specified path",
+      "explanation": "Use `ls` to explore directory contents. Combine with flags like `-l` (long format), `-a` (hidden files), and `-h` (human-readable sizes)."
+    },
+    {
+      "question": "Which command would you use to view disk usage of the cgroups directory?",
+      "options": [
+        "du -sh /path/to/directory",
+        "cat /path/to/directory",
+        "cp -r /path/to/directory",
+        "chmod /path/to/directory"
+      ],
+      "answer": "du -sh /path/to/directory",
+      "explanation": "`du -sh` (disk usage, summary, human-readable) shows the total size of a directory and its contents."
+    },
+    {
+      "question": "A user reports \"Permission denied\" when trying to access a cgroups directory. What is the first command you should run?",
+      "options": [
+        "ls -ld /path/to/directory",
+        "chmod 777 /path/to/directory",
+        "rm -rf /path/to/directory",
+        "systemctl restart sshd"
+      ],
+      "answer": "ls -ld /path/to/directory",
+      "explanation": "`ls -ld` shows the directory's permissions and ownership. Always inspect before making changes — starting with `chmod 777` is a security anti-pattern."
+    },
+    {
+      "question": "In a cgroups scenario, your monitoring alerts show ls failing intermittently. What is the correct debugging workflow?",
+      "options": [
+        "Check logs → verify configuration → test in staging → apply fix → monitor",
+        "Reboot the server immediately",
+        "Reinstall the operating system",
+        "Ignore the alert and wait for it to resolve"
+      ],
+      "answer": "Check logs → verify configuration → test in staging → apply fix → monitor",
+      "explanation": "A structured debugging workflow prevents cascading failures. Always diagnose before acting, especially in production environments where downtime has direct business impact."
+    }
+  ],
+  "interviewTips": [
+    "FAANG Architect's Note:  cgroups and namespaces are the most important Linux features you've probably never directly used",
+    "FAANG does), you depend on these features every day"
+  ],
+  "productionTips": [
+    "Production Tip:  Always set memory limits on containers and services"
+  ],
+  "bestPractices": [
+    "Use version control for all configuration (/etc, scripts, Dockerfiles)",
+    "Implement infrastructure as code; avoid manual server changes",
+    "Test changes in staging before production; have rollback plans"
+  ],
+  "enterprisePerspective": "In enterprise environments, cgroups & namespaces is managed through automation (Ansible, Terraform), monitored centrally (Prometheus, Datadog), and governed by compliance policies (CIS benchmarks, SOC2). Changes go through change advisory boards with rollback procedures documented.",
+  "visualHint": "cgroup_hierarchy"
 }

@@ -1,11 +1,14 @@
 {
+  "schemaVersion": "2.0",
+  "contentVersion": "1.0",
+  "lastReviewed": "2026-07-08",
+  "reviewStatus": "migrated",
   "id": "linux-git",
   "title": "Git Version Control",
   "category": "Linux",
   "subcategory": "Foundations",
   "language": "bash",
-  "description": "Git is the version control system that underpins all modern software development. Created by Linus Torvalds for Linux kernel development, Git is now used by every FAANG company. Understanding Git deeply — not just add/commit/push — is essential for working in large engineering teams.",
-  "codeBlock": "",
+  "description": "Git is the version control system that underpins all modern software development. Created by Linus Torvalds for Linux kernel development, Git is now used by every Enterprise company. Understanding Git deeply — not just add/commit/push — is essential for working in large engineering teams.",
   "sections": [
     {
       "title": "Git Objects: Blobs, Trees, Commits",
@@ -14,8 +17,8 @@
     },
     {
       "title": "Branching & Merging Strategies",
-      "description": "Branches are lightweight pointers to commits. Creating a branch is nearly instant — just a 41-byte file. FAANG teams use various branching strategies; understanding the tradeoffs between merge, rebase, and squash is an interview topic.",
-      "codeBlock": "# Branches are just labels on commits\n# main → C3 ← feature → C4\n#              ↖         ↗\n#               merge commit\n\ngit branch              # List local branches\ngit branch feature      # Create branch from HEAD\ngit checkout feature    # Switch to branch\ngit checkout -b feature # Create and switch (one command)\ngit switch feature      # Modern alternative to checkout\n\n# === Merge ===\ngit checkout main\ngit merge feature       # Creates a merge commit\n# Pros: preserves history, safe\n# Cons: cluttered history with merge commits\n\n# === Rebase ===\ngit checkout feature\ngit rebase main         # Replay feature commits on top of main\ngit checkout main\ngit merge feature       # Fast-forward merge\n# Pros: linear history, clean\n# Cons: rewrites history (never rebase shared branches!)\n\n# === Squash ===\ngit merge --squash feature\ngit commit -m \"Add feature\"\n# Pros: single commit per feature\n# Cons: loses intermediate commits (debugging harder)\n\n# FAANG common workflows:\n# Google: squash-merge (single commit per CL)\n# Meta: rebase + merge (linear history)\n# Amazon: merge commits (preserve full history)"
+      "description": "Branches are lightweight pointers to commits. Creating a branch is nearly instant — just a 41-byte file. Enterprise teams use various branching strategies; understanding the tradeoffs between merge, rebase, and squash is an interview topic.",
+      "codeBlock": "# Branches are just labels on commits\n# main → C3 ← feature → C4\n#              ↖         ↗\n#               merge commit\n\ngit branch              # List local branches\ngit branch feature      # Create branch from HEAD\ngit checkout feature    # Switch to branch\ngit checkout -b feature # Create and switch (one command)\ngit switch feature      # Modern alternative to checkout\n\n# === Merge ===\ngit checkout main\ngit merge feature       # Creates a merge commit\n# Pros: preserves history, safe\n# Cons: cluttered history with merge commits\n\n# === Rebase ===\ngit checkout feature\ngit rebase main         # Replay feature commits on top of main\ngit checkout main\ngit merge feature       # Fast-forward merge\n# Pros: linear history, clean\n# Cons: rewrites history (never rebase shared branches!)\n\n# === Squash ===\ngit merge --squash feature\ngit commit -m \"Add feature\"\n# Pros: single commit per feature\n# Cons: loses intermediate commits (debugging harder)\n\n# Enterprise common workflows:\n# Google: squash-merge (single commit per CL)\n# Meta: rebase + merge (linear history)\n# Amazon: merge commits (preserve full history)"
     },
     {
       "title": "Interactive Rebase & History Rewriting",
@@ -23,17 +26,17 @@
       "codeBlock": "# Interactive rebase — reorder, squash, edit, drop commits\ngit rebase -i HEAD~5     # Rebase last 5 commits\n\n# In the editor, you'll see:\n# pick abc1234 First commit\n# pick def5678 Second commit\n# pick hij9010 Third commit\n#\n# Commands:\n# pick   = use commit as-is\n# reword = change commit message\n# edit   = stop to amend\n# squash = combine with previous commit\n# fixup  = squash but discard message\n# drop   = delete commit\n\n# Example: squash the last 3 commits into one:\ngit rebase -i HEAD~3\n# Change 'pick' to 'squash' for commits 2 and 3\n\n# Amend the last commit (fix message or add forgotten changes)\ngit add forgotten-file.txt\ngit commit --amend --no-edit   # Add to last commit without editing message\n\n# Undo the last commit but keep changes staged\ngit reset --soft HEAD~1\n\n# Undo the last commit and unstage changes\ngit reset HEAD~1               # --mixed (default)\n\n# Completely discard last commit and changes\ngit reset --hard HEAD~1        # DANGER: destructive!"
     },
     {
-      "title": "Git in Production: The FAANG Workflow",
-      "description": "At FAANG, Git workflows enforce code review, CI/CD, and deployment gates. Understanding these patterns helps you navigate large codebases and collaborate effectively.",
-      "codeBlock": "# === Typical FAANG Feature Workflow ===\n\n# 1. Start from latest main\ngit checkout main\ngit pull --rebase          # Fetch + rebase local changes\n\n# 2. Create feature branch\ngit checkout -b feat/my-feature\n\n# 3. Make changes, commit often (incrementally)\ngit add -p                 # Interactive staging (hunk by hunk)\ngit commit -m \"feat: add user auth\"\n\n# 4. Keep branch updated with main\ngit fetch origin\ngit rebase origin/main     # Rebase instead of merge\n\n# 5. Final cleanup before push\ngit rebase -i origin/main  # Squash fixup commits\ngit log --oneline          # Verify clean history\n\n# 6. Push and create pull request\ngit push -u origin feat/my-feature\n# (Open PR in GitHub/GitLab/Bitbucket)\n\n# 7. Address review feedback\n# Make changes, then:\ngit add -p\ngit commit --amend --no-edit  # Keep single commit (if squashing)\n# or: just add more commits (if merging)\ngit push --force-with-lease   # Safe force-push after rebase\n\n# 8. Merge (via PR button — squash or merge commit)\n\n# === Cherry-pick for hotfixes ===\ngit checkout release/v2.0\ngit cherry-pick abc1234    # Pick a specific commit from main\n\n# === Bisect: find the commit that introduced a bug ===\ngit bisect start\ngit bisect bad             # Current commit is bad\ngit bisect good v1.0       # v1.0 is known good\n# Git checks out a midpoint commit — test it\ngit bisect good            # Or: git bisect bad\n# Repeat until the first bad commit is found\ngit bisect reset"
+      "title": "Git in Production: The Enterprise Workflow",
+      "description": "At Enterprise, Git workflows enforce code review, CI/CD, and deployment gates. Understanding these patterns helps you navigate large codebases and collaborate effectively.",
+      "codeBlock": "# === Typical Enterprise Feature Workflow ===\n\n# 1. Start from latest main\ngit checkout main\ngit pull --rebase          # Fetch + rebase local changes\n\n# 2. Create feature branch\ngit checkout -b feat/my-feature\n\n# 3. Make changes, commit often (incrementally)\ngit add -p                 # Interactive staging (hunk by hunk)\ngit commit -m \"feat: add user auth\"\n\n# 4. Keep branch updated with main\ngit fetch origin\ngit rebase origin/main     # Rebase instead of merge\n\n# 5. Final cleanup before push\ngit rebase -i origin/main  # Squash fixup commits\ngit log --oneline          # Verify clean history\n\n# 6. Push and create pull request\ngit push -u origin feat/my-feature\n# (Open PR in GitHub/GitLab/Bitbucket)\n\n# 7. Address review feedback\n# Make changes, then:\ngit add -p\ngit commit --amend --no-edit  # Keep single commit (if squashing)\n# or: just add more commits (if merging)\ngit push --force-with-lease   # Safe force-push after rebase\n\n# 8. Merge (via PR button — squash or merge commit)\n\n# === Cherry-pick for hotfixes ===\ngit checkout release/v2.0\ngit cherry-pick abc1234    # Pick a specific commit from main\n\n# === Bisect: find the commit that introduced a bug ===\ngit bisect start\ngit bisect bad             # Current commit is bad\ngit bisect good v1.0       # v1.0 is known good\n# Git checks out a midpoint commit — test it\ngit bisect good            # Or: git bisect bad\n# Repeat until the first bad commit is found\ngit bisect reset"
     },
     {
       "title": "Git Configuration & Productivity Tips",
-      "description": "A well-configured Git setup saves hours. These are the configurations every FAANG engineer sets up on day one.",
-      "codeBlock": "# Global configuration (set once)\ngit config --global user.name \"Kallol Chakraborty\"\ngit config --global user.email \"kallol@example.com\"\ngit config --global core.editor vim\ngit config --global init.defaultBranch main\n\n# Useful aliases\ngit config --global alias.lg \"log --oneline --graph --all --decorate\"\ngit config --global alias.last \"log -1 HEAD\"\ngit config --global alias.unstage \"reset HEAD --\"\ngit config --global alias.amend \"commit --amend --no-edit\"\ngit config --global alias.st \"status -sb\"\n\n# Better diffing\ngit config --global diff.algorithm patience\ngit config --global diff.context 5\n\n# .gitignore essentials for Linux projects:\n# *.log\n# *.swp\n# .DS_Store\n# build/\n# dist/\n# node_modules/\n# .env\n\n# === FAANG scenario: large monorepo ===\ngit clone --depth 1 <repo>          # Shallow clone (no history)\ngit clone --filter=blob:none <repo> # Partial clone (no blobs until needed)\ngit sparse-checkout set /path       # Checkout only specific directories\n\n# === Stashing ===\ngit stash                    # Save uncommitted changes\ngit stash -u                 # Include untracked files\ngit stash pop                # Restore and remove stash\ngit stash list               # List all stashes\ngit stash drop stash@{0}     # Delete a stash"
+      "description": "A well-configured Git setup saves hours. These are the configurations every Production engineers sets up on day one.",
+      "codeBlock": "# Global configuration (set once)\ngit config --global user.name \"Kallol Chakraborty\"\ngit config --global user.email \"kallol@example.com\"\ngit config --global core.editor vim\ngit config --global init.defaultBranch main\n\n# Useful aliases\ngit config --global alias.lg \"log --oneline --graph --all --decorate\"\ngit config --global alias.last \"log -1 HEAD\"\ngit config --global alias.unstage \"reset HEAD --\"\ngit config --global alias.amend \"commit --amend --no-edit\"\ngit config --global alias.st \"status -sb\"\n\n# Better diffing\ngit config --global diff.algorithm patience\ngit config --global diff.context 5\n\n# .gitignore essentials for Linux projects:\n# *.log\n# *.swp\n# .DS_Store\n# build/\n# dist/\n# node_modules/\n# .env\n\n# === Production scenario: large monorepo ===\ngit clone --depth 1 <repo>          # Shallow clone (no history)\ngit clone --filter=blob:none <repo> # Partial clone (no blobs until needed)\ngit sparse-checkout set /path       # Checkout only specific directories\n\n# === Stashing ===\ngit stash                    # Save uncommitted changes\ngit stash -u                 # Include untracked files\ngit stash pop                # Restore and remove stash\ngit stash list               # List all stashes\ngit stash drop stash@{0}     # Delete a stash"
     },
     {
-      "title": "FAANG Interview Q&A",
+      "title": "Interview Q&A",
       "description": "<strong>Q:</strong> 'Explain the difference between git merge and git rebase. When would you use each?'<br><br><strong>A:</strong> 'Merge creates a merge commit that ties two branches together — it preserves history exactly as it happened. Rebase rewrites your feature branch commits on top of the target branch — it creates a linear history. Use merge for shared branches (main, release) to preserve the true sequence of events. Use rebase for personal feature branches to keep history clean before review.'<br><br><strong>Q:</strong> 'You accidentally committed to the wrong branch. How do you move the commit to the correct branch?'<br><br><strong>A:</strong> '<code>git log</code> to find the commit hash. <code>git checkout correct-branch</code>. <code>git cherry-pick <hash></code>. <code>git checkout wrong-branch</code>. <code>git reset --hard HEAD~1</code>. Or use <code>git rebase --onto</code> to move a range of commits.'<br><br><strong>Q:</strong> 'A junior engineer force-pushed to main and rewrote history. How do you recover?'<br><br><strong>A:</strong> '<code>git reflog</code> on the remote (if you have access) to find the original commit. <code>git reset --hard <original-commit></code>. <code>git push --force-with-lease</code> to restore. Enable branch protection on main to prevent this — main should require PRs and disallow force-push.'",
       "codeBlock": ""
     },
@@ -43,6 +46,169 @@
       "codeBlock": ""
     }
   ],
-  "details": "<p class=\"mb-3\"><strong>FAANG Architect's Note:</strong> Git was created to solve a specific problem: 20,000+ developers contributing to the Linux kernel simultaneously. The FAANG monorepo models (Google's Piper, Meta's Mercurial-based repo) are more sophisticated, but Git skills translate directly. If you understand Git's object model deeply, you'll understand any VCS.</p><p><strong>Interview Tip:</strong> When asked Git questions, show depth by referencing the underlying object model (blobs, trees, commits). Candidates who only know 'add, commit, push' don't demonstrate senior-level understanding. Know how to recover from mistakes — that's what separates experienced engineers.</p>",
-  "tags": ["FAANG", "Linux", "git", "version-control", "interview"]
+  "tags": [
+    "faang-insight",
+    "Linux",
+    "git",
+    "version-control",
+    "interview"
+  ],
+  "difficulty": "advanced",
+  "readingTime": 17,
+  "practiceTime": 13,
+  "prerequisites": [
+    "linux-cli-basics"
+  ],
+  "learningObjectives": [
+    "Understand git Objects: Blobs, Trees, Commits",
+    "Understand branching & Merging Strategies",
+    "Understand interactive Rebase & History Rewriting",
+    "Understand git in Production: The Enterprise Workflow",
+    "Understand git Configuration & Productivity Tips"
+  ],
+  "analogy": {
+    "title": "Git as a Time Machine",
+    "description": "Commits are snapshots in time. Branches are parallel timelines. Merge brings timelines together. Rebase rewrites history to make it linear. The working directory is your present. The index (staging) is your packing list for the next snapshot. Remote is a backup vault in another dimension."
+  },
+  "commonMistakes": [
+    {
+      "mistake": "Ignoring log rotation until disk fills up",
+      "solution": "Configure logrotate before deploying; monitor /var/log usage"
+    },
+    {
+      "mistake": "Disabling SELinux/AppArmor instead of fixing policies",
+      "solution": "Use `audit2allow` to generate policies from denials; keep MAC enabled"
+    },
+    {
+      "mistake": "Running containers as root",
+      "solution": "Add `USER nonroot` in Dockerfile; use `--user` flag at runtime"
+    },
+    {
+      "mistake": "Not setting resource limits on containers",
+      "solution": "Always set `--cpus` and `--memory`; configure cgroup limits in Kubernetes"
+    },
+    {
+      "mistake": "Checking /proc/meminfo inside containers for memory",
+      "solution": "Use cgroup v2 files: /sys/fs/cgroup/memory.current, memory.events"
+    }
+  ],
+  "practiceLabs": [
+    {
+      "title": "Explore: Git Objects: Blobs, Trees, Commits",
+      "task": "Run `git` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man git` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: Branching & Merging Strategies",
+      "task": "Run `echo` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man echo` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: Interactive Rebase & History Rewriting",
+      "task": "Run `git` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man git` to see all available flags and understand the output columns."
+    }
+  ],
+  "quickReference": {
+    "title": "Quick Reference",
+    "content": "| Command | Description |\n|---|---|\n| `git` | Git Objects: Blobs, Trees, Commits |\n| `echo` | Git Objects: Blobs, Trees, Commits |\n| `git` | Branching & Merging Strategies |\n| `git` | Interactive Rebase & History Rewriting |\n| `git` | Git in Production: The Enterprise Workflow |\n| `git` | Git Configuration & Productivity Tips |"
+  },
+  "troubleshooting": [
+    {
+      "symptom": "git returns unexpected output",
+      "cause": "Incorrect arguments, wrong working directory, or stale cached data",
+      "solution": "Verify arguments with `man git`; check current path with `pwd`; clear cache if applicable"
+    },
+    {
+      "symptom": "Configuration changes not taking effect",
+      "cause": "Service not reloaded or syntax error in config file",
+      "solution": "Validate config syntax with built-in test flag; reload service with `systemctl reload` or `restart`"
+    },
+    {
+      "symptom": "git operation slow or timing out",
+      "cause": "Resource exhaustion (disk I/O, memory pressure, or lock contention)",
+      "solution": "Check `iostat`, `free -m`, and `top`; look for stuck processes with `ps aux --sort=-%cpu`"
+    },
+    {
+      "symptom": "Permission issues accessing git resources",
+      "cause": "Incorrect file ownership or overly restrictive permissions",
+      "solution": "Inspect with `ls -la`; fix with `chown`/ `chmod`; check ACLs with `getfacl`"
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is Git Objects: Blobs, Trees, Commits?",
+      "options": [
+        "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+        "A tool for managing disk partitions",
+        "A network configuration protocol",
+        "A user authentication system"
+      ],
+      "answer": "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+      "explanation": "The Git Objects: Blobs, Trees, Commits is the foundation of the Linux filesystem — everything in the system is organized under this structure."
+    },
+    {
+      "question": "How do you list the contents of a git related directory?",
+      "options": [
+        "Lists files and directories in the current or specified path",
+        "Changes the current working directory",
+        "Creates a new file",
+        "Displays system information"
+      ],
+      "answer": "Lists files and directories in the current or specified path",
+      "explanation": "Use `ls` to explore directory contents. Combine with flags like `-l` (long format), `-a` (hidden files), and `-h` (human-readable sizes)."
+    },
+    {
+      "question": "Which command would you use to view disk usage of the git directory?",
+      "options": [
+        "du -sh /path/to/directory",
+        "cat /path/to/directory",
+        "cp -r /path/to/directory",
+        "chmod /path/to/directory"
+      ],
+      "answer": "du -sh /path/to/directory",
+      "explanation": "`du -sh` (disk usage, summary, human-readable) shows the total size of a directory and its contents."
+    },
+    {
+      "question": "A user reports \"Permission denied\" when trying to access a git directory. What is the first command you should run?",
+      "options": [
+        "ls -ld /path/to/directory",
+        "chmod 777 /path/to/directory",
+        "rm -rf /path/to/directory",
+        "systemctl restart sshd"
+      ],
+      "answer": "ls -ld /path/to/directory",
+      "explanation": "`ls -ld` shows the directory's permissions and ownership. Always inspect before making changes — starting with `chmod 777` is a security anti-pattern."
+    },
+    {
+      "question": "In a git scenario, your monitoring alerts show git failing intermittently. What is the correct debugging workflow?",
+      "options": [
+        "Check logs → verify configuration → test in staging → apply fix → monitor",
+        "Reboot the server immediately",
+        "Reinstall the operating system",
+        "Ignore the alert and wait for it to resolve"
+      ],
+      "answer": "Check logs → verify configuration → test in staging → apply fix → monitor",
+      "explanation": "A structured debugging workflow prevents cascading failures. Always diagnose before acting, especially in production environments where downtime has direct business impact."
+    }
+  ],
+  "interviewTips": [
+    "FAANG Architect's Note:  Git was created to solve a specific problem: 20,000+ developers contributing to the Linux kernel simultaneously",
+    "FAANG monorepo models (Google's Piper, Meta's Mercurial-based repo) are more sophisticated, but Git skills translate directly"
+  ],
+  "productionTips": [
+    "Monitor key metrics continuously; alert on anomalies before users notice.",
+    "Automate routine tasks; manual processes do not scale.",
+    "Document runbooks for common incidents; practice them regularly."
+  ],
+  "bestPractices": [
+    "Use version control for all configuration (/etc, scripts, Dockerfiles)",
+    "Implement infrastructure as code; avoid manual server changes",
+    "Test changes in staging before production; have rollback plans"
+  ],
+  "enterprisePerspective": "In enterprise environments, git version control is managed through automation (Ansible, Terraform), monitored centrally (Prometheus, Datadog), and governed by compliance policies (CIS benchmarks, SOC2). Changes go through change advisory boards with rollback procedures documented.",
+  "visualHint": "git_branching"
 }

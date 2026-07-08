@@ -1,11 +1,14 @@
 {
+  "schemaVersion": "2.0",
+  "contentVersion": "1.0",
+  "lastReviewed": "2026-07-08",
+  "reviewStatus": "migrated",
   "id": "linux-permissions",
   "title": "File Permissions & ACLs",
   "category": "Linux",
   "subcategory": "Foundations",
   "language": "bash",
-  "description": "Linux file permissions are the foundation of system security. Every FAANG SRE and infrastructure engineer must understand the permission model cold — including SUID/SGID, sticky bits, ACLs, and how they interact. Permission misconfiguration is a leading cause of security vulnerabilities in production.",
-  "codeBlock": "",
+  "description": "Linux file permissions are the foundation of system security. Every Production SRE and infrastructure engineer must understand the permission model cold — including SUID/SGID, sticky bits, ACLs, and how they interact. Permission misconfiguration is a leading cause of security vulnerabilities in production.",
   "sections": [
     {
       "title": "The Permission Triplet: Owner-Group-Other",
@@ -20,21 +23,21 @@
     {
       "title": "Special Permissions: SUID, SGID, Sticky Bit",
       "description": "Three special permission bits add additional behavior. <strong>SUID (4000)</strong> — run a file with the owner's privileges (e.g., passwd runs as root). <strong>SGID (2000)</strong> — on files, run with group's privileges; on directories, new files inherit the directory's group. <strong>Sticky Bit (1000)</strong> — only file owners can delete their files (used on /tmp). These are frequent interview topics.",
-      "codeBlock": "# SUID (Set User ID) — runs as file owner, not the user executing it\nchmod u+s /usr/bin/passwd  # Set SUID (s in user execute position)\nls -l /usr/bin/passwd\n# -rwsr-xr-x ... passwd — the 's' means SUID + executable\n\n# Check all SUID binaries on your system:\nfind / -perm -4000 -type f 2>/dev/null\n\n# SGID (Set Group ID) — on directories: new files inherit group\nchmod g+s /shared/project   # Set SGID (s in group execute position)\n# Now any file created in /shared/project belongs to the directory's group\n\n# Sticky Bit — only owners can delete their own files\nchmod +t /tmp               # Set sticky bit (t in others execute position)\nls -ld /tmp\n# drwxrwxrwt ... /tmp — the 't' means sticky bit is set\n\n# === FAANG Interview: SUID Security ===\n# Why is SUID dangerous? If a SUID root binary has a vulnerability,\n# any user can escalate to root.\n# Mitigation: minimize SUID binaries (use sudo instead),\n# mount filesystems with 'nosuid' option where possible.\n\n# Numeric shortcuts:\nchmod 4755 script  # SUID + rwxr-xr-x\nchmod 2755 dir     # SGID + rwxr-xr-x\nchmod 1777 /tmp    # Sticky bit + rwxrwxrwx"
+      "codeBlock": "# SUID (Set User ID) — runs as file owner, not the user executing it\nchmod u+s /usr/bin/passwd  # Set SUID (s in user execute position)\nls -l /usr/bin/passwd\n# -rwsr-xr-x ... passwd — the 's' means SUID + executable\n\n# Check all SUID binaries on your system:\nfind / -perm -4000 -type f 2>/dev/null\n\n# SGID (Set Group ID) — on directories: new files inherit group\nchmod g+s /shared/project   # Set SGID (s in group execute position)\n# Now any file created in /shared/project belongs to the directory's group\n\n# Sticky Bit — only owners can delete their own files\nchmod +t /tmp               # Set sticky bit (t in others execute position)\nls -ld /tmp\n# drwxrwxrwt ... /tmp — the 't' means sticky bit is set\n\n# === Interview: SUID Security ===\n# Why is SUID dangerous? If a SUID root binary has a vulnerability,\n# any user can escalate to root.\n# Mitigation: minimize SUID binaries (use sudo instead),\n# mount filesystems with 'nosuid' option where possible.\n\n# Numeric shortcuts:\nchmod 4755 script  # SUID + rwxr-xr-x\nchmod 2755 dir     # SGID + rwxr-xr-x\nchmod 1777 /tmp    # Sticky bit + rwxrwxrwx"
     },
     {
       "title": "Access Control Lists (ACLs)",
-      "description": "POSIX ACLs extend the traditional permission model to support multiple users and groups. When the basic u/g/o model is insufficient, ACLs provide fine-grained control. <strong>FAANG production use case:</strong> shared team directories where multiple service accounts and humans need different access levels.",
-      "codeBlock": "# Check if ACLs are enabled on a filesystem\nmount | grep acl\n# (Most modern filesystems have ACLs enabled by default)\n\n# View ACLs on a file/directory\ngetfacl /shared/project\n# file: shared/project\n# owner: alice\n# group: dev-team\n# user::rwx\n# user:bob:r-x       # Bob has read+execute only\n# group::r-x\n# mask::r-x\n# other::---\n\n# Set ACLs\nsetfacl -m u:bob:rx /shared/project    # Add Bob with read+execute\nsetfacl -m g:devops:rwx /shared/tools  # Add devops group with full access\nsetfacl -m o::--- /shared/project      # Remove all access for others\n\n# Recursive ACL (be careful — performance impact)\nsetfacl -R -m u:ci-user:rx /app/deploy\n\n# Remove specific ACL entry\nsetfacl -x u:bob /shared/project\n\n# Default ACL — new files/dirs inherit these ACLs\nsetfacl -d -m g:dev-team:rwx /shared/project\n\n# === FAANG Insight ===\n# ACLs add complexity. Before extending ACLs, ask:\n# Can I solve this with Unix groups in /etc/group?\n# ACLs are harder to audit and debug than traditional permissions.\n# In FAANG environments, we minimize ACL usage and rely on:\n# - Clear group membership\n# - Service accounts with minimal permissions\n# - Config management (Ansible/Terraform) to enforce permissions"
+      "description": "POSIX ACLs extend the traditional permission model to support multiple users and groups. When the basic u/g/o model is insufficient, ACLs provide fine-grained control. <strong>Production use case:</strong> shared team directories where multiple service accounts and humans need different access levels.",
+      "codeBlock": "# Check if ACLs are enabled on a filesystem\nmount | grep acl\n# (Most modern filesystems have ACLs enabled by default)\n\n# View ACLs on a file/directory\ngetfacl /shared/project\n# file: shared/project\n# owner: alice\n# group: dev-team\n# user::rwx\n# user:bob:r-x       # Bob has read+execute only\n# group::r-x\n# mask::r-x\n# other::---\n\n# Set ACLs\nsetfacl -m u:bob:rx /shared/project    # Add Bob with read+execute\nsetfacl -m g:devops:rwx /shared/tools  # Add devops group with full access\nsetfacl -m o::--- /shared/project      # Remove all access for others\n\n# Recursive ACL (be careful — performance impact)\nsetfacl -R -m u:ci-user:rx /app/deploy\n\n# Remove specific ACL entry\nsetfacl -x u:bob /shared/project\n\n# Default ACL — new files/dirs inherit these ACLs\nsetfacl -d -m g:dev-team:rwx /shared/project\n\n# === Enterprise Insight ===\n# ACLs add complexity. Before extending ACLs, ask:\n# Can I solve this with Unix groups in /etc/group?\n# ACLs are harder to audit and debug than traditional permissions.\n# In Enterprise environments, we minimize ACL usage and rely on:\n# - Clear group membership\n# - Service accounts with minimal permissions\n# - Config management (Ansible/Terraform) to enforce permissions"
     },
     {
       "title": "umask & Default Permissions",
       "description": "The <code>umask</code> determines default permissions for newly created files and directories. It's a mask (inverted) — the permissions are <code>base - umask</code>. Files default to <code>666 (rw-rw-rw-)</code>, directories to <code>777 (rwxrwxrwx)</code>. The umask subtracts from these.",
-      "codeBlock": "# Current umask value\numask                     # 0022 (most common)\numask -S                 # Symbolic: u=rwx,g=rx,o=rx\n\n# How umask works:\n# File defaults:   666 (rw-rw-rw-)\n# Minus umask:     022 (----w--w-)\n# Result:          644 (rw-r--r--)\n\n# Directory defaults: 777 (rwxrwxrwx)\n# Minus umask:        022 (----w--w-)\n# Result:             755 (rwxr-xr-x)\n\n# Common umask values:\n# 0022 — rw-r--r-- files, rwxr-xr-x dirs (standard)\n# 0027 — rw-r-----, rwxr-x--- (shared team with restricted group)\n# 0077 — rw-------, rwx------ (private — SSH keys!)\n\numask 0077               # Set for this shell session\n# Add to ~/.bashrc for persistence\n\n# === FAANG Interview ===\n# Q: 'A user reports that files they create in /shared/project\n#     are not accessible by their teammates. What's wrong?'\n# A: Check umask. If it's 0077, files are created with no group access.\n#    Fix: set umask 0027 in the team's .bashrc or the shared script."
+      "codeBlock": "# Current umask value\numask                     # 0022 (most common)\numask -S                 # Symbolic: u=rwx,g=rx,o=rx\n\n# How umask works:\n# File defaults:   666 (rw-rw-rw-)\n# Minus umask:     022 (----w--w-)\n# Result:          644 (rw-r--r--)\n\n# Directory defaults: 777 (rwxrwxrwx)\n# Minus umask:        022 (----w--w-)\n# Result:             755 (rwxr-xr-x)\n\n# Common umask values:\n# 0022 — rw-r--r-- files, rwxr-xr-x dirs (standard)\n# 0027 — rw-r-----, rwxr-x--- (shared team with restricted group)\n# 0077 — rw-------, rwx------ (private — SSH keys!)\n\numask 0077               # Set for this shell session\n# Add to ~/.bashrc for persistence\n\n# === Interview ===\n# Q: 'A user reports that files they create in /shared/project\n#     are not accessible by their teammates. What's wrong?'\n# A: Check umask. If it's 0077, files are created with no group access.\n#    Fix: set umask 0027 in the team's .bashrc or the shared script."
     },
     {
-      "title": "FAANG Interview Q&A",
-      "description": "<strong>Q:</strong> 'What does chmod 4755 do?'<br><br><strong>A:</strong> '4 indicates the SUID bit is set. 755 means rwxr-xr-x. So the file runs with the owner's privileges regardless of who executes it. Common for utilities like passwd and ping that need elevated access.'<br><br><strong>Q:</strong> 'How do you audit permissions across a fleet of 1000 Linux servers?'<br><br><strong>A:</strong> 'At FAANG scale, we never SSH into individual servers to check permissions. Instead, configuration management (Ansible, Chef, Puppet) enforces desired permissions via declarative config. We also use auditing tools like <code>auditd</code> with watches on sensitive paths, and drift detection that compares current permissions against a golden baseline. For security-critical checks (SUID, world-writable files), we run automated scans and alert on changes.'<br><br><strong>Q:</strong> 'Scenario: You need to give a CI/CD service account write access to /app/deploy but read-only access to /app/config. The owner is deploy-user, group is dev-team. How?'<br><br><strong>A:</strong> 'Traditional permissions: if ci-user needs different access than deploy-user, the basic u/g/o model won't work. I'd use ACLs: <code>setfacl -m u:ci-user:rwx /app/deploy</code> and <code>setfacl -m u:ci-user:rx /app/config</code>. Or create a dedicated group (ci-agents), add ci-user to it, and set group permissions accordingly. The group approach is simpler to audit.'",
+      "title": "Interview Q&A",
+      "description": "<strong>Q:</strong> 'What does chmod 4755 do?'<br><br><strong>A:</strong> '4 indicates the SUID bit is set. 755 means rwxr-xr-x. So the file runs with the owner's privileges regardless of who executes it. Common for utilities like passwd and ping that need elevated access.'<br><br><strong>Q:</strong> 'How do you audit permissions across a fleet of 1000 Linux servers?'<br><br><strong>A:</strong> 'At Enterprise scale, we never SSH into individual servers to check permissions. Instead, configuration management (Ansible, Chef, Puppet) enforces desired permissions via declarative config. We also use auditing tools like <code>auditd</code> with watches on sensitive paths, and drift detection that compares current permissions against a golden baseline. For security-critical checks (SUID, world-writable files), we run automated scans and alert on changes.'<br><br><strong>Q:</strong> 'Scenario: You need to give a CI/CD service account write access to /app/deploy but read-only access to /app/config. The owner is deploy-user, group is dev-team. How?'<br><br><strong>A:</strong> 'Traditional permissions: if ci-user needs different access than deploy-user, the basic u/g/o model won't work. I'd use ACLs: <code>setfacl -m u:ci-user:rwx /app/deploy</code> and <code>setfacl -m u:ci-user:rx /app/config</code>. Or create a dedicated group (ci-agents), add ci-user to it, and set group permissions accordingly. The group approach is simpler to audit.'",
       "codeBlock": ""
     },
     {
@@ -43,6 +46,167 @@
       "codeBlock": ""
     }
   ],
-  "details": "<p class=\"mb-3\"><strong>FAANG Architect's Note:</strong> Permission management at Internet scale is fundamentally different from single-server Linux. We use <strong>Infrastructure as Code</strong> to declare file and directory permissions (e.g., Terraform's file_permission attribute, Ansible's file module). We never rely on manual chmod or ACL configuration in production. The principle of least privilege applies: every service account should have exactly the permissions it needs — no more.</p><p><strong>Interview Tip:</strong> When asked about permissions, immediately think about the security implications. A candidate who says 'chmod 777 to fix it' fails immediately. The right answer always involves 'what's the minimum permission needed?'</p>",
-  "tags": ["FAANG", "Linux", "permissions", "security", "interview"]
+  "tags": [
+    "faang-insight",
+    "Linux",
+    "permissions",
+    "security",
+    "interview"
+  ],
+  "difficulty": "advanced",
+  "readingTime": 17,
+  "practiceTime": 13,
+  "prerequisites": [
+    "linux-filesystem",
+    "linux-cli-basics"
+  ],
+  "learningObjectives": [
+    "Understand the Permission Triplet: Owner-Group-Other",
+    "Understand directories: Execute Bit = Traversal",
+    "Understand special Permissions: SUID, SGID, Sticky Bit",
+    "Understand access Control Lists (ACLs)",
+    "Understand umask & Default Permissions"
+  ],
+  "analogy": {
+    "title": "Permissions as House Keys",
+    "description": "Each file is a room. The owner has the master key (read/write/execute). Group members have a shared key (read/execute). Others might only peek through the window (read). The sticky bit on /tmp is like a coat check - you can hang your coat, but only you can take it back."
+  },
+  "commonMistakes": [
+    {
+      "mistake": "Ignoring log rotation until disk fills up",
+      "solution": "Configure logrotate before deploying; monitor /var/log usage"
+    },
+    {
+      "mistake": "Disabling SELinux/AppArmor instead of fixing policies",
+      "solution": "Use `audit2allow` to generate policies from denials; keep MAC enabled"
+    },
+    {
+      "mistake": "Running containers as root",
+      "solution": "Add `USER nonroot` in Dockerfile; use `--user` flag at runtime"
+    },
+    {
+      "mistake": "Not setting resource limits on containers",
+      "solution": "Always set `--cpus` and `--memory`; configure cgroup limits in Kubernetes"
+    },
+    {
+      "mistake": "Checking /proc/meminfo inside containers for memory",
+      "solution": "Use cgroup v2 files: /sys/fs/cgroup/memory.current, memory.events"
+    }
+  ],
+  "practiceLabs": [
+    {
+      "title": "Explore: The Permission Triplet: Owner-Group-Other",
+      "task": "Run `ls` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man ls` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: Directories: Execute Bit = Traversal",
+      "task": "Run `chmod` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man chmod` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: Special Permissions: SUID, SGID, Sticky Bit",
+      "task": "Run `cat` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man cat` to see all available flags and understand the output columns."
+    }
+  ],
+  "quickReference": {
+    "title": "Quick Reference",
+    "content": "| Command | Description |\n|---|---|\n| `ls` | The Permission Triplet: Owner-Group-Other |\n| `chmod` | The Permission Triplet: Owner-Group-Other |\n| `chmod` | Directories: Execute Bit = Traversal |\n| `ls` | Directories: Execute Bit = Traversal |\n| `cat` | Directories: Execute Bit = Traversal |\n| `chmod` | Special Permissions: SUID, SGID, Sticky Bit |\n| `ls` | Special Permissions: SUID, SGID, Sticky Bit |\n| `find` | Special Permissions: SUID, SGID, Sticky Bit |\n| `mount` | Access Control Lists (ACLs) |\n| `getfacl` | Access Control Lists (ACLs) |\n| `setfacl` | Access Control Lists (ACLs) |\n| `umask` | umask & Default Permissions |"
+  },
+  "troubleshooting": [
+    {
+      "symptom": "ls returns unexpected output",
+      "cause": "Incorrect arguments, wrong working directory, or stale cached data",
+      "solution": "Verify arguments with `man ls`; check current path with `pwd`; clear cache if applicable"
+    },
+    {
+      "symptom": "Configuration changes not taking effect",
+      "cause": "Service not reloaded or syntax error in config file",
+      "solution": "Validate config syntax with built-in test flag; reload service with `systemctl reload` or `restart`"
+    },
+    {
+      "symptom": "permissions operation slow or timing out",
+      "cause": "Resource exhaustion (disk I/O, memory pressure, or lock contention)",
+      "solution": "Check `iostat`, `free -m`, and `top`; look for stuck processes with `ps aux --sort=-%cpu`"
+    },
+    {
+      "symptom": "Permission issues accessing permissions resources",
+      "cause": "Incorrect file ownership or overly restrictive permissions",
+      "solution": "Inspect with `ls -la`; fix with `chown`/ `chmod`; check ACLs with `getfacl`"
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is The Permission Triplet: Owner-Group-Other?",
+      "options": [
+        "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+        "A tool for managing disk partitions",
+        "A network configuration protocol",
+        "A user authentication system"
+      ],
+      "answer": "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+      "explanation": "The The Permission Triplet: Owner-Group-Other is the foundation of the Linux filesystem — everything in the system is organized under this structure."
+    },
+    {
+      "question": "What does `ls` do?",
+      "options": [
+        "Lists information about permissions",
+        "Creates a new directory",
+        "Removes files",
+        "Copies files between directories"
+      ],
+      "answer": "Lists files and directories in the current or specified path",
+      "explanation": "Use `ls` to explore directory contents. Combine with flags like `-l` (long format), `-a` (hidden files), and `-h` (human-readable sizes)."
+    },
+    {
+      "question": "Which command would you use to view disk usage of the permissions directory?",
+      "options": [
+        "du -sh /path/to/directory",
+        "cat /path/to/directory",
+        "cp -r /path/to/directory",
+        "chmod /path/to/directory"
+      ],
+      "answer": "du -sh /path/to/directory",
+      "explanation": "`du -sh` (disk usage, summary, human-readable) shows the total size of a directory and its contents."
+    },
+    {
+      "question": "A user reports \"Permission denied\" when trying to access a permissions directory. What is the first command you should run?",
+      "options": [
+        "ls -ld /path/to/directory",
+        "chmod 777 /path/to/directory",
+        "rm -rf /path/to/directory",
+        "systemctl restart sshd"
+      ],
+      "answer": "ls -ld /path/to/directory",
+      "explanation": "`ls -ld` shows the directory's permissions and ownership. Always inspect before making changes — starting with `chmod 777` is a security anti-pattern."
+    },
+    {
+      "question": "In a permissions scenario, your monitoring alerts show ls failing intermittently. What is the correct debugging workflow?",
+      "options": [
+        "Check logs → verify configuration → test in staging → apply fix → monitor",
+        "Reboot the server immediately",
+        "Reinstall the operating system",
+        "Ignore the alert and wait for it to resolve"
+      ],
+      "answer": "Check logs → verify configuration → test in staging → apply fix → monitor",
+      "explanation": "A structured debugging workflow prevents cascading failures. Always diagnose before acting, especially in production environments where downtime has direct business impact."
+    }
+  ],
+  "interviewTips": [
+    "FAANG Architect's Note:  Permission management at Internet scale is fundamentally different from single-server Linux"
+  ],
+  "productionTips": [
+    "production"
+  ],
+  "bestPractices": [
+    "Use version control for all configuration (/etc, scripts, Dockerfiles)",
+    "Implement infrastructure as code; avoid manual server changes",
+    "Test changes in staging before production; have rollback plans"
+  ],
+  "enterprisePerspective": "In enterprise environments, file permissions & acls is managed through automation (Ansible, Terraform), monitored centrally (Prometheus, Datadog), and governed by compliance policies (CIS benchmarks, SOC2). Changes go through change advisory boards with rollback procedures documented.",
+  "visualHint": "permission_matrix"
 }

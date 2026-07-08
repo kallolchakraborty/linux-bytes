@@ -1,35 +1,38 @@
 {
+  "schemaVersion": "2.0",
+  "contentVersion": "1.0",
+  "lastReviewed": "2026-07-08",
+  "reviewStatus": "migrated",
   "id": "linux-bpf",
   "title": "BPF & eBPF Deep Dive",
   "category": "Linux",
   "subcategory": "Advanced",
   "language": "bash",
-  "description": "BPF (Berkeley Packet Filter), evolved into eBPF (extended BPF), is a revolutionary kernel technology that allows running sandboxed programs in the kernel without changing kernel code or loading modules. eBPF enables safe, efficient, and programmable observability, networking, and security. At FAANG, eBPF powers critical infrastructure: Cilium (Kubernetes networking), Falco (security), Pixie (observability), and custom monitoring tools.",
-  "codeBlock": "",
+  "description": "BPF (Berkeley Packet Filter), evolved into eBPF (extended BPF), is a revolutionary kernel technology that allows running sandboxed programs in the kernel without changing kernel code or loading modules. eBPF enables safe, efficient, and programmable observability, networking, and security. At Enterprise, eBPF powers critical infrastructure: Cilium (Kubernetes networking), Falco (security), Pixie (observability), and custom monitoring tools.",
   "sections": [
     {
       "title": "eBPF Architecture & Concepts",
-      "description": "eBPF programs are written in a restricted C, compiled to BPF bytecode, verified by the kernel (safety checks: no loops with unbounded iterations, valid memory access, max instruction count), and attached to events (syscalls, tracepoints, kprobes, network interfaces). <strong>The in-kernel verifier is what makes eBPF safe — it rejects any program that could crash or hang the kernel.</strong> At FAANG, eBPF is used for: performance monitoring (bcc/bpftrace tools), network observability (Cilium), security auditing (Falco), and custom container monitoring.",
+      "description": "eBPF programs are written in a restricted C, compiled to BPF bytecode, verified by the kernel (safety checks: no loops with unbounded iterations, valid memory access, max instruction count), and attached to events (syscalls, tracepoints, kprobes, network interfaces). <strong>The in-kernel verifier is what makes eBPF safe — it rejects any program that could crash or hang the kernel.</strong> At Enterprise, eBPF is used for: performance monitoring (bcc/bpftrace tools), network observability (Cilium), security auditing (Falco), and custom container monitoring.",
       "codeBlock": "# === Check eBPF support ===\ncat /proc/sys/kernel/unprivileged_bpf_disabled  # 0 = enabled, 1 = disabled\n# Check if BPF syscall is available:\ngrep bpf /proc/kallsyms | head -5\n\n# === eBPF program types ===\n# Kprobes     — Dynamic kernel function tracing\n# Tracepoints — Static kernel tracepoints\n# Perf events — PMC-based sampling\n# XDP         — eXpress Data Path (network driver level)\n# TC          — Traffic Control (network stack level)\n# cgroup      — cgroup operations (device, socket, sysctl)\n\n# === The eBPF lifecycle ===\n# 1. Write BPF program (C / Rust / Python / Lua)\n# 2. Compile to BPF bytecode (LLVM/clang)\n# 3. Load into kernel (bpf() syscall)\n# 4. Kernel verifier checks safety\n# 5. JIT compiler translates to native code\n# 6. Attach to event (kprobe, tracepoint, etc.)\n# 7. Program runs on event, writes to BPF maps\n# 8. User-space reads maps via bpf() syscall\n\n# === BPF maps (data structures) ===\n# Hash maps, arrays, per-CPU arrays, stacks, queues, ring buffers\n# Shared between kernel BPF program and user-space\n# Used for: aggregated metrics, configuration, state\n\n# === Limitations ===\n# - Max 4096 instructions (can be extended to 1M with tail calls)\n# - No loops until recently (bounded loops added in Linux 5.17)\n# - No kernel function calls (must be inlined) until BPF helpers\n# - Stack limited to 512 bytes"
     },
     {
       "title": "bpftrace: High-Level eBPF Tracing",
-      "description": "<strong>bpftrace</strong> is a high-level tracing language for Linux eBPF. It's like awk for kernel tracing — you write one-liners to observe kernel and user-space events. At FAANG, bpftrace is the go-to tool for ad-hoc performance investigations and root cause analysis.",
+      "description": "<strong>bpftrace</strong> is a high-level tracing language for Linux eBPF. It's like awk for kernel tracing — you write one-liners to observe kernel and user-space events. At Enterprise, bpftrace is the go-to tool for ad-hoc performance investigations and root cause analysis.",
       "codeBlock": "# === Install bpftrace ===\nsudo apt install bpftrace\n\n# === File open tracing ===\nbpftrace -e 'tracepoint:syscalls:sys_enter_openat { printf(\"%s %s\\n\", comm, str(args->filename)); }'\n# Shows every file opened, by which process\n\n# === New process tracing ===\nbpftrace -e 'tracepoint:syscalls:sys_enter_execve { printf(\"%s -> %s\\n\", comm, str(args->filename)); }'\n\n# === Kill tracing (who is sending SIGKILL?) ===\nbpftrace -e 'tracepoint:syscalls:sys_enter_kill { printf(\"%s -> PID %d SIG %d\\n\", comm, args->pid, args->sig); }'\n\n# === OOM tracing ===\nbpftrace -e 'kprobe:oom_kill_process { printf(\"OOM killed %s (%d)\\n\", str(args->task->comm), args->task->pid); }'\n\n# === Count syscalls by process ===\nbpftrace -e 'tracepoint:syscalls:sys_enter_* { @[comm] = count(); }'\n\n# === Block I/O tracing ===\nbpftrace -e 'kprobe:blk_account_io_start { printf(\"I/O: %s %s\\n\", comm, args->rwbs); }'\n\n# === TCP connection tracing ===\nbpftrace -e 'kprobe:tcp_connect { printf(\"%s connected to %s:%d\\n\", comm, ntop(args->sk->__sk_common->skc_daddr), args->sk->__sk_common->skc_dport); }'\n\n# === One-shot latency histogram (read syscall) ===\nbpftrace -e 'kprobe:vfs_read { @start[tid] = nsecs; } kretprobe:vfs_read /@start[tid]/ { @us = hist((nsecs - @start[tid]) / 1000); delete(@start[tid]); }'\n\n# === Profile: CPU sampling ===\nbpftrace -e 'profile:hz:99 { @[kstack, comm] = count(); }'  # Kernel stack\nbpftrace -e 'profile:hz:99 { @[ustack, comm] = count(); }'  # User stack\n\n# === Built-in tools ===\nsudo bpftrace -l                     # List all probes\nsudo bpftrace -l 'tracepoint:syscalls:*'  # List syscall tracepoints\n# Many pre-built tools come with bpftrace:\nls /usr/share/bpftrace/tools/\n# opensnoop.bt, killsnoop.bt, execsnoop.bt, tcplife.bt, ...\n\n# Run a pre-built tool:\nsudo bpftrace /usr/share/bpftrace/tools/opensnoop.bt"
     },
     {
       "title": "bcc: The BPF Compiler Collection",
-      "description": "<strong>bcc</strong> (BPF Compiler Collection) provides Python- and Lua-based tools for eBPF tracing. It's more flexible than bpftrace (full programming language support) but also more complex. <strong>bcc tools are production-ready — many are used daily at FAANG for performance monitoring.</strong>",
+      "description": "<strong>bcc</strong> (BPF Compiler Collection) provides Python- and Lua-based tools for eBPF tracing. It's more flexible than bpftrace (full programming language support) but also more complex. <strong>bcc tools are production-ready — many are used daily at Enterprise for performance monitoring.</strong>",
       "codeBlock": "# === Install bcc ===\nsudo apt install bpfcc-tools   # Ubuntu package name\n# Tools are prefixed with -bpfcc:\n\n# === Essential bcc tools ===\n# opensnoop: trace file opens\nsudo opensnoop-bpfcc\n\n# execsnoop: trace new processes\nsudo execsnoop-bpfcc\n\n# biotop: block I/O by process\nsudo biotop-bpfcc\n\n# tcplife: TCP connection lifecycle\nsudo tcplife-bpfcc\n\n# tcptop: TCP throughput by process\nsudo tcptop-bpfcc\n\n# cpuunclaimed: CPU not claimed by scheduler\nsudo cpuunclaimed-bpfcc\n\n# offcputime: trace blocked time (off-CPU analysis)\nsudo offcputime-bpfcc -K 30\n\n# runqlat: scheduler run-queue latency\nsudo runqlat-bpfcc\n\n# profile: CPU sampling with frames\nsudo profile-bpfcc -af 30\n\n# cachestat: page cache hit rate\nsudo cachestat-bpfcc\n\n# llcstat: Last-level cache misses\nsudo llcstat-bpfcc\n\n# === Custom bcc Python script (minimal example) ===\ncat > trace_open.py << 'EOF'\nfrom bcc import BPF\n\n# BPF C program\nbpf_program = \"\"\"\nint kprobe__do_sys_openat2(struct pt_regs *ctx, int dfd, const char __user *filename, int flags) {\n    bpf_trace_printk(\"openat: %s\\\\n\", filename);\n    return 0;\n}\n\"\"\"\n\nb = BPF(text=bpf_program)\nb.trace_print()\nEOF\n\nsudo python3 trace_open.py"
     },
     {
       "title": "XDP & eBPF Networking",
-      "description": "<strong>XDP (eXpress Data Path)</strong> is an eBPF-based packet processing framework that runs at the network driver level — before the kernel's network stack processes the packet. This enables DDoS mitigation, load balancing, and packet filtering at line rate (millions of packets per second). At FAANG, XDP is used for: DDoS protection (Cloudflare), Kubernetes service load balancing (Cilium), and custom network filtering.",
+      "description": "<strong>XDP (eXpress Data Path)</strong> is an eBPF-based packet processing framework that runs at the network driver level — before the kernel's network stack processes the packet. This enables DDoS mitigation, load balancing, and packet filtering at line rate (millions of packets per second). At Enterprise, XDP is used for: DDoS protection (Cloudflare), Kubernetes service load balancing (Cilium), and custom network filtering.",
       "codeBlock": "# === XDP program flow ===\n# 1. Packet arrives at NIC\n# 2. XDP program runs (driver level, before skb allocation)\n# 3. Actions: XDP_DROP, XDP_PASS, XDP_TX, XDP_REDIRECT\n# 4. Result: drop packet (fast), pass to kernel stack (normal),\n#            transmit back out (hairpin), or redirect to another NIC\n\n# === XDP vs kernel bypass (DPDK) ===\n# XDP: kernel is still in control, safe, programmable, no userspace changes\n# DPDK: bypasses kernel entirely, userspace driver, fastest possible,\n#       but requires dedicated CPUs and application changes\n\n# === Cilium (Kubernetes CNI powered by eBPF) ===\n# Cilium uses eBPF for:\n# - Service load balancing (replacing kube-proxy)\n# - Network policies (L3/L4/L7)\n# - Observability (Hubble)\n# - Transparent encryption\n\n# === Check if XDP is supported ===\nip link show eth0                     # Check features: xdp\n# Enable XDP on interface:\nsudo ip link set dev eth0 xdp obj my_xdp_prog.o sec xdp\n\n# === XDP example: DDoS blacklist ===\n# Simple XDP program to drop packets from blacklisted IPs\n# (Conceptual — real XDP uses BPF maps for dynamic blacklists)\n\n# === eBPF for security: Falco ===\n# Falco uses eBPF tracepoints/kprobes to detect:\n# - Container escape attempts\n# - Unauthorized file access\n# - Suspicious network connections\n# - Privilege escalation\n\n# Install Falco (using eBPF probe):\n# falco driver-loader bpf\n# falco --bpf"
     },
     {
-      "title": "FAANG Interview Q&A",
-      "description": "<strong>Q:</strong> 'How does eBPF differ from a kernel module?'<br><br><strong>A:</strong> 'A kernel module can access any kernel function, data structure, or memory — it can crash the entire system. eBPF programs are verified by the kernel's BPF verifier before loading — the verifier checks for: (1) valid memory access (no null pointers), (2) bounded loops (termination guaranteed), (3) maximum instruction count (4096 default, up to 1M with tail calls), (4) valid helper function calls. If verification fails, the program is rejected. This safety guarantee is what makes eBPF deployable in production — a buggy eBPF program can't crash the kernel like a buggy module can.'<br><br><strong>Q:</strong> 'What's a real-world use case for eBPF at FAANG?'<br><br><strong>A:</strong> 'One example: Cilium at scale. At a FAANG company using Kubernetes with 10,000+ nodes, Cilium uses eBPF to replace kube-proxy for service load balancing — instead of iptables rules (which become O(n) with number of services), eBPF programs are updated per-service and run at the XDP or TC layer. This eliminates the iptables scaling bottleneck. Another example: Datadog's continuous profiler uses eBPF to sample stack traces without any application changes — no agent code, no recompilation, no JVM flags.'<br><br><strong>Q:</strong> 'What are the limitations of eBPF?'<br><br><strong>A:</strong> '(1) Instruction limit: 4096 by default (can be extended). (2) Stack limit: 512 bytes — you can't allocate large local data structures. (3) No unbounded loops (before Linux 5.17). (4) Limited helper functions — you can call only a fixed set of BPF helpers, not arbitrary kernel functions. (5) Verifier complexity — the verifier can be slow for complex programs. (6) No floating-point arithmetic. (7) Kernel version dependence — newer BPF features require newer kernels. At FAANG, we run custom kernels (or at least Linux 5.10+) specifically to get modern eBPF features.'",
+      "title": "Interview Q&A",
+      "description": "<strong>Q:</strong> 'How does eBPF differ from a kernel module?'<br><br><strong>A:</strong> 'A kernel module can access any kernel function, data structure, or memory — it can crash the entire system. eBPF programs are verified by the kernel's BPF verifier before loading — the verifier checks for: (1) valid memory access (no null pointers), (2) bounded loops (termination guaranteed), (3) maximum instruction count (4096 default, up to 1M with tail calls), (4) valid helper function calls. If verification fails, the program is rejected. This safety guarantee is what makes eBPF deployable in production — a buggy eBPF program can't crash the kernel like a buggy module can.'<br><br><strong>Q:</strong> 'What's a real-world use case for eBPF at Enterprise?'<br><br><strong>A:</strong> 'One example: Cilium at scale. At a Enterprise company using Kubernetes with 10,000+ nodes, Cilium uses eBPF to replace kube-proxy for service load balancing — instead of iptables rules (which become O(n) with number of services), eBPF programs are updated per-service and run at the XDP or TC layer. This eliminates the iptables scaling bottleneck. Another example: Datadog's continuous profiler uses eBPF to sample stack traces without any application changes — no agent code, no recompilation, no JVM flags.'<br><br><strong>Q:</strong> 'What are the limitations of eBPF?'<br><br><strong>A:</strong> '(1) Instruction limit: 4096 by default (can be extended). (2) Stack limit: 512 bytes — you can't allocate large local data structures. (3) No unbounded loops (before Linux 5.17). (4) Limited helper functions — you can call only a fixed set of BPF helpers, not arbitrary kernel functions. (5) Verifier complexity — the verifier can be slow for complex programs. (6) No floating-point arithmetic. (7) Kernel version dependence — newer BPF features require newer kernels. At Enterprise, we run custom kernels (or at least Linux 5.10+) specifically to get modern eBPF features.'",
       "codeBlock": ""
     },
     {
@@ -38,6 +41,171 @@
       "codeBlock": ""
     }
   ],
-  "details": "<p class=\"mb-3\"><strong>FAANG Architect's Note:</strong> eBPF is the most important Linux kernel technology of the last decade. It's transforming observability, networking, and security — without eBPF, you'd need kernel modules (dangerous) or ptrace (slow) for most of these use cases. At FAANG, eBPF is not a 'nice to have' — it's infrastructure. Cilium, Falco, Pixie, and Datadog's continuous profiler all rely on eBPF. If you're working on infrastructure at FAANG, learning eBPF (even just the tooling like bpftrace and bcc) will give you debugging superpowers that traditional tools can't match.</p><p><strong>Production Tip:</strong> bpftrace is safe for production use — it's designed to never crash the system. However, certain bcc tools (especially those using kprobes at high frequency) can add measurable overhead. Start with the pre-built tools (execsnoop, opensnoop, etc.) — they're optimized for low overhead. For custom BPF programs, test in a staging environment first and always monitor CPU usage of the BPF program itself (visible via <code>bpftool prog show</code>).</p>",
-  "tags": ["FAANG", "Linux", "eBPF", "BPF", "bpftrace", "bcc", "XDP", "observability", "networking"]
+  "tags": [
+    "faang-insight",
+    "Linux",
+    "eBPF",
+    "BPF",
+    "bpftrace",
+    "bcc",
+    "XDP",
+    "observability",
+    "networking"
+  ],
+  "difficulty": "advanced",
+  "readingTime": 16,
+  "practiceTime": 12,
+  "prerequisites": [
+    "linux-kernel",
+    "linux-networking"
+  ],
+  "learningObjectives": [
+    "Understand eBPF Architecture & Concepts",
+    "Understand bpftrace: High-Level eBPF Tracing",
+    "Understand bcc: The BPF Compiler Collection",
+    "Understand xDP & eBPF Networking"
+  ],
+  "analogy": {
+    "title": "eBPF as X-Ray Vision",
+    "description": "eBPF lets you safely run custom programs inside the kernel - like inserting a microscope into a living cell. No kernel modules, no crashes. You attach probes to kernel functions (kprobes), tracepoints, or USDT. The verifier ensures your program cannot crash the kernel."
+  },
+  "commonMistakes": [
+    {
+      "mistake": "Ignoring log rotation until disk fills up",
+      "solution": "Configure logrotate before deploying; monitor /var/log usage"
+    },
+    {
+      "mistake": "Disabling SELinux/AppArmor instead of fixing policies",
+      "solution": "Use `audit2allow` to generate policies from denials; keep MAC enabled"
+    },
+    {
+      "mistake": "Running containers as root",
+      "solution": "Add `USER nonroot` in Dockerfile; use `--user` flag at runtime"
+    },
+    {
+      "mistake": "Not setting resource limits on containers",
+      "solution": "Always set `--cpus` and `--memory`; configure cgroup limits in Kubernetes"
+    },
+    {
+      "mistake": "Checking /proc/meminfo inside containers for memory",
+      "solution": "Use cgroup v2 files: /sys/fs/cgroup/memory.current, memory.events"
+    }
+  ],
+  "practiceLabs": [
+    {
+      "title": "Explore: eBPF Architecture & Concepts",
+      "task": "Run `cat` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man cat` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: bpftrace: High-Level eBPF Tracing",
+      "task": "Run `grep` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man grep` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: bcc: The BPF Compiler Collection",
+      "task": "Run `sudo` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man sudo` to see all available flags and understand the output columns."
+    }
+  ],
+  "quickReference": {
+    "title": "Quick Reference",
+    "content": "| Command | Description |\n|---|---|\n| `cat` | eBPF Architecture & Concepts |\n| `grep` | eBPF Architecture & Concepts |\n| `sudo` | bpftrace: High-Level eBPF Tracing |\n| `bpftrace` | bpftrace: High-Level eBPF Tracing |\n| `ls` | bpftrace: High-Level eBPF Tracing |\n| `sudo` | bcc: The BPF Compiler Collection |\n| `cat` | bcc: The BPF Compiler Collection |\n| `from` | bcc: The BPF Compiler Collection |\n| `ip` | XDP & eBPF Networking |\n| `sudo` | XDP & eBPF Networking |"
+  },
+  "troubleshooting": [
+    {
+      "symptom": "cat returns unexpected output",
+      "cause": "Incorrect arguments, wrong working directory, or stale cached data",
+      "solution": "Verify arguments with `man cat`; check current path with `pwd`; clear cache if applicable"
+    },
+    {
+      "symptom": "Configuration changes not taking effect",
+      "cause": "Service not reloaded or syntax error in config file",
+      "solution": "Validate config syntax with built-in test flag; reload service with `systemctl reload` or `restart`"
+    },
+    {
+      "symptom": "bpf operation slow or timing out",
+      "cause": "Resource exhaustion (disk I/O, memory pressure, or lock contention)",
+      "solution": "Check `iostat`, `free -m`, and `top`; look for stuck processes with `ps aux --sort=-%cpu`"
+    },
+    {
+      "symptom": "Permission issues accessing bpf resources",
+      "cause": "Incorrect file ownership or overly restrictive permissions",
+      "solution": "Inspect with `ls -la`; fix with `chown`/ `chmod`; check ACLs with `getfacl`"
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is eBPF Architecture & Concepts?",
+      "options": [
+        "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+        "A tool for managing disk partitions",
+        "A network configuration protocol",
+        "A user authentication system"
+      ],
+      "answer": "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+      "explanation": "The eBPF Architecture & Concepts is the foundation of the Linux filesystem — everything in the system is organized under this structure."
+    },
+    {
+      "question": "What does `cat` do?",
+      "options": [
+        "Lists information about bpf",
+        "Creates a new directory",
+        "Removes files",
+        "Copies files between directories"
+      ],
+      "answer": "Lists files and directories in the current or specified path",
+      "explanation": "Use `ls` to explore directory contents. Combine with flags like `-l` (long format), `-a` (hidden files), and `-h` (human-readable sizes)."
+    },
+    {
+      "question": "Which command would you use to view disk usage of the bpf directory?",
+      "options": [
+        "du -sh /path/to/directory",
+        "cat /path/to/directory",
+        "cp -r /path/to/directory",
+        "chmod /path/to/directory"
+      ],
+      "answer": "du -sh /path/to/directory",
+      "explanation": "`du -sh` (disk usage, summary, human-readable) shows the total size of a directory and its contents."
+    },
+    {
+      "question": "A user reports \"Permission denied\" when trying to access a bpf directory. What is the first command you should run?",
+      "options": [
+        "ls -ld /path/to/directory",
+        "chmod 777 /path/to/directory",
+        "rm -rf /path/to/directory",
+        "systemctl restart sshd"
+      ],
+      "answer": "ls -ld /path/to/directory",
+      "explanation": "`ls -ld` shows the directory's permissions and ownership. Always inspect before making changes — starting with `chmod 777` is a security anti-pattern."
+    },
+    {
+      "question": "In a bpf scenario, your monitoring alerts show cat failing intermittently. What is the correct debugging workflow?",
+      "options": [
+        "Check logs → verify configuration → test in staging → apply fix → monitor",
+        "Reboot the server immediately",
+        "Reinstall the operating system",
+        "Ignore the alert and wait for it to resolve"
+      ],
+      "answer": "Check logs → verify configuration → test in staging → apply fix → monitor",
+      "explanation": "A structured debugging workflow prevents cascading failures. Always diagnose before acting, especially in production environments where downtime has direct business impact."
+    }
+  ],
+  "interviewTips": [
+    "FAANG Architect's Note:  eBPF is the most important Linux kernel technology of the last decade",
+    "FAANG, eBPF is not a 'nice to have' — it's infrastructure"
+  ],
+  "productionTips": [
+    "Production Tip:  bpftrace is safe for production use — it's designed to never crash the system"
+  ],
+  "bestPractices": [
+    "Use version control for all configuration (/etc, scripts, Dockerfiles)",
+    "Implement infrastructure as code; avoid manual server changes",
+    "Test changes in staging before production; have rollback plans"
+  ],
+  "enterprisePerspective": "In enterprise environments, bpf & ebpf deep dive is managed through automation (Ansible, Terraform), monitored centrally (Prometheus, Datadog), and governed by compliance policies (CIS benchmarks, SOC2). Changes go through change advisory boards with rollback procedures documented.",
+  "visualHint": "bpf_attachment_points"
 }

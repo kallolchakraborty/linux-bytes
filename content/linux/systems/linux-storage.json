@@ -1,20 +1,23 @@
 {
+  "schemaVersion": "2.0",
+  "contentVersion": "1.0",
+  "lastReviewed": "2026-07-08",
+  "reviewStatus": "migrated",
   "id": "linux-storage",
   "title": "Storage, Filesystems & Disk Management",
   "category": "Linux",
   "subcategory": "Systems & Operations",
   "language": "bash",
-  "description": "Storage on Linux spans a hierarchy: physical disks → partitions → LVM (logical volumes) → filesystems → mount points. At FAANG, storage is abstracted through multiple layers: local NVMe SSD, EBS volumes, network filesystems (NFS/EFS), and distributed filesystems (Ceph, JuiceFS). Understanding the Linux storage stack is essential for capacity planning, performance tuning, and data integrity.",
-  "codeBlock": "",
+  "description": "Storage on Linux spans a hierarchy: physical disks → partitions → LVM (logical volumes) → filesystems → mount points. At Enterprise, storage is abstracted through multiple layers: local NVMe SSD, EBS volumes, network filesystems (NFS/EFS), and distributed filesystems (Ceph, JuiceFS). Understanding the Linux storage stack is essential for capacity planning, performance tuning, and data integrity.",
   "sections": [
     {
       "title": "Disk Discovery & Partitioning",
-      "description": "The first step in storage management is discovering what disks are available. Modern Linux uses <code>lsblk</code> and <code>fdisk</code>/<code>parted</code> for partitioning. <strong>At FAANG, disks are typically provisioned via cloud APIs (EBS volumes, persistent disks) and formatted automatically by init scripts — manual partitioning is rare but understanding it is expected for system-level roles.</strong>",
+      "description": "The first step in storage management is discovering what disks are available. Modern Linux uses <code>lsblk</code> and <code>fdisk</code>/<code>parted</code> for partitioning. <strong>At Enterprise, disks are typically provisioned via cloud APIs (EBS volumes, persistent disks) and formatted automatically by init scripts — manual partitioning is rare but understanding it is expected for system-level roles.</strong>",
       "codeBlock": "# === Disk discovery ===\nlsblk                                # Tree view of all block devices\nlsblk -f                             # Include filesystem info (FSTYPE, UUID, LABEL)\nlsblk -o NAME,SIZE,TYPE,MOUNTPOINT,FSTYPE,UUID  # Custom columns\n\nsudo fdisk -l                        # Detailed partition table\nsudo parted -l                       # Alternative partition tool\n\n# Device naming:\n# /dev/sda, /dev/sdb, ...  — SCSI/SATA disks (also virtio-blk, EBS)\n# /dev/nvme0n1, /dev/nvme1n1, ... — NVMe SSDs\n# /dev/vda, /dev/vdb, ...  — VirtIO disks (KVM)\n# /dev/mapper/*            — LVM logical volumes\n\n# === Partitioning with parted (GPT) ===\nsudo parted /dev/sdb mklabel gpt                      # Create GPT label\nsudo parted /dev/sdb mkpart primary ext4 0% 100%      # Use entire disk\nsudo parted /dev/sdb mkpart primary ext4 1MiB 10GiB   # Specific size\nsudo parted /dev/sdb print                            # Show partition table\n\n# === Partitioning with fdisk (MBR) ===\nsudo fdisk /dev/sdb                                   # Interactive\n# n → new partition, p → primary, w → write\n\n# === Partition tables: MBR vs GPT ===\n# MBR (DOS): max 2TB, 4 primary partitions\n# GPT:       up to 8ZiB, 128 partitions, redundant header\n# Most modern systems use GPT\n\n# === Wipe a disk ===\nsudo wipefs -a /dev/sdb              # Wipe all filesystem signatures\nsudo dd if=/dev/zero of=/dev/sdb bs=1M count=100  # Overwrite first 100MB\n\n# === Kernel re-scan ===\nsudo partprobe                        # Inform kernel of partition table changes\necho 1 | sudo tee /sys/block/sdb/device/rescan"
     },
     {
       "title": "Filesystems: ext4, XFS & Modern Options",
-      "description": "The filesystem is the layer that organizes data on disk. <strong>ext4</strong> is the default on Ubuntu/Debian — reliable and well-tested. <strong>XFS</strong> is the default on RHEL/Amazon Linux — excellent for large files and parallel I/O. At FAANG, the choice of filesystem depends on workload: XFS for large distributed databases, ext4 for general-purpose, and specialised FS for specific use cases (ZFS for data integrity, Btrfs for snapshots).",
+      "description": "The filesystem is the layer that organizes data on disk. <strong>ext4</strong> is the default on Ubuntu/Debian — reliable and well-tested. <strong>XFS</strong> is the default on RHEL/Amazon Linux — excellent for large files and parallel I/O. At Enterprise, the choice of filesystem depends on workload: XFS for large distributed databases, ext4 for general-purpose, and specialised FS for specific use cases (ZFS for data integrity, Btrfs for snapshots).",
       "codeBlock": "# === Creating filesystems ===\nsudo mkfs.ext4 /dev/sdb1              # Format as ext4\nsudo mkfs.ext4 -L mydata /dev/sdb1    # With label\nsudo mkfs.xfs /dev/sdb1               # Format as XFS\nsudo mkfs.xfs -L mydata /dev/sdb1     # XFS with label\nsudo mkfs.btrfs /dev/sdb1             # Btrfs\n\n# === ext4 tuning ===\nsudo mkfs.ext4 -m 0 /dev/sdb1         # 0% reserved for root (was 5%, good for data volumes)\nsudo mkfs.ext4 -E lazy_itable_init=0 /dev/sdb1  # Initialize inode table (faster first mount? Actually slower now, faster later)\n# tune2fs: tune an existing ext2/3/4 filesystem\nsudo tune2fs -l /dev/sdb1             # List filesystem features\nsudo tune2fs -m 1 /dev/sdb1           # Change reserved block percentage\n\n# === XFS tuning ===\n# XFS is optimized for large files and parallel I/O\n# Key mkfs.xfs options:\n# -d agcount=4     — Allocation group count (more = better parallelism)\n# -f               — Force (overwrite existing FS)\n# -m crc=1         — Enable metadata CRC (default since RHEL 7)\n\n# === Filesystem features comparison ===\n# Feature           ext4            XFS             Btrfs\n# Max file size     16TB            8EB             16EB\n# Max volume size   1EB             8EB             16EB\n# Default fsck      e2fsck          xfs_repair      btrfs check\n# Snapshots         no              no              yes\n# Compression       no              no              yes\n# Online defrag     no              yes (xfs_fsr)   yes\n\n# === Check filesystem ===\nsudo fsck /dev/sdb1                  # Check and repair (must be unmounted!)\nsudo fsck.ext4 -f /dev/sdb1          # Force check even if clean\nsudo xfs_repair /dev/sdb1            # XFS repair (unmounted)\nsudo xfs_check /dev/sdb1             # XFS check (unmounted)"
     },
     {
@@ -24,17 +27,17 @@
     },
     {
       "title": "LVM: Logical Volume Manager",
-      "description": "LVM provides a flexible abstraction layer between physical disks and filesystems. <strong>With LVM, you can resize volumes without repartitioning, take snapshots for backups, and span volumes across multiple disks.</strong> At FAANG, LVM is used on on-premise servers but cloud instances typically use cloud block storage directly (EBS volumes) — though understanding LVM is still expected for infrastructure roles.",
+      "description": "LVM provides a flexible abstraction layer between physical disks and filesystems. <strong>With LVM, you can resize volumes without repartitioning, take snapshots for backups, and span volumes across multiple disks.</strong> At Enterprise, LVM is used on on-premise servers but cloud instances typically use cloud block storage directly (EBS volumes) — though understanding LVM is still expected for infrastructure roles.",
       "codeBlock": "# === LVM Architecture ===\n# Physical Volumes (PVs) → Volume Group (VG) → Logical Volumes (LVs)\n\n# === Create LVM ===\n# 1. Mark disk as Physical Volume\nsudo pvcreate /dev/sdb /dev/sdc\n\n# 2. Create Volume Group\nsudo vgcreate vg_data /dev/sdb /dev/sdc\n\n# 3. Create Logical Volume\nsudo lvcreate -L 100G -n lv_data vg_data\nsudo lvcreate -l 100%FREE -n lv_data vg_data     # Use all free space\n\n# 4. Format and mount\nsudo mkfs.ext4 /dev/vg_data/lv_data\nsudo mkdir /mnt/data\nsudo mount /dev/vg_data/lv_data /mnt/data\n\n# === LVM commands ===\npvs                                    # List physical volumes\npvs -o+pv_used                         # With usage info\nvgs                                    # List volume groups\nvgs -o+vg_free                         # With free space\nlvs                                    # List logical volumes\nlvdisplay                              # Detailed LV info\n\n# === Resize LVM ===\n# Extend PV (if underlying disk grew)\nsudo pvresize /dev/sdb\n\n# Extend VG (add new disk)\nsudo vgextend vg_data /dev/sdd\n\n# Extend LV (then resize filesystem)\nsudo lvextend -L +50G /dev/vg_data/lv_data\nsudo lvextend -l +100%FREE /dev/vg_data/lv_data\n\n# Resize filesystem (ext4)\nsudo resize2fs /dev/vg_data/lv_data\n\n# Resize filesystem (xfs)\nsudo xfs_growfs /mnt/data               # XFS grows online (must be mounted)\n\n# === LVM Snapshots ===\n# Create a snapshot (for backup consistency)\nsudo lvcreate -L 10G -s -n lv_data_snap /dev/vg_data/lv_data\n# Mount snapshot read-only:\nsudo mount -o ro /dev/vg_data/lv_data_snap /mnt/backup\n# Remove snapshot:\nsudo lvremove /dev/vg_data/lv_data_snap\n\n# === Remove LVM ===\nsudo umount /mnt/data\nsudo lvremove /dev/vg_data/lv_data\nsudo vgremove vg_data\nsudo pvremove /dev/sdb /dev/sdc"
     },
     {
       "title": "Monitoring: I/O, Space & Inodes",
-      "description": "Storage monitoring is critical for production reliability. <strong>Out of disk space is the #1 cause of predictable production incidents — it's almost always a log file or database that wasn't rotated.</strong> At FAANG, disk monitoring is built into the observability stack, but you still need to know the command-line tools for ad-hoc debugging.",
+      "description": "Storage monitoring is critical for production reliability. <strong>Out of disk space is the #1 cause of predictable production incidents — it's almost always a log file or database that wasn't rotated.</strong> At Enterprise, disk monitoring is built into the observability stack, but you still need to know the command-line tools for ad-hoc debugging.",
       "codeBlock": "# === Disk space ===\ndf -h                                # Human-readable disk usage\ndf -hT                               # With filesystem type\ndf -i                                # Inode usage (filesystem can be full even with free space!)\n\n# === Directory size ===\ndu -sh /var/log                      # Total size of directory\ndu -sh /*                            # Size of top-level directories\ndu -sh /var/log/* | sort -rh | head -10  # Largest items in /var/log\n\n# === I/O performance ===\niostat -x 1                          # I/O stats by device (1s intervals)\n# Key fields:\n# %util      — % of time device was busy (warning at >80%)\n# await      — Average I/O latency (ms)\n# r/s, w/s   — Read/write IOPS\n# rkB/s, wkB/s — Throughput\n\niostat -x 1 5                        # 5 samples, 1 second apart\n\n# === I/O top (per-process) ===\niotop -oP                            # Show only processes doing I/O\n\n# === Find large files ===\nfind /var/log -type f -size +100M    # Files > 100MB\nfind / -xdev -type f -size +1G -exec ls -lh {} \\;  # Files > 1GB on root FS\n\n# === Find and remove old logs ===\nfind /var/log -name \"*.log\" -mtime +30 -delete  # Delete logs > 30 days\n\n# === TRIM for SSDs ===\nsudo fstrim -v /                     # Manually TRIM a filesystem\nsudo fstrim -av                      # TRIM all mounted FS that support it\n# Systemd timer: systemctl status fstrim.timer\n\n# === SMART disk health ===\nsudo apt install smartmontools\nsudo smartctl -H /dev/sda            # Overall health status\nsudo smartctl -a /dev/sda            # Full SMART data\nsudo smartctl -t short /dev/sda      # Run short self-test\n\n# === dd benchmark ===\ndd if=/dev/zero of=/tmp/test bs=1M count=1000 oflag=direct  # Write test\ndd if=/tmp/test of=/dev/null bs=1M count=1000 iflag=direct   # Read test\n# Replace with fio for production-grade benchmarks\n\n# === fio (Flexible I/O Tester) ===\nsudo apt install fio\nfio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 \\\n   --name=test --bs=4k --iodepth=64 --size=1G --readwrite=randread \\\n   --filename=/tmp/fio-test"
     },
     {
-      "title": "FAANG Interview Q&A",
-      "description": "<strong>Q:</strong> 'The database server has no space, but df shows 50% free. What's wrong?'<br><br><strong>A:</strong> 'Check <code>df -i</code> — the filesystem may be out of inodes, not space. This happens when millions of tiny files (like Docker overlay layers, mail spool files, or a runaway process writing temp files) exhaust the inode table. Inode count is set at filesystem creation and can't be changed without reformatting. The fix: find and remove the unnecessary small files, or create a new filesystem with more inodes using <code>mkfs.ext4 -N &lt;count&gt;</code>.'<br><br><strong>Q:</strong> 'How do you choose between ext4 and XFS for a new filesystem?'<br><br><strong>A:</strong> 'It depends on the workload. For general-purpose, ext4 is fine. For large files (>2TB), high concurrency of parallel I/O, or workloads with many large files (media, logs, databases), XFS performs better — especially because it supports online defragmentation (xfs_fsr) and has better allocation groups for parallelism. For metadata-heavy workloads (many small files, like a mail server or git repository), ext4 is typically better. At FAANG, the standard is often XFS on RHEL/Amazon Linux for production and ext4 on Ubuntu for development.'<br><br><strong>Q:</strong> 'You receive an alert: EBS volume is at 95% capacity. Walk through your response.'<br><br><strong>A:</strong> 'First, acknowledge the alert. SSH into the instance (or use session manager). Run <code>df -h</code> to confirm which volume. Run <code>du -sh /* | sort -rh | head -10</code> to find the largest directories. Identify the culprit (logs, database WAL files, temp files). If it's logs: rotate/compress with logrotate or delete old logs. If it's predictable growth, extend the EBS volume (increase size in cloud console), then <code>sudo growpart /dev/xvda 1</code> (extend partition) and <code>sudo resize2fs /dev/xvda1</code> (extend filesystem). File a ticket to increase monitoring thresholds or add auto-scaling. Document the incident.'",
+      "title": "Interview Q&A",
+      "description": "<strong>Q:</strong> 'The database server has no space, but df shows 50% free. What's wrong?'<br><br><strong>A:</strong> 'Check <code>df -i</code> — the filesystem may be out of inodes, not space. This happens when millions of tiny files (like Docker overlay layers, mail spool files, or a runaway process writing temp files) exhaust the inode table. Inode count is set at filesystem creation and can't be changed without reformatting. The fix: find and remove the unnecessary small files, or create a new filesystem with more inodes using <code>mkfs.ext4 -N &lt;count&gt;</code>.'<br><br><strong>Q:</strong> 'How do you choose between ext4 and XFS for a new filesystem?'<br><br><strong>A:</strong> 'It depends on the workload. For general-purpose, ext4 is fine. For large files (>2TB), high concurrency of parallel I/O, or workloads with many large files (media, logs, databases), XFS performs better — especially because it supports online defragmentation (xfs_fsr) and has better allocation groups for parallelism. For metadata-heavy workloads (many small files, like a mail server or git repository), ext4 is typically better. At Enterprise, the standard is often XFS on RHEL/Amazon Linux for production and ext4 on Ubuntu for development.'<br><br><strong>Q:</strong> 'You receive an alert: EBS volume is at 95% capacity. Walk through your response.'<br><br><strong>A:</strong> 'First, acknowledge the alert. SSH into the instance (or use session manager). Run <code>df -h</code> to confirm which volume. Run <code>du -sh /* | sort -rh | head -10</code> to find the largest directories. Identify the culprit (logs, database WAL files, temp files). If it's logs: rotate/compress with logrotate or delete old logs. If it's predictable growth, extend the EBS volume (increase size in cloud console), then <code>sudo growpart /dev/xvda 1</code> (extend partition) and <code>sudo resize2fs /dev/xvda1</code> (extend filesystem). File a ticket to increase monitoring thresholds or add auto-scaling. Document the incident.'",
       "codeBlock": ""
     },
     {
@@ -43,6 +46,171 @@
       "codeBlock": ""
     }
   ],
-  "details": "<p class=\"mb-3\"><strong>FAANG Architect's Note:</strong> Storage management has changed dramatically with cloud computing. At FAANG, you rarely touch physical drives — you provision EBS volumes, create snapshots, and manage lifecycle policies through APIs. But the Linux storage concepts (partitioning, filesystems, mount points, LVM) directly translate to the cloud: EBS volumes are like virtual disks, EBS snapshots are like LVM snapshots, and filesystem tuning is even more important when your storage is network-attached with variable latency. Don't skip these fundamentals because 'everything is in the cloud now' — the cloud abstracts hardware, not concepts.</p><p><strong>Production Tip:</strong> Set up monitoring on disk inode usage, not just space usage. I've seen production outages caused by 'disk space OK but inodes full' — Docker overlay filesystems and log rotation failures are common culprits. Add a <code>df -i</code> check at 80% inode usage to your monitoring thresholds. Also, always use <code>noatime</code> mount option for performance — updating access time on every read is rarely needed and adds unnecessary I/O.</p>",
-  "tags": ["FAANG", "Linux", "storage", "filesystem", "LVM", "disk management", "monitoring"]
+  "tags": [
+    "faang-insight",
+    "Linux",
+    "storage",
+    "filesystem",
+    "LVM",
+    "disk management",
+    "monitoring"
+  ],
+  "difficulty": "beginner",
+  "readingTime": 20,
+  "practiceTime": 15,
+  "prerequisites": [
+    "linux-filesystem",
+    "linux-permissions"
+  ],
+  "learningObjectives": [
+    "Understand disk Discovery & Partitioning",
+    "Understand filesystems: ext4, XFS & Modern Options",
+    "Understand mounting & /etc/fstab",
+    "Understand lVM: Logical Volume Manager",
+    "Understand monitoring: I/O, Space & Inodes"
+  ],
+  "analogy": {
+    "title": "Storage as a Filing Cabinet",
+    "description": "Block devices are empty drawers. Filesystems (ext4, XFS) are the filing system - they organize how papers are stored. LVM adds flexible drawers that can grow. Mount points are labels on the drawer fronts telling you what is inside. RAID is keeping duplicate copies in multiple cabinets."
+  },
+  "commonMistakes": [
+    {
+      "mistake": "Ignoring log rotation until disk fills up",
+      "solution": "Configure logrotate before deploying; monitor /var/log usage"
+    },
+    {
+      "mistake": "Disabling SELinux/AppArmor instead of fixing policies",
+      "solution": "Use `audit2allow` to generate policies from denials; keep MAC enabled"
+    },
+    {
+      "mistake": "Running containers as root",
+      "solution": "Add `USER nonroot` in Dockerfile; use `--user` flag at runtime"
+    },
+    {
+      "mistake": "Not setting resource limits on containers",
+      "solution": "Always set `--cpus` and `--memory`; configure cgroup limits in Kubernetes"
+    },
+    {
+      "mistake": "Checking /proc/meminfo inside containers for memory",
+      "solution": "Use cgroup v2 files: /sys/fs/cgroup/memory.current, memory.events"
+    }
+  ],
+  "practiceLabs": [
+    {
+      "title": "Explore: Disk Discovery & Partitioning",
+      "task": "Run `lsblk` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man lsblk` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: Filesystems: ext4, XFS & Modern Options",
+      "task": "Run `sudo` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man sudo` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: Mounting & /etc/fstab",
+      "task": "Run `echo` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man echo` to see all available flags and understand the output columns."
+    }
+  ],
+  "quickReference": {
+    "title": "Quick Reference",
+    "content": "| Command | Description |\n|---|---|\n| `lsblk` | Disk Discovery & Partitioning |\n| `sudo` | Disk Discovery & Partitioning |\n| `echo` | Disk Discovery & Partitioning |\n| `sudo` | Filesystems: ext4, XFS & Modern Options |\n| `sudo` | Mounting & /etc/fstab |\n| `UUID` | Mounting & /etc/fstab |\n| `mount` | Mounting & /etc/fstab |\n| `sudo` | LVM: Logical Volume Manager |\n| `pvs` | LVM: Logical Volume Manager |\n| `vgs` | LVM: Logical Volume Manager |\n| `df` | Monitoring: I/O, Space & Inodes |\n| `du` | Monitoring: I/O, Space & Inodes |\n| `iostat` | Monitoring: I/O, Space & Inodes |"
+  },
+  "troubleshooting": [
+    {
+      "symptom": "lsblk returns unexpected output",
+      "cause": "Incorrect arguments, wrong working directory, or stale cached data",
+      "solution": "Verify arguments with `man lsblk`; check current path with `pwd`; clear cache if applicable"
+    },
+    {
+      "symptom": "Configuration changes not taking effect",
+      "cause": "Service not reloaded or syntax error in config file",
+      "solution": "Validate config syntax with built-in test flag; reload service with `systemctl reload` or `restart`"
+    },
+    {
+      "symptom": "storage operation slow or timing out",
+      "cause": "Resource exhaustion (disk I/O, memory pressure, or lock contention)",
+      "solution": "Check `iostat`, `free -m`, and `top`; look for stuck processes with `ps aux --sort=-%cpu`"
+    },
+    {
+      "symptom": "Permission issues accessing storage resources",
+      "cause": "Incorrect file ownership or overly restrictive permissions",
+      "solution": "Inspect with `ls -la`; fix with `chown`/ `chmod`; check ACLs with `getfacl`"
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is Disk Discovery & Partitioning?",
+      "options": [
+        "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+        "A tool for managing disk partitions",
+        "A network configuration protocol",
+        "A user authentication system"
+      ],
+      "answer": "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+      "explanation": "The Disk Discovery & Partitioning is the foundation of the Linux filesystem — everything in the system is organized under this structure."
+    },
+    {
+      "question": "What does `lsblk` do?",
+      "options": [
+        "Lists information about storage",
+        "Creates a new directory",
+        "Removes files",
+        "Copies files between directories"
+      ],
+      "answer": "Lists files and directories in the current or specified path",
+      "explanation": "Use `ls` to explore directory contents. Combine with flags like `-l` (long format), `-a` (hidden files), and `-h` (human-readable sizes)."
+    },
+    {
+      "question": "Which command would you use to view disk usage of the storage directory?",
+      "options": [
+        "du -sh /path/to/directory",
+        "cat /path/to/directory",
+        "cp -r /path/to/directory",
+        "chmod /path/to/directory"
+      ],
+      "answer": "du -sh /path/to/directory",
+      "explanation": "`du -sh` (disk usage, summary, human-readable) shows the total size of a directory and its contents."
+    },
+    {
+      "question": "A user reports \"Permission denied\" when trying to access a storage directory. What is the first command you should run?",
+      "options": [
+        "ls -ld /path/to/directory",
+        "chmod 777 /path/to/directory",
+        "rm -rf /path/to/directory",
+        "systemctl restart sshd"
+      ],
+      "answer": "ls -ld /path/to/directory",
+      "explanation": "`ls -ld` shows the directory's permissions and ownership. Always inspect before making changes — starting with `chmod 777` is a security anti-pattern."
+    },
+    {
+      "question": "In a storage scenario, your monitoring alerts show lsblk failing intermittently. What is the correct debugging workflow?",
+      "options": [
+        "Check logs → verify configuration → test in staging → apply fix → monitor",
+        "Reboot the server immediately",
+        "Reinstall the operating system",
+        "Ignore the alert and wait for it to resolve"
+      ],
+      "answer": "Check logs → verify configuration → test in staging → apply fix → monitor",
+      "explanation": "A structured debugging workflow prevents cascading failures. Always diagnose before acting, especially in production environments where downtime has direct business impact."
+    }
+  ],
+  "interviewTips": [
+    "FAANG Architect's Note:  Storage management has changed dramatically with cloud computing",
+    "FAANG, you rarely touch physical drives — you provision EBS volumes, create snapshots, and manage lifecycle policies through APIs"
+  ],
+  "productionTips": [
+    "Production Tip:  Set up monitoring on disk inode usage, not just space usage",
+    "production outages caused by 'disk space OK but inodes full' — Docker overlay filesystems and log rotation failures are common culprits"
+  ],
+  "bestPractices": [
+    "Use version control for all configuration (/etc, scripts, Dockerfiles)",
+    "Implement infrastructure as code; avoid manual server changes",
+    "Test changes in staging before production; have rollback plans"
+  ],
+  "enterprisePerspective": "In enterprise environments, storage, filesystems & disk management is managed through automation (Ansible, Terraform), monitored centrally (Prometheus, Datadog), and governed by compliance policies (CIS benchmarks, SOC2). Changes go through change advisory boards with rollback procedures documented.",
+  "visualHint": "storage_layers"
 }

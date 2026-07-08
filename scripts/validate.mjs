@@ -55,6 +55,44 @@ function collectMetadata(dir) {
         if (!data.category) errors.push(`${fullPath}: missing "category"`);
         if (!data.subcategory) errors.push(`${fullPath}: missing "subcategory"`);
 
+        // LCM v2 schema validation
+        if (data.schemaVersion) {
+          if (data.schemaVersion !== '2.0') {
+            errors.push(`${fullPath}: schemaVersion should be "2.0", got "${data.schemaVersion}"`);
+          }
+        } else {
+          errors.push(`${fullPath}: missing "schemaVersion" (LCM v2 required)`);
+        }
+
+        if (!data.contentVersion) errors.push(`${fullPath}: missing "contentVersion"`);
+        if (!data.lastReviewed) errors.push(`${fullPath}: missing "lastReviewed"`);
+
+        if (!data.difficulty) {
+          errors.push(`${fullPath}: missing "difficulty"`);
+        } else if (!['beginner', 'intermediate', 'advanced'].includes(data.difficulty)) {
+          errors.push(`${fullPath}: difficulty must be "beginner", "intermediate", or "advanced", got "${data.difficulty}"`);
+        }
+
+        if (data.readingTime === undefined || data.readingTime === null) {
+          errors.push(`${fullPath}: missing "readingTime"`);
+        } else if (typeof data.readingTime !== 'number' || data.readingTime < 1) {
+          errors.push(`${fullPath}: readingTime must be a positive number, got ${data.readingTime}`);
+        }
+
+        if (data.practiceTime === undefined || data.practiceTime === null) {
+          errors.push(`${fullPath}: missing "practiceTime"`);
+        } else if (typeof data.practiceTime !== 'number' || data.practiceTime < 1) {
+          errors.push(`${fullPath}: practiceTime must be a positive number, got ${data.practiceTime}`);
+        }
+
+        if (!data.prerequisites || !Array.isArray(data.prerequisites)) {
+          errors.push(`${fullPath}: missing or invalid "prerequisites" array`);
+        }
+
+        if (!data.learningObjectives || !Array.isArray(data.learningObjectives) || data.learningObjectives.length === 0) {
+          errors.push(`${fullPath}: missing or empty "learningObjectives" array`);
+        }
+
         const id = data.id;
         validRoutes.add(id);
 
@@ -140,6 +178,14 @@ function validateContent(dir) {
           }
         }
         checkLinks(data);
+        // Validate LCM v2 prerequisites reference valid chapter IDs
+        if (data.prerequisites && Array.isArray(data.prerequisites)) {
+          for (const prereq of data.prerequisites) {
+            if (!validRoutes.has(prereq)) {
+              errors.push(`${fullPath}.prerequisites: "${prereq}" does not match any existing chapter ID`);
+            }
+          }
+        }
       } catch (e) {
         // Errors already caught in first pass
       }

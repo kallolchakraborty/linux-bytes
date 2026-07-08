@@ -1,40 +1,43 @@
 {
+  "schemaVersion": "2.0",
+  "contentVersion": "1.0",
+  "lastReviewed": "2026-07-08",
+  "reviewStatus": "migrated",
   "id": "linux-ssh",
   "title": "SSH: Secure Shell",
   "category": "Linux",
   "subcategory": "Systems & Operations",
   "language": "bash",
-  "description": "SSH (Secure Shell) is the universal protocol for remote access to Linux systems. Despite the rise of 'no-SSH' architectures (immutable infrastructure, containers, session managers), SSH remains essential for incident response, debugging, and infrastructure management. At FAANG, SSH is typically gated behind bastion hosts, certificate-based auth, and session recording.",
-  "codeBlock": "",
+  "description": "SSH (Secure Shell) is the universal protocol for remote access to Linux systems. Despite the rise of 'no-SSH' architectures (immutable infrastructure, containers, session managers), SSH remains essential for incident response, debugging, and infrastructure management. At Enterprise, SSH is typically gated behind bastion hosts, certificate-based auth, and session recording.",
   "sections": [
     {
       "title": "SSH Authentication: Keys, Certificates & Agents",
-      "description": "Password-based SSH access is a security risk and is generally disabled in production. <strong>Key-based authentication is the minimum standard. At FAANG, SSH certificate authorities (CAs) are used — users get short-lived certificates signed by a central CA.</strong> The SSH agent handles key forwarding so you don't store private keys on jump boxes.",
-      "codeBlock": "# === Key generation ===\n# ED25519 is the modern default (faster, smaller, more secure than RSA)\nssh-keygen -t ed25519 -C \"kallol@company.com\"\n\n# RSA with 4096 bits (legacy compatibility)\nssh-keygen -t rsa -b 4096 -C \"kallol@company.com\"\n\n# === Key files ===\n# ~/.ssh/id_ed25519       — Private key (NEVER share, chmod 600)\n# ~/.ssh/id_ed25519.pub   — Public key (safe to share)\n# ~/.ssh/authorized_keys  — Public keys allowed to log in (on the server)\n# ~/.ssh/known_hosts      — Known server host keys (on the client)\n\n# === Copy key to server ===\nssh-copy-id user@server                   # Copy public key to authorized_keys\n# Manual equivalent:\ncat ~/.ssh/id_ed25519.pub | ssh user@server \"mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys\"\n\n# === SSH Agent (key forwarding) ===\neval \"$(ssh-agent -s)\"                    # Start agent\nssh-add ~/.ssh/id_ed25519                 # Add private key to agent\nssh-add -l                                 # List loaded keys\nssh-add -L                                 # List loaded public keys\n\n# === SSH Agent Forwarding ===\n# Connect to bastion and from there to internal hosts\nssh -A user@bastion                        # -A forwards your agent\n# WARNING: agent forwarding is powerful but risky — root on bastion can use your agent\n# Better: use ProxyJump (see below)\n\n# === Certificate-based SSH (FAANG standard) ===\n# Server-side: /etc/ssh/ca.pub added to TrustedUserCAKeys\n# User gets short-lived cert signed by corporate CA\nssh-keygen -s user_ca -I user@company -n kali -V +52w user.pub\n# Result: user-cert.pub (valid for 52 weeks, typically rotated more often)"
+      "description": "Password-based SSH access is a security risk and is generally disabled in production. <strong>Key-based authentication is the minimum standard. At Enterprise, SSH certificate authorities (CAs) are used — users get short-lived certificates signed by a central CA.</strong> The SSH agent handles key forwarding so you don't store private keys on jump boxes.",
+      "codeBlock": "# === Key generation ===\n# ED25519 is the modern default (faster, smaller, more secure than RSA)\nssh-keygen -t ed25519 -C \"kallol@company.com\"\n\n# RSA with 4096 bits (legacy compatibility)\nssh-keygen -t rsa -b 4096 -C \"kallol@company.com\"\n\n# === Key files ===\n# ~/.ssh/id_ed25519       — Private key (NEVER share, chmod 600)\n# ~/.ssh/id_ed25519.pub   — Public key (safe to share)\n# ~/.ssh/authorized_keys  — Public keys allowed to log in (on the server)\n# ~/.ssh/known_hosts      — Known server host keys (on the client)\n\n# === Copy key to server ===\nssh-copy-id user@server                   # Copy public key to authorized_keys\n# Manual equivalent:\ncat ~/.ssh/id_ed25519.pub | ssh user@server \"mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys\"\n\n# === SSH Agent (key forwarding) ===\neval \"$(ssh-agent -s)\"                    # Start agent\nssh-add ~/.ssh/id_ed25519                 # Add private key to agent\nssh-add -l                                 # List loaded keys\nssh-add -L                                 # List loaded public keys\n\n# === SSH Agent Forwarding ===\n# Connect to bastion and from there to internal hosts\nssh -A user@bastion                        # -A forwards your agent\n# WARNING: agent forwarding is powerful but risky — root on bastion can use your agent\n# Better: use ProxyJump (see below)\n\n# === Certificate-based SSH (Enterprise standard) ===\n# Server-side: /etc/ssh/ca.pub added to TrustedUserCAKeys\n# User gets short-lived cert signed by corporate CA\nssh-keygen -s user_ca -I user@company -n kali -V +52w user.pub\n# Result: user-cert.pub (valid for 52 weeks, typically rotated more often)"
     },
     {
       "title": "SSH Client Configuration (~/.ssh/config)",
-      "description": "A well-organized SSH config is the hallmark of an experienced engineer. It eliminates repetitive flags, handles jump hosts, and manages keys per host. <strong>At FAANG, your SSH config manages bastion hosts, different keys for different environments, and connection persistence.</strong>",
+      "description": "A well-organized SSH config is the hallmark of an experienced engineer. It eliminates repetitive flags, handles jump hosts, and manages keys per host. <strong>At Enterprise, your SSH config manages bastion hosts, different keys for different environments, and connection persistence.</strong>",
       "codeBlock": "# ~/.ssh/config — Highly recommended\n\n# Global defaults\nHost *\n    ServerAliveInterval 60\n    ServerAliveCountMax 3\n    StrictHostKeyChecking accept-new\n    UserKnownHostsFile ~/.ssh/known_hosts\n    AddKeysToAgent yes\n    UseKeychain yes                      # macOS: store passphrase in keychain\n\n# Bastion host (jump box)\nHost bastion\n    HostName bastion.corp.example.com\n    User kali\n    IdentityFile ~/.ssh/id_ed25519\n    ForwardAgent no                     # Safer: don't forward agent on bastion\n\n# Internal hosts (via bastion proxy)\nHost bastion-proxy bastion.corp.example.com\n\nHost *.internal.example.com\n    User kali\n    ProxyJump bastion                   # Jump through bastion (no agent forwarding needed)\n    IdentityFile ~/.ssh/id_ed25519\n\n# Specific server with different key\nHost prod-db-*\n    User admin\n    Port 2222\n    IdentityFile ~/.ssh/prod-key\n    ProxyJump bastion\n\n# GitHub / GitLab\nHost github.com\n    HostName github.com\n    User git\n    IdentityFile ~/.ssh/id_ed25519\n    IdentitiesOnly yes\n\n# === Usage ===\nssh internal-web-01.internal.example.com  # Automatically uses bastion\nssh bastion                               # Direct bastion access"
     },
     {
       "title": "SSH Server Hardening",
-      "description": "The SSH daemon (<code>sshd</code>) is the most exposed service on any Linux server. <strong>At FAANG, SSH hardening is mandatory: no passwords, no root login, custom ports are discouraged (security by obscurity is not security), and all sessions are logged.</strong>",
+      "description": "The SSH daemon (<code>sshd</code>) is the most exposed service on any Linux server. <strong>At Enterprise, SSH hardening is mandatory: no passwords, no root login, custom ports are discouraged (security by obscurity is not security), and all sessions are logged.</strong>",
       "codeBlock": "# /etc/ssh/sshd_config — Security hardening\n\n# Authentication\nPubkeyAuthentication yes              # Key-based auth only\nPasswordAuthentication no             # Disable passwords (must have keys working first!)\nPermitRootLogin without-password     # Or 'prohibit-password' (disallow root passwords)\n# PermitRootLogin no                  # Even better: no root SSH at all\n\n# Keys\nAuthorizedKeysFile .ssh/authorized_keys\nTrustedUserCAKeys /etc/ssh/ca.pub    # If using SSH CA\n\n# Network\nPort 22                               # Using non-standard port just annoys attackers slightly\nListenAddress 0.0.0.0                # Bind to specific IP if possible\n\n# Session\nClientAliveInterval 300               # 5 min keepalive\nClientAliveCountMax 0                 # Disconnect after 1 missed keepalive\nMaxAuthTries 3                        # Limit auth attempts\nMaxSessions 10                        # Max concurrent sessions per connection\nLoginGraceTime 30                     # 30 seconds to authenticate\n\n# Forwarding\nAllowAgentForwarding no               # Disable on bastions (security)\nAllowTcpForwarding yes                # Enable only if needed\nX11Forwarding no                      # Almost never needed\n\n# Logging\nLogLevel VERBOSE                      # Log fingerprints (for audit)\n\n# === After changes ===\nsshd -t                               # Validate config before restart\nsudo systemctl restart sshd\n\n# === Fail2ban (supplementary protection) ===\nsudo apt install fail2ban\n# /etc/fail2ban/jail.local\n[sshd]\nenabled = true\nmaxretry = 3\nbantime = 3600\n\n# === Check current SSH sessions ===\nss -tnp | grep :22                    # Active SSH connections\nwho                                    # Logged in users\nsudo journalctl -u sshd -n 20         # Recent SSH auth logs"
     },
     {
       "title": "SSH Tunneling & Port Forwarding",
-      "description": "SSH can tunnel arbitrary TCP connections through encrypted channels. This is essential for accessing internal services (databases, monitoring dashboards) without exposing them to the network. <strong>At FAANG, SSH tunnels are a common pattern for 'break glass' database access.</strong>",
+      "description": "SSH can tunnel arbitrary TCP connections through encrypted channels. This is essential for accessing internal services (databases, monitoring dashboards) without exposing them to the network. <strong>At Enterprise, SSH tunnels are a common pattern for 'break glass' database access.</strong>",
       "codeBlock": "# === Local Port Forwarding ===\n# Access internal service via local port\n# Syntax: ssh -L local_port:target_host:target_port bastion\nssh -L 5432:internal-db.internal:5432 bastion\n# Now connect to localhost:5432 → encrypted → internal-db:5432\n\n# === Remote Port Forwarding ===\n# Expose local port on remote server (reverse tunnel)\n# Syntax: ssh -R remote_port:local_host:local_port bastion\nssh -R 8080:localhost:3000 bastion\n# Now bastion:8080 → encrypted → localhost:3000\n\n# === Dynamic Port Forwarding (SOCKS proxy) ===\n# Create a SOCKS5 proxy through the SSH connection\nssh -D 1080 bastion\n# Configure browser/system SOCKS proxy to localhost:1080\n# Now all traffic routes through the bastion\n\n# === Jump host (ProxyJump) ===\n# Newer, simpler alternative to chaining SSH tunnels\nssh -J bastion internal-host\n\n# === SSH through multiple hops ===\nssh -J bastion,internal-bastion target-host\n\n# === Common tunnel patterns ===\n# Database access via bastion\nssh -L 3306:prod-db-1.internal:3306 -N bastion &\n# -N = don't open a shell, just forward ports\n\n# RDP to Windows jump box behind bastion\nssh -L 3389:windows-jump.internal:3389 bastion\n\n# === Auto-reconnecting tunnel (autossh) ===\nautossh -M 0 -o \"ServerAliveInterval 60\" -o \"ServerAliveCountMax 3\" -L 5432:db:5432 bastion"
     },
     {
       "title": "SSH Troubleshooting & Debugging",
-      "description": "When SSH doesn't work, the default error messages can be cryptic. <strong>Verbose mode (-vvv) is your primary diagnostic tool.</strong> At FAANG, SSH issues are a common on-call triage category — knowing how to diagnose quickly is essential.",
+      "description": "When SSH doesn't work, the default error messages can be cryptic. <strong>Verbose mode (-vvv) is your primary diagnostic tool.</strong> At Enterprise, SSH issues are a common on-call triage category — knowing how to diagnose quickly is essential.",
       "codeBlock": "# === Verbose mode ===\nssh -vvv user@server                  # Detailed debug output\n\n# Common issues by verbose output analysis:\n# 1. \"Permission denied (publickey)\" — No matching key in authorized_keys\n# 2. \"Connection refused\" — sshd not running or port wrong\n# 3. \"Connection timed out\" — Firewall blocking (check security groups)\n# 4. \"Host key verification failed\" — Host key changed (MITM or server rebuild)\n#    Fix: ssh-keygen -R \"hostname\" then reconnect\n# 5. \"Too many authentication failures\" — ssh is trying too many keys\n#    Fix: ssh -o IdentitiesOnly=yes -i specific_key user@host\n\n# === Test connectivity ===\nnc -zv server 22                      # Check if port 22 is open\ntelnet server 22                      # Raw connection test\n\n# === Check host keys ===\nssh-keyscan server                    # Get server's public host key\nssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub  # Server host key fingerprint\n\n# === Check which key is being offered ===\nssh -v user@server 2>&1 | grep \"Offering public key\"\n\n# === Known hosts issues ===\ncat ~/.ssh/known_hosts                # List known hosts\nssh-keygen -F server                  # Search known_hosts for a host\nssh-keygen -R server                  # Remove host from known_hosts\n\n# === Agent issues ===\nssh-add -l                            # Check which keys are loaded\nssh-add -D                            # Clear all keys\nssh -o IdentitiesOnly=yes -i ~/.ssh/custom_key user@host  # Force specific key\n\n# === SCP & SFTP ===\nscp file.txt user@server:/remote/path/\nscp -r dir/ user@server:/remote/path/\nrsync -avz -e ssh dir/ user@server:/remote/path/  # Better for large transfers\nsftp user@server                     # Interactive file transfer"
     },
     {
-      "title": "FAANG Interview Q&A",
-      "description": "<strong>Q:</strong> 'How would you design SSH access for a fleet of 10,000 servers?'<br><br><strong>A:</strong> 'No direct SSH. All access goes through bastion hosts. Bastions are locked down — SSH only from corporate VPN, MFA required, no agent forwarding. Users authenticate with SSH certificates signed by a central CA — certificates expire after 4-8 hours. All sessions are recorded (script, tlog). Host keys are distributed via configuration management (Ansible/Chef). Servers have no individual user accounts — engineers authenticate via their certificate, which maps to a local account via AuthorizedPrincipalsFile. This gives us audit trails, revocability, and no key distribution problem.'<br><br><strong>Q:</strong> 'You can't SSH into a production server. What do you check?'<br><br><strong>A:</strong> 'Layer by layer: (1) Network: can I ping it? <code>nc -zv host 22</code>? Check security groups/firewall rules. (2) Service: is sshd running? Check via monitoring or console access. (3) Authentication: am I using the right key? <code>ssh -vvv</code>. Check my certificate hasn't expired. (4) Server config: is sshd_config correct? <code>sshd -t</code> remotely via console. (5) PAM/SELinux: is SELinux blocking? <code>ausearch -m avc -ts recent</code>. At FAANG, 'console access' means AWS Systems Manager Session Manager or the equivalent — we always have a backup access method.'<br><br><strong>Q:</strong> 'What's the difference between SSH tunneling and a VPN?'<br><br><strong>A:</strong> 'An SSH tunnel is a single TCP port forwarded through an encrypted channel — it's application-specific. A VPN creates a virtual network interface and routes all (or selected) traffic through an encrypted tunnel — it's network-level. SSH tunneling is simpler and doesn't require admin privileges (just SSH access), but it only works for TCP and requires manual setup per port. VPNs are transparent to applications but need client software and more infrastructure. At FAANG, both are used: VPN for general corporate access, SSH tunnels for granular 'break glass' access to specific services.'",
+      "title": "Interview Q&A",
+      "description": "<strong>Q:</strong> 'How would you design SSH access for a fleet of 10,000 servers?'<br><br><strong>A:</strong> 'No direct SSH. All access goes through bastion hosts. Bastions are locked down — SSH only from corporate VPN, MFA required, no agent forwarding. Users authenticate with SSH certificates signed by a central CA — certificates expire after 4-8 hours. All sessions are recorded (script, tlog). Host keys are distributed via configuration management (Ansible/Chef). Servers have no individual user accounts — engineers authenticate via their certificate, which maps to a local account via AuthorizedPrincipalsFile. This gives us audit trails, revocability, and no key distribution problem.'<br><br><strong>Q:</strong> 'You can't SSH into a production server. What do you check?'<br><br><strong>A:</strong> 'Layer by layer: (1) Network: can I ping it? <code>nc -zv host 22</code>? Check security groups/firewall rules. (2) Service: is sshd running? Check via monitoring or console access. (3) Authentication: am I using the right key? <code>ssh -vvv</code>. Check my certificate hasn't expired. (4) Server config: is sshd_config correct? <code>sshd -t</code> remotely via console. (5) PAM/SELinux: is SELinux blocking? <code>ausearch -m avc -ts recent</code>. At Enterprise, 'console access' means AWS Systems Manager Session Manager or the equivalent — we always have a backup access method.'<br><br><strong>Q:</strong> 'What's the difference between SSH tunneling and a VPN?'<br><br><strong>A:</strong> 'An SSH tunnel is a single TCP port forwarded through an encrypted channel — it's application-specific. A VPN creates a virtual network interface and routes all (or selected) traffic through an encrypted tunnel — it's network-level. SSH tunneling is simpler and doesn't require admin privileges (just SSH access), but it only works for TCP and requires manual setup per port. VPNs are transparent to applications but need client software and more infrastructure. At Enterprise, both are used: VPN for general corporate access, SSH tunnels for granular 'break glass' access to specific services.'",
       "codeBlock": ""
     },
     {
@@ -43,6 +46,170 @@
       "codeBlock": ""
     }
   ],
-  "details": "<p class=\"mb-3\"><strong>FAANG Architect's Note:</strong> The 'no SSH' trend in infrastructure (immutable servers, containers, 'cattle not pets') is real — at FAANG, the vast majority of interactions with servers are automated through deployment pipelines, orchestration systems, and API-driven management. But when something goes wrong, SSH is still the emergency brake. Every senior engineer I know has stories of SSH'ing into a server at 3 AM to fix a critical issue. The difference at FAANG is that SSH access is audited, limited, and temporary — but it still exists, and knowing how to use it effectively is a survival skill.</p><p><strong>Production Tip:</strong> Always test SSH config changes with a second session before closing the first. A common production outage scenario: an engineer edits sshd_config, restarts sshd, and the new config has a syntax error that kills all active sessions — locking everyone out. Keep an active 'emergency' session while testing. Better yet: use <code>sshd -t</code> to validate before restarting.</p>",
-  "tags": ["FAANG", "Linux", "SSH", "security", "tunneling", "authentication"]
+  "tags": [
+    "faang-insight",
+    "Linux",
+    "SSH",
+    "security",
+    "tunneling",
+    "authentication"
+  ],
+  "difficulty": "intermediate",
+  "readingTime": 19,
+  "practiceTime": 14,
+  "prerequisites": [
+    "linux-users",
+    "linux-networking"
+  ],
+  "learningObjectives": [
+    "Understand sSH Authentication: Keys, Certificates & Agents",
+    "Understand sSH Client Configuration (~/.ssh/config)",
+    "Understand sSH Server Hardening",
+    "Understand sSH Tunneling & Port Forwarding",
+    "Understand sSH Troubleshooting & Debugging"
+  ],
+  "analogy": {
+    "title": "SSH as a Secure Tunnel",
+    "description": "The client and server perform a secret handshake (key exchange). Public keys are like padlocks - anyone can snap them on (encrypt), but only the private key holder can unlock (decrypt). The tunnel protects everything inside from eavesdroppers on the public internet."
+  },
+  "commonMistakes": [
+    {
+      "mistake": "Ignoring log rotation until disk fills up",
+      "solution": "Configure logrotate before deploying; monitor /var/log usage"
+    },
+    {
+      "mistake": "Disabling SELinux/AppArmor instead of fixing policies",
+      "solution": "Use `audit2allow` to generate policies from denials; keep MAC enabled"
+    },
+    {
+      "mistake": "Running containers as root",
+      "solution": "Add `USER nonroot` in Dockerfile; use `--user` flag at runtime"
+    },
+    {
+      "mistake": "Not setting resource limits on containers",
+      "solution": "Always set `--cpus` and `--memory`; configure cgroup limits in Kubernetes"
+    },
+    {
+      "mistake": "Checking /proc/meminfo inside containers for memory",
+      "solution": "Use cgroup v2 files: /sys/fs/cgroup/memory.current, memory.events"
+    }
+  ],
+  "practiceLabs": [
+    {
+      "title": "Explore: SSH Authentication: Keys, Certificates & Agents",
+      "task": "Run `ssh-keygen` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man ssh-keygen` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: SSH Client Configuration (~/.ssh/config)",
+      "task": "Run `ssh-copy-id` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man ssh-copy-id` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: SSH Server Hardening",
+      "task": "Run `cat` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man cat` to see all available flags and understand the output columns."
+    }
+  ],
+  "quickReference": {
+    "title": "Quick Reference",
+    "content": "| Command | Description |\n|---|---|\n| `ssh-keygen` | SSH Authentication: Keys, Certificates & Agents |\n| `ssh-copy-id` | SSH Authentication: Keys, Certificates & Agents |\n| `cat` | SSH Authentication: Keys, Certificates & Agents |\n| `Host` | SSH Client Configuration (~/.ssh/config) |\n| `ServerAliveInterval` | SSH Client Configuration (~/.ssh/config) |\n| `ServerAliveCountMax` | SSH Client Configuration (~/.ssh/config) |\n| `PubkeyAuthentication` | SSH Server Hardening |\n| `PasswordAuthentication` | SSH Server Hardening |\n| `PermitRootLogin` | SSH Server Hardening |\n| `ssh` | SSH Tunneling & Port Forwarding |\n| `autossh` | SSH Tunneling & Port Forwarding |\n| `ssh` | SSH Troubleshooting & Debugging |\n| `nc` | SSH Troubleshooting & Debugging |\n| `telnet` | SSH Troubleshooting & Debugging |"
+  },
+  "troubleshooting": [
+    {
+      "symptom": "ssh-keygen returns unexpected output",
+      "cause": "Incorrect arguments, wrong working directory, or stale cached data",
+      "solution": "Verify arguments with `man ssh-keygen`; check current path with `pwd`; clear cache if applicable"
+    },
+    {
+      "symptom": "Configuration changes not taking effect",
+      "cause": "Service not reloaded or syntax error in config file",
+      "solution": "Validate config syntax with built-in test flag; reload service with `systemctl reload` or `restart`"
+    },
+    {
+      "symptom": "ssh operation slow or timing out",
+      "cause": "Resource exhaustion (disk I/O, memory pressure, or lock contention)",
+      "solution": "Check `iostat`, `free -m`, and `top`; look for stuck processes with `ps aux --sort=-%cpu`"
+    },
+    {
+      "symptom": "Permission issues accessing ssh resources",
+      "cause": "Incorrect file ownership or overly restrictive permissions",
+      "solution": "Inspect with `ls -la`; fix with `chown`/ `chmod`; check ACLs with `getfacl`"
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is SSH Authentication: Keys, Certificates & Agents?",
+      "options": [
+        "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+        "A tool for managing disk partitions",
+        "A network configuration protocol",
+        "A user authentication system"
+      ],
+      "answer": "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+      "explanation": "The SSH Authentication: Keys, Certificates & Agents is the foundation of the Linux filesystem — everything in the system is organized under this structure."
+    },
+    {
+      "question": "What does `ssh-keygen` do?",
+      "options": [
+        "Lists information about ssh",
+        "Creates a new directory",
+        "Removes files",
+        "Copies files between directories"
+      ],
+      "answer": "Lists files and directories in the current or specified path",
+      "explanation": "Use `ls` to explore directory contents. Combine with flags like `-l` (long format), `-a` (hidden files), and `-h` (human-readable sizes)."
+    },
+    {
+      "question": "Which command would you use to view disk usage of the ssh directory?",
+      "options": [
+        "du -sh /path/to/directory",
+        "cat /path/to/directory",
+        "cp -r /path/to/directory",
+        "chmod /path/to/directory"
+      ],
+      "answer": "du -sh /path/to/directory",
+      "explanation": "`du -sh` (disk usage, summary, human-readable) shows the total size of a directory and its contents."
+    },
+    {
+      "question": "A user reports \"Permission denied\" when trying to access a ssh directory. What is the first command you should run?",
+      "options": [
+        "ls -ld /path/to/directory",
+        "chmod 777 /path/to/directory",
+        "rm -rf /path/to/directory",
+        "systemctl restart sshd"
+      ],
+      "answer": "ls -ld /path/to/directory",
+      "explanation": "`ls -ld` shows the directory's permissions and ownership. Always inspect before making changes — starting with `chmod 777` is a security anti-pattern."
+    },
+    {
+      "question": "In a ssh scenario, your monitoring alerts show ssh-keygen failing intermittently. What is the correct debugging workflow?",
+      "options": [
+        "Check logs → verify configuration → test in staging → apply fix → monitor",
+        "Reboot the server immediately",
+        "Reinstall the operating system",
+        "Ignore the alert and wait for it to resolve"
+      ],
+      "answer": "Check logs → verify configuration → test in staging → apply fix → monitor",
+      "explanation": "A structured debugging workflow prevents cascading failures. Always diagnose before acting, especially in production environments where downtime has direct business impact."
+    }
+  ],
+  "interviewTips": [
+    "FAANG Architect's Note:  The 'no SSH' trend in infrastructure (immutable servers, containers, 'cattle not pets') is real — at FAANG, the vast majority of interactions with servers are automated through deployment pipelines, orchestration systems, and API-driven management",
+    "FAANG is that SSH access is audited, limited, and temporary — but it still exists, and knowing how to use it effectively is a survival skill"
+  ],
+  "productionTips": [
+    "Production Tip:  Always test SSH config changes with a second session before closing the first",
+    "production outage scenario: an engineer edits sshd_config, restarts sshd, and the new config has a syntax error that kills all active sessions — locking everyone out"
+  ],
+  "bestPractices": [
+    "Use version control for all configuration (/etc, scripts, Dockerfiles)",
+    "Implement infrastructure as code; avoid manual server changes",
+    "Test changes in staging before production; have rollback plans"
+  ],
+  "enterprisePerspective": "In enterprise environments, ssh: secure shell is managed through automation (Ansible, Terraform), monitored centrally (Prometheus, Datadog), and governed by compliance policies (CIS benchmarks, SOC2). Changes go through change advisory boards with rollback procedures documented.",
+  "visualHint": "ssh_tunnel"
 }

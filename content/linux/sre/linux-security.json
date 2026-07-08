@@ -1,35 +1,38 @@
 {
+  "schemaVersion": "2.0",
+  "contentVersion": "1.0",
+  "lastReviewed": "2026-07-08",
+  "reviewStatus": "migrated",
   "id": "linux-security",
   "title": "Security Hardening",
   "category": "Linux",
   "subcategory": "Containers & SRE",
   "language": "bash",
-  "description": "Linux security is defense in depth: from kernel hardening (SELinux, AppArmor, seccomp) to system configuration (sysctl, PAM, auditd) to operational practices (patch management, least privilege, incident response). At FAANG, every server is hardened against a baseline, and deviations are automatically detected and remediated.",
-  "codeBlock": "",
+  "description": "Linux security is defense in depth: from kernel hardening (SELinux, AppArmor, seccomp) to system configuration (sysctl, PAM, auditd) to operational practices (patch management, least privilege, incident response). At Enterprise, every server is hardened against a baseline, and deviations are automatically detected and remediated.",
   "sections": [
     {
       "title": "Kernel Hardening: sysctl Security Settings",
-      "description": "The Linux kernel has many security-related parameters accessible via <code>sysctl</code>. <strong>These settings mitigate common attack vectors: IP spoofing, SYN floods, source routing, and kernel pointer leaks.</strong> At FAANG, these are enforced by configuration management (Ansible, Chef) and verified by compliance scanners.",
+      "description": "The Linux kernel has many security-related parameters accessible via <code>sysctl</code>. <strong>These settings mitigate common attack vectors: IP spoofing, SYN floods, source routing, and kernel pointer leaks.</strong> At Enterprise, these are enforced by configuration management (Ansible, Chef) and verified by compliance scanners.",
       "codeBlock": "# === /etc/sysctl.d/99-security.conf ===\n\n# === Network hardening ===\n# Disable IP forwarding (unless the host is a router)\nnet.ipv4.ip_forward = 0\nnet.ipv6.conf.all.forwarding = 0\n\n# Disable source packet routing\nnet.ipv4.conf.all.accept_source_route = 0\nnet.ipv6.conf.all.accept_source_route = 0\n\n# Enable IP spoofing protection (reverse-path filtering)\nnet.ipv4.conf.all.rp_filter = 1\n\n# Ignore ICMP redirects (MITM vector)\nnet.ipv4.conf.all.accept_redirects = 0\nnet.ipv6.conf.all.accept_redirects = 0\nnet.ipv4.conf.all.secure_redirects = 0\nnet.ipv4.conf.all.send_redirects = 0\n\n# SYN flood protection\nnet.ipv4.tcp_syncookies = 1\nnet.ipv4.tcp_syn_retries = 5\nnet.ipv4.tcp_synack_retries = 2\n\n# Don't log martians (bogus packets)\nnet.ipv4.conf.all.log_martians = 1\n\n# === Kernel hardening ===\n# Restrict kernel pointer access (prevents KASLR bypass)\nkernel.kptr_restrict = 2\n\n# Restrict dmesg to root only\nkernel.dmesg_restrict = 1\n\n# Restrict perf events to root only\nkernel.perf_event_paranoid = 3\n\n# Disable kexec (prevent kernel replacement without reboot)\nkernel.kexec_load_disabled = 0\n\n# ASLR (Address Space Layout Randomization)\nkernel.randomize_va_space = 2\n\n# Restrict ptrace (prevents process injection)\nkernel.yama.ptrace_scope = 1\n\n# === Apply ===\nsudo sysctl -p /etc/sysctl.d/99-security.conf\nsudo sysctl --system                  # Apply all sysctl files\n\n# === Check current settings ===\nsudo sysctl -a | grep -E \"(kernel.(kptr|dmesg|perf|yama)|net.ipv4.conf.all.(rp_filter|accept_source))\""
     },
     {
       "title": "Seccomp: Secure Computing Mode",
-      "description": "Seccomp restricts which syscalls a process can make. <strong>seccomp-bpf (since Linux 3.5) allows programmable filters using BPF bytecode.</strong> At FAANG, seccomp is mandatory for all containers — it's part of the container runtime default. A process that makes a syscall outside the allowed set is either killed (SECCOMP_RET_KILL) or denied with an error (SECCOMP_RET_ERRNO).",
+      "description": "Seccomp restricts which syscalls a process can make. <strong>seccomp-bpf (since Linux 3.5) allows programmable filters using BPF bytecode.</strong> At Enterprise, seccomp is mandatory for all containers — it's part of the container runtime default. A process that makes a syscall outside the allowed set is either killed (SECCOMP_RET_KILL) or denied with an error (SECCOMP_RET_ERRNO).",
       "codeBlock": "# === Check seccomp status ===\ncat /proc/<PID>/status | grep Seccomp\n# 0 = disabled\n# 1 = strict (only read, write, exit, sigreturn)\n# 2 = filter (custom seccomp-bpf policy)\n\n# === Docker seccomp profiles ===\n# Default profile: /usr/share/containers/seccomp.json (or Docker's built-in)\n# Run container with custom seccomp:\ndocker run --security-opt seccomp=custom.json nginx\n\n# === Disable seccomp (not recommended!) ===\ndocker run --security-opt seccomp=unconfined nginx\n\n# === Common seccomp policies ===\n# For web apps: allow ~250-300 syscalls (most common)\n# For databases: allow ~200-250 syscalls\n# For minimal containers: allow ~50 syscalls\n# Example denied syscalls: kexec_load, uselib, create_module, delete_module\n# \n# Tools:\n# - inspektor-gadget: inspect seccomp profiles of running containers\n# - strace: generate a list of syscalls used by your app, then build profile\n\n# === Generate seccomp profile ===\n# Record syscalls:\nstrace -c -f -o syscalls.txt ./myapp\n# Then convert to seccomp JSON profile using:\n# https://github.com/docker/labs/blob/master/security/seccomp/seccomp-profiles/allow-all.json\n\n# === Check if seccomp blocked a syscall ===\n# Look for: 'exit code 159' or SIGSYS (seccomp violation)\ndmesg | grep -i \"seccomp\\|SIGSYS\"\njournalctl -k | grep -i seccomp\n\n# === seccomp with systemd ===\n[Service]\nSystemCallFilter=@system-service   # Allow standard service syscalls\nSystemCallArchitectures=native     # Only allow native architecture syscalls\nSystemCallErrorNumber=EPERM        # Return 'Operation not permitted' instead of killing"
     },
     {
       "title": "SELinux & AppArmor",
-      "description": "<strong>SELinux</strong> (Security-Enhanced Linux) and <strong>AppArmor</strong> are Linux Security Modules (LSM) that enforce mandatory access control (MAC). <strong>SELinux labels every file, process, and port with a security context and defines policies for allowed interactions.</strong> AppArmor uses path-based profiles instead of labels. At FAANG, SELinux is enabled on RHEL/Amazon Linux; AppArmor is the default on Ubuntu/Debian. Both achieve the same goal: confine processes even if they run as root.",
+      "description": "<strong>SELinux</strong> (Security-Enhanced Linux) and <strong>AppArmor</strong> are Linux Security Modules (LSM) that enforce mandatory access control (MAC). <strong>SELinux labels every file, process, and port with a security context and defines policies for allowed interactions.</strong> AppArmor uses path-based profiles instead of labels. At Enterprise, SELinux is enabled on RHEL/Amazon Linux; AppArmor is the default on Ubuntu/Debian. Both achieve the same goal: confine processes even if they run as root.",
       "codeBlock": "# === SELinux (RHEL/Amazon Linux) ===\n# Check status:\ngetenforce                           # Enforcing | Permissive | Disabled\nsestatus                             # Detailed SELinux status\n\n# Modes:\n# Enforcing  — Security policy is enforced (production)\n# Permissive — Policy violations are logged but not blocked (debugging)\n# Disabled   — SELinux is off (not recommended)\n\n# Switch modes (runtime):\nsudo setenforce 0                    # Permissive (for troubleshooting)\nsudo setenforce 1                    # Enforcing\n# Permanent: /etc/selinux/config — SELINUX=enforcing\n\n# === SELinux context ===\nls -Z /var/www/html/index.html       # Show SELinux context\n# system_u:object_r:httpd_sys_content_t:s0\n# user:role:type:level\n\nps auxZ | grep nginx                 # Show process SELinux context\n\n# === Common SELinux commands ===\nsemanage fcontext -l | grep /var/log  # List file contexts\nsemanage port -l | grep http         # List port contexts\n\n# Fix file context:\nsudo restorecon -Rv /var/www/html     # Restore default contexts\n\n# Change file context:\nsudo semanage fcontext -a -t httpd_sys_content_t \"/web(/.*)?\"\nsudo restorecon -Rv /web\n\n# Enable/disable booleans:\ngetsebool -a | grep http             # List SELinux booleans\nsudo setsebool -P httpd_can_network_connect on  # Allow Apache to make outbound connections\n\n# === SELinux audit log ===\nsudo ausearch -m avc -ts recent      # Recent denials\nsudo sealert -a /var/log/audit/audit.log  # Generate readable denials\n\n# === AppArmor (Ubuntu/Debian) ===\nsudo aa-status                       # List loaded profiles\nsudo apparmor_status\n\n# Profile modes:\n# enforce — Policy enforced (production)\n# complain — Policy violations logged but allowed (debugging)\n\n# Switch profile mode:\nsudo aa-complain /usr/sbin/nginx     # Set to complain mode\nsudo aa-enforce /usr/sbin/nginx      # Set to enforce mode\n\n# === AppArmor profile example ===\n# /etc/apparmor.d/usr.sbin.nginx\n# profile nginx /usr/sbin/nginx {\n#   include <abstractions/base>\n#   include <abstractions/nginx>\n#   /etc/nginx/** r,\n#   /var/log/nginx/* w,\n#   /var/www/html/** r,\n# }\n\n# === Disable (not recommended for production) ===\n# To disable temporarily:\nsudo ln -sf /etc/apparmor.d/usr.sbin.nginx /etc/apparmor.d/disable/\nsudo apparmor_parser -R /etc/apparmor.d/usr.sbin.nginx"
     },
     {
       "title": "Auditd: Linux Audit System",
-      "description": "The Linux Audit System (<code>auditd</code>) records security-relevant events: file access, syscalls, user logins, and configuration changes. <strong>At FAANG, auditd is mandatory on all servers — it provides the audit trail for security incidents and compliance.</strong> The audit logs are shipped to centralized SIEM systems (Splunk, Elasticsearch) for analysis and long-term retention.",
+      "description": "The Linux Audit System (<code>auditd</code>) records security-relevant events: file access, syscalls, user logins, and configuration changes. <strong>At Enterprise, auditd is mandatory on all servers — it provides the audit trail for security incidents and compliance.</strong> The audit logs are shipped to centralized SIEM systems (Splunk, Elasticsearch) for analysis and long-term retention.",
       "codeBlock": "# === auditd setup ===\nsudo apt install auditd audispd-plugins\nsudo systemctl enable --now auditd\n\n# === Rules file: /etc/audit/rules.d/audit.rules ===\n# Monitor password file changes\n-w /etc/passwd -p wa -k identity\n-w /etc/shadow -p wa -k identity\n-w /etc/sudoers -p wa -k sudoers\n-w /etc/ssh/sshd_config -p wa -k sshd\n\n# Monitor SUID/SGID file changes\n-a always,exit -F arch=b64 -S execve -F euid=0 -k root_command\n\n# Monitor user/group changes\n-w /usr/sbin/useradd -p x -k useradd\n-w /usr/sbin/usermod -p x -k usermod\n-w /usr/sbin/groupadd -p x -k groupadd\n\n# Monitor network configuration changes\n-w /sbin/iptables -p x -k iptables\n-w /sbin/ip -p x -k ip\n\n# Monitor important directories\n-w /etc/ -p wa -k etc_changes\n-w /root/.bashrc -p wa -k root_config\n\n# Monitor syscalls (performance impact!)\n-a always,exit -F arch=b64 -S openat,open -F key=file_open\n\n# === Query audit logs ===\n# Recent events:\nsudo ausearch -ts recent -k identity   # Events tagged 'identity'\nsudo ausearch -m USER_LOGIN            # Login events\nsudo ausearch -m EXECVE                # Commands executed (sudo)\n\n# Live monitoring:\nsudo tail -f /var/log/audit/audit.log | aureport --interpret\n\n# Summary report:\nsudo aureport --summary                 # Summary by event type\nsudo aureport --user                   # By user\nsudo aureport -ts this-week             # This week's events\n\n# === Check auditd status ===\nsudo auditctl -s                       # Status\nsudo auditctl -l                       # List loaded rules\n\n# === Log file ===\n/var/log/audit/audit.log               # Raw audit events\n# Format:\n# type=SYSCALL msg=audit(1705300000.123:456): arch=c000003e syscall=2 success=yes exit=3 a0=...\n# Interpret: ausearch --interpret or audit2why"
     },
     {
-      "title": "FAANG Interview Q&A",
-      "description": "<strong>Q:</strong> 'A compliance auditor asks: how do you ensure that only authorized users can access production servers?'<br><br><strong>A:</strong> 'At FAANG, we use a multi-layered approach: (1) No direct SSH — all access goes through a bastion host or session manager (AWS SSM, Teleport). (2) Authentication is via short-lived certificates (SSH CA) — no long-lived SSH keys on developer workstations. (3) Authorization is checked by the bastion — it integrates with the corporate identity system (Okta, LDAP) and enforces MFA. (4) All sessions are recorded — every keystroke is logged and retained for compliance. (5) Access is time-bound — sessions expire after 4-8 hours, and access reviews are automated. (6) Changes are made through CI/CD pipelines, not SSH — SSH access is reserved for emergencies and debugging, not routine changes.'<br><br><strong>Q:</strong> 'What's the difference between DAC and MAC?'<br><br><strong>A:</strong> 'DAC (Discretionary Access Control) is the standard Unix permission model — the owner of a file decides who can read/write/execute it. Root can bypass all DAC checks. MAC (Mandatory Access Control) is enforced by the kernel via LSM (SELinux/AppArmor) — it overrides DAC decisions. Even if a file is chmod 777, SELinux can deny access if the process doesn't have the right security context. MAC is defense in depth: if an attacker compromises a service (e.g., nginx with a remote code execution), MAC prevents them from accessing files labeled for other services, even if they're running as root.'<br><br><strong>Q:</strong> 'A server was compromised. What do you do?'<br><br><strong>A:</strong> 'Follow the incident response protocol: (1) Isolate the server — remove it from the network, block traffic at the firewall, but DON'T shut it down (memory forensics). (2) Capture forensic data: memory dump (LiME, fmem), disk image, audit logs, process list, network connections. (3) Determine the attack vector: check sshd logs, web server logs, package manager logs for unauthorized installs. (4) Check persistence mechanisms: cron jobs, systemd services, SSH authorized_keys, kernel modules. (5) Contain: rotate all credentials the server had access to. (6) Eradicate: rebuild the server from a known-good image, apply patches, review access controls. (7) Postmortem: what allowed the compromise? How do we prevent recurrence? At FAANG, incident response is a well-rehearsed process with dedicated security engineers, runbooks, and automated containment workflows.'",
+      "title": "Interview Q&A",
+      "description": "<strong>Q:</strong> 'A compliance auditor asks: how do you ensure that only authorized users can access production servers?'<br><br><strong>A:</strong> 'At Enterprise, we use a multi-layered approach: (1) No direct SSH — all access goes through a bastion host or session manager (AWS SSM, Teleport). (2) Authentication is via short-lived certificates (SSH CA) — no long-lived SSH keys on developer workstations. (3) Authorization is checked by the bastion — it integrates with the corporate identity system (Okta, LDAP) and enforces MFA. (4) All sessions are recorded — every keystroke is logged and retained for compliance. (5) Access is time-bound — sessions expire after 4-8 hours, and access reviews are automated. (6) Changes are made through CI/CD pipelines, not SSH — SSH access is reserved for emergencies and debugging, not routine changes.'<br><br><strong>Q:</strong> 'What's the difference between DAC and MAC?'<br><br><strong>A:</strong> 'DAC (Discretionary Access Control) is the standard Unix permission model — the owner of a file decides who can read/write/execute it. Root can bypass all DAC checks. MAC (Mandatory Access Control) is enforced by the kernel via LSM (SELinux/AppArmor) — it overrides DAC decisions. Even if a file is chmod 777, SELinux can deny access if the process doesn't have the right security context. MAC is defense in depth: if an attacker compromises a service (e.g., nginx with a remote code execution), MAC prevents them from accessing files labeled for other services, even if they're running as root.'<br><br><strong>Q:</strong> 'A server was compromised. What do you do?'<br><br><strong>A:</strong> 'Follow the incident response protocol: (1) Isolate the server — remove it from the network, block traffic at the firewall, but DON'T shut it down (memory forensics). (2) Capture forensic data: memory dump (LiME, fmem), disk image, audit logs, process list, network connections. (3) Determine the attack vector: check sshd logs, web server logs, package manager logs for unauthorized installs. (4) Check persistence mechanisms: cron jobs, systemd services, SSH authorized_keys, kernel modules. (5) Contain: rotate all credentials the server had access to. (6) Eradicate: rebuild the server from a known-good image, apply patches, review access controls. (7) Postmortem: what allowed the compromise? How do we prevent recurrence? At Enterprise, incident response is a well-rehearsed process with dedicated security engineers, runbooks, and automated containment workflows.'",
       "codeBlock": ""
     },
     {
@@ -38,6 +41,173 @@
       "codeBlock": ""
     }
   ],
-  "details": "<p class=\"mb-3\"><strong>FAANG Architect's Note:</strong> Security is everyone's job at FAANG, not just the security team's. The principle is 'security as code' — security configurations are version-controlled, reviewed, and automatically enforced. The engineers who stand out are those who think about security as a design constraint, not an afterthought. They add seccomp profiles to their container definitions, they set kernel hardening params in their deployment configs, and they ensure their services follow least privilege — running as non-root, with only the capabilities they need, in a confined SELinux domain.</p><p><strong>Production Tip:</strong> Before enabling SELinux enforcement on an existing server, run in permissive mode for at least a week. Collect the denials with <code>ausearch -m avc -ts boot</code> and use <code>audit2allow -a</code> to generate the required policy rules. The most common SELinux-related production outage is an engineer enabling enforcement without first identifying all the necessary permissions — the application crashes because it can't access files that DAC would allow but SELinux denies. At FAANG, SELinux is 'enforcing by default' in AMIs, so applications are developed and tested with SELinux enabled from day one.</p>",
-  "tags": ["FAANG", "Linux", "security", "SELinux", "AppArmor", "seccomp", "auditd", "hardening"]
+  "tags": [
+    "faang-insight",
+    "Linux",
+    "security",
+    "SELinux",
+    "AppArmor",
+    "seccomp",
+    "auditd",
+    "hardening"
+  ],
+  "difficulty": "intermediate",
+  "readingTime": 17,
+  "practiceTime": 13,
+  "prerequisites": [
+    "linux-users",
+    "linux-permissions",
+    "linux-networking",
+    "linux-systemd"
+  ],
+  "learningObjectives": [
+    "Understand kernel Hardening: sysctl Security Settings",
+    "Understand seccomp: Secure Computing Mode",
+    "Understand sELinux & AppArmor",
+    "Understand auditd: Linux Audit System"
+  ],
+  "analogy": {
+    "title": "Security as Layers of Defense",
+    "description": "Perimeter (firewall) is the castle wall. SELinux/AppArmor are guards inside each room. Seccomp filters which syscalls a process can make. Updates patch holes in the wall. Least privilege means every servant has only the keys they need. Auditd logs who opened which door."
+  },
+  "commonMistakes": [
+    {
+      "mistake": "Ignoring log rotation until disk fills up",
+      "solution": "Configure logrotate before deploying; monitor /var/log usage"
+    },
+    {
+      "mistake": "Disabling SELinux/AppArmor instead of fixing policies",
+      "solution": "Use `audit2allow` to generate policies from denials; keep MAC enabled"
+    },
+    {
+      "mistake": "Running containers as root",
+      "solution": "Add `USER nonroot` in Dockerfile; use `--user` flag at runtime"
+    },
+    {
+      "mistake": "Not setting resource limits on containers",
+      "solution": "Always set `--cpus` and `--memory`; configure cgroup limits in Kubernetes"
+    },
+    {
+      "mistake": "Checking /proc/meminfo inside containers for memory",
+      "solution": "Use cgroup v2 files: /sys/fs/cgroup/memory.current, memory.events"
+    }
+  ],
+  "practiceLabs": [
+    {
+      "title": "Explore: Kernel Hardening: sysctl Security Settings",
+      "task": "Run `net.ipv4.ip_forward` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man netipv4ip_forward` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: Seccomp: Secure Computing Mode",
+      "task": "Run `net.ipv6.conf.all.forwarding` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man netipv6confallforwarding` to see all available flags and understand the output columns."
+    },
+    {
+      "title": "Explore: SELinux & AppArmor",
+      "task": "Run `net.ipv4.conf.all.rp_filter` and examine the output. Note the structure, key fields, and patterns you observe. Try different flags to see how the output changes.",
+      "expectedOutput": "Output will vary by system. Look for structured fields, key identifiers, and configuration sections.",
+      "hint": "Use `man netipv4confallrp_filter` to see all available flags and understand the output columns."
+    }
+  ],
+  "quickReference": {
+    "title": "Quick Reference",
+    "content": "| Command | Description |\n|---|---|\n| `net.ipv4.ip_forward` | Kernel Hardening: sysctl Security Settings |\n| `net.ipv6.conf.all.forwarding` | Kernel Hardening: sysctl Security Settings |\n| `net.ipv4.conf.all.accept_source_route` | Kernel Hardening: sysctl Security Settings |\n| `cat` | Seccomp: Secure Computing Mode |\n| `docker` | Seccomp: Secure Computing Mode |\n| `strace` | Seccomp: Secure Computing Mode |\n| `getenforce` | SELinux & AppArmor |\n| `sestatus` | SELinux & AppArmor |\n| `sudo` | SELinux & AppArmor |\n| `sudo` | Auditd: Linux Audit System |"
+  },
+  "troubleshooting": [
+    {
+      "symptom": "net.ipv4.ip_forward returns unexpected output",
+      "cause": "Incorrect arguments, wrong working directory, or stale cached data",
+      "solution": "Verify arguments with `man net.ipv4.ip_forward`; check current path with `pwd`; clear cache if applicable"
+    },
+    {
+      "symptom": "Configuration changes not taking effect",
+      "cause": "Service not reloaded or syntax error in config file",
+      "solution": "Validate config syntax with built-in test flag; reload service with `systemctl reload` or `restart`"
+    },
+    {
+      "symptom": "security operation slow or timing out",
+      "cause": "Resource exhaustion (disk I/O, memory pressure, or lock contention)",
+      "solution": "Check `iostat`, `free -m`, and `top`; look for stuck processes with `ps aux --sort=-%cpu`"
+    },
+    {
+      "symptom": "Permission issues accessing security resources",
+      "cause": "Incorrect file ownership or overly restrictive permissions",
+      "solution": "Inspect with `ls -la`; fix with `chown`/ `chmod`; check ACLs with `getfacl`"
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is Kernel Hardening: sysctl Security Settings?",
+      "options": [
+        "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+        "A tool for managing disk partitions",
+        "A network configuration protocol",
+        "A user authentication system"
+      ],
+      "answer": "A standardized directory structure that defines where files and directories should be placed on Linux systems",
+      "explanation": "The Kernel Hardening: sysctl Security Settings is the foundation of the Linux filesystem — everything in the system is organized under this structure."
+    },
+    {
+      "question": "What does `net.ipv4.ip_forward` do?",
+      "options": [
+        "Lists information about security",
+        "Creates a new directory",
+        "Removes files",
+        "Copies files between directories"
+      ],
+      "answer": "Lists files and directories in the current or specified path",
+      "explanation": "Use `ls` to explore directory contents. Combine with flags like `-l` (long format), `-a` (hidden files), and `-h` (human-readable sizes)."
+    },
+    {
+      "question": "Which command would you use to view disk usage of the security directory?",
+      "options": [
+        "du -sh /path/to/directory",
+        "cat /path/to/directory",
+        "cp -r /path/to/directory",
+        "chmod /path/to/directory"
+      ],
+      "answer": "du -sh /path/to/directory",
+      "explanation": "`du -sh` (disk usage, summary, human-readable) shows the total size of a directory and its contents."
+    },
+    {
+      "question": "A user reports \"Permission denied\" when trying to access a security directory. What is the first command you should run?",
+      "options": [
+        "ls -ld /path/to/directory",
+        "chmod 777 /path/to/directory",
+        "rm -rf /path/to/directory",
+        "systemctl restart sshd"
+      ],
+      "answer": "ls -ld /path/to/directory",
+      "explanation": "`ls -ld` shows the directory's permissions and ownership. Always inspect before making changes — starting with `chmod 777` is a security anti-pattern."
+    },
+    {
+      "question": "In a security scenario, your monitoring alerts show net.ipv4.ip_forward failing intermittently. What is the correct debugging workflow?",
+      "options": [
+        "Check logs → verify configuration → test in staging → apply fix → monitor",
+        "Reboot the server immediately",
+        "Reinstall the operating system",
+        "Ignore the alert and wait for it to resolve"
+      ],
+      "answer": "Check logs → verify configuration → test in staging → apply fix → monitor",
+      "explanation": "A structured debugging workflow prevents cascading failures. Always diagnose before acting, especially in production environments where downtime has direct business impact."
+    }
+  ],
+  "interviewTips": [
+    "FAANG Architect's Note:  Security is everyone's job at FAANG, not just the security team's",
+    "FAANG, SELinux is 'enforcing by default' in AMIs, so applications are developed and tested with SELinux enabled from day one"
+  ],
+  "productionTips": [
+    "Production Tip:  Before enabling SELinux enforcement on an existing server, run in permissive mode for at least a week",
+    "production outage is an engineer enabling enforcement without first identifying all the necessary permissions — the application crashes because it can't access files that DAC would allow but SELinux denies"
+  ],
+  "bestPractices": [
+    "Use version control for all configuration (/etc, scripts, Dockerfiles)",
+    "Implement infrastructure as code; avoid manual server changes",
+    "Test changes in staging before production; have rollback plans"
+  ],
+  "enterprisePerspective": "In enterprise environments, security hardening is managed through automation (Ansible, Terraform), monitored centrally (Prometheus, Datadog), and governed by compliance policies (CIS benchmarks, SOC2). Changes go through change advisory boards with rollback procedures documented.",
+  "visualHint": "security_layers"
 }

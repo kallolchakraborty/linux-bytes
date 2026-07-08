@@ -58,7 +58,10 @@ function scanContent() {
             url: `docs.html${hash}`,
             tags: data.tags || [],
             description: plainDesc,
-            sections: sectionTitles
+            sections: sectionTitles,
+            difficulty: data.difficulty || '',
+            readingTime: data.readingTime || 0,
+            prerequisites: data.prerequisites || []
           };
           searchIndex.push(searchEntry);
         } catch (e) {
