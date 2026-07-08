@@ -19,6 +19,18 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://kallolchakraborty.github.io/ai-bytes/docs.html#linux-build-toolchain</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://kallolchakraborty.github.io/ai-bytes/docs.html#linux-gpu-computing</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://kallolchakraborty.github.io/ai-bytes/docs.html#linux-io</loc>
     <lastmod>2026-07-08</lastmod>
     <changefreq>weekly</changefreq>
@@ -103,13 +115,31 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://kallolchakraborty.github.io/ai-bytes/docs.html#linux-faang-scale</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://kallolchakraborty.github.io/ai-bytes/docs.html#linux-interview-qs</loc>
     <lastmod>2026-07-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://kallolchakraborty.github.io/ai-bytes/docs.html#linux-kubernetes</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://kallolchakraborty.github.io/ai-bytes/docs.html#linux-security</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://kallolchakraborty.github.io/ai-bytes/docs.html#linux-system-rescue</loc>
     <lastmod>2026-07-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
