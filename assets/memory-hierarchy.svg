@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 300" class="learning-svg">
+  <defs>
+    <linearGradient id="brand-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF8A65" />
+      <stop offset="50%" stop-color="#E95420" />
+      <stop offset="100%" stop-color="#BF360C" />
+    </linearGradient>
+    <linearGradient id="layer-fast" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF8A65" />
+      <stop offset="100%" stop-color="#E95420" />
+    </linearGradient>
+    <linearGradient id="layer-mid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E95420" />
+      <stop offset="100%" stop-color="#BF360C" />
+    </linearGradient>
+    <linearGradient id="layer-slow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#BF360C" />
+      <stop offset="100%" stop-color="#7A1A05" />
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+    </filter>
+  </defs>
+  <style>
+    .layer { stroke: #1e293b; stroke-width: 1.5; }
+    .layer-label { font-family: 'Ubuntu Mono', monospace; font-size: 11px; fill: #e2e8f0; }
+    .layer-desc { font-family: 'Ubuntu', sans-serif; font-size: 8px; fill: #cbd5e1; }
+    .latency-tag { font-family: 'Ubuntu', sans-serif; font-size: 7px; fill: #94a3b8; }
+    @keyframes arrow-fall { 0% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -12; } }
+    .data-arrow { stroke: #E95420; stroke-width: 2; stroke-dasharray: 6,4; fill: none; animation: arrow-fall 1.2s linear infinite; filter: url(#glow); }
+    @keyframes glow-pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+    .glow-dot { fill: #FF8A65; animation: glow-pulse 1.5s ease-in-out infinite; }
+    .title-text { font-family: 'Ubuntu', sans-serif; font-size: 12px; font-weight: 600; fill: #E95420; text-anchor: middle; }
+    .size-text { font-family: 'Ubuntu', sans-serif; font-size: 7px; fill: #64748b; }
+    @keyframes scale-in { 0% { transform: scaleY(0); } 100% { transform: scaleY(1); } }
+  </style>
+
+  <text x="250" y="18" class="title-text">Linux Memory Hierarchy</text>
+
+  <!-- Layer 1: CPU Registers (top, narrowest) -->
+  <rect x="175" y="30" width="150" height="30" rx="4" class="layer" fill="url(#layer-fast)" />
+  <text x="250" y="48" class="layer-label" text-anchor="middle" font-weight="600">CPU Registers</text>
+  <text x="250" y="65" class="latency-tag" text-anchor="middle">~1 ns  |  ~1 KB</text>
+  <circle cx="178" cy="38" r="2" class="glow-dot" />
+
+  <!-- Arrow: Registers → Cache -->
+  <line x1="250" y1="60" x2="250" y2="82" class="data-arrow" />
+  <polygon points="246,80 250,86 254,80" fill="#E95420" />
+
+  <!-- Layer 2: L1/L2/L3 Cache -->
+  <rect x="135" y="85" width="230" height="35" rx="4" class="layer" fill="url(#layer-mid)" />
+  <text x="250" y="105" class="layer-label" text-anchor="middle">L1 / L2 / L3 Cache</text>
+  <text x="250" y="125" class="latency-tag" text-anchor="middle">~3-40 ns  |  ~32 KB - 32 MB</text>
+  <circle cx="138" cy="95" r="2" class="glow-dot" />
+
+  <!-- Arrow: Cache → RAM -->
+  <line x1="250" y1="120" x2="250" y2="142" class="data-arrow" />
+  <polygon points="246,140 250,146 254,140" fill="#E95420" />
+
+  <!-- Layer 3: RAM (main memory) -->
+  <rect x="95" y="145" width="310" height="40" rx="4" class="layer" fill="url(#layer-slow)" />
+  <text x="250" y="167" class="layer-label" text-anchor="middle">RAM (Main Memory)</text>
+  <text x="250" y="180" class="layer-desc" text-anchor="middle">anonymous pages · page cache · buffers</text>
+  <text x="250" y="190" class="latency-tag" text-anchor="middle">~100 ns  |  GB - TB</text>
+  <circle cx="98" cy="157" r="2" class="glow-dot" />
+
+  <!-- Arrow: RAM → Swap -->
+  <line x1="250" y1="185" x2="250" y2="207" class="data-arrow" />
+  <polygon points="246,205 250,211 254,205" fill="#E95420" />
+
+  <!-- Layer 4: Swap -->
+  <rect x="120" y="210" width="260" height="35" rx="4" class="layer" fill="#7A1A05" stroke="#5A1305" />
+  <text x="250" y="230" class="layer-label" text-anchor="middle">Swap (Disk-backed)</text>
+  <text x="250" y="250" class="latency-tag" text-anchor="middle">~10 ms  |  GB - TB</text>
+  <circle cx="123" cy="220" r="2" class="glow-dot" />
+
+  <!-- Arrow: Swap → Disk -->
+  <line x1="250" y1="245" x2="250" y2="262" class="data-arrow" />
+  <polygon points="246,260 250,266 254,260" fill="#E95420" />
+
+  <!-- Layer 5: Disk (bottom, widest) -->
+  <rect x="75" y="265" width="350" height="30" rx="4" class="layer" fill="#3A0D02" stroke="#5A1305" />
+  <text x="250" y="284" class="layer-label" text-anchor="middle">Disk (SSD / HDD / NVMe)</text>
+  <text x="250" y="298" class="latency-tag" text-anchor="middle">~100 μs - 10 ms  |  TB</text>
+
+  <!-- Speed indicators on the right -->
+  <text x="440" y="48" class="size-text">fastest</text>
+  <text x="440" y="284" class="size-text">slowest</text>
+
+  <!-- Animated data dots moving down the hierarchy -->
+  <circle r="3" fill="#FF8A65" filter="url(#glow)">
+    <animateMotion dur="4s" repeatCount="indefinite" path="M250,30 L250,295"/>
+  </circle>
+  <circle r="2" fill="#FF8A65" filter="url(#glow)" opacity="0.7">
+    <animateMotion dur="4s" repeatCount="indefinite" begin="1s" path="M250,30 L250,295"/>
+  </circle>
+  <circle r="2" fill="#FF8A65" filter="url(#glow)" opacity="0.4">
+    <animateMotion dur="4s" repeatCount="indefinite" begin="2s" path="M250,30 L250,295"/>
+  </circle>
+</svg>

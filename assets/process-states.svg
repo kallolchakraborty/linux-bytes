@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 180" class="learning-svg">
+  <defs>
+    <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF8A65" />
+      <stop offset="50%" stop-color="#E95420" />
+      <stop offset="100%" stop-color="#BF360C" />
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+    </filter>
+  </defs>
+  <style>
+    .state-node { fill: #1e293b; stroke-width: 2; }
+    .state-label { font-family: 'Ubuntu Mono', monospace; font-size: 9px; fill: #e2e8f0; text-anchor: middle; }
+    .state-desc { font-family: 'Ubuntu', sans-serif; font-size: 6.5px; fill: #94a3b8; text-anchor: middle; }
+    .trans-arrow { stroke: #475569; stroke-width: 1.5; fill: none; }
+    .trans-label { font-family: 'Ubuntu', sans-serif; font-size: 5.5px; fill: #64748b; text-anchor: middle; }
+    @keyframes pulse-node { 0%, 100% { stroke-opacity: 0.5; } 50% { stroke-opacity: 1; stroke-width: 2.5; } }
+    @keyframes flow-arrow { to { stroke-dashoffset: -8; } }
+    .active-path { stroke: #E95420; stroke-width: 2; stroke-dasharray: 4,3; animation: flow-arrow 0.8s linear infinite; filter: url(#glow); }
+    .active-node { animation: pulse-node 2s ease-in-out infinite; stroke: #E95420; }
+    .idle-node { stroke: #475569; }
+    @keyframes ripple-out { 0% { r: 4; opacity: 0.7; } 100% { r: 16; opacity: 0; } }
+    .ripple { fill: none; stroke: #FF8A65; stroke-width: 1; }
+    .r1 { animation: ripple-out 2.5s ease-out infinite; }
+    @keyframes core-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+    .core { fill: #E95420; filter: url(#glow); }
+    .core-ring { fill: none; stroke: #FF8A65; stroke-width: 0.8; opacity: 0.6; }
+    .title-text { font-family: 'Ubuntu', sans-serif; font-size: 10px; font-weight: 600; fill: #E95420; text-anchor: middle; }
+  </style>
+
+  <text x="300" y="18" class="title-text">Linux Process States & Transitions</text>
+
+  <!-- === Running (center) === -->
+  <rect x="220" y="35" width="160" height="42" rx="21" class="state-node active-node" />
+  <text x="300" y="56" class="state-label">Running (R)</text>
+  <text x="300" y="68" class="state-desc">Currently executing on CPU</text>
+  <circle cx="233" cy="48" r="3" class="core"><animate attributeName="r" values="3;4;3" dur="1.5s" repeatCount="indefinite"/></circle>
+
+  <!-- Running → Sleeping (timer/scheduler) -->
+  <path d="M300,77 Q300,100 300,115" class="trans-arrow" marker-end="url(#arrowhead)" />
+  <polygon points="296,112 300,118 304,112" fill="#475569" />
+  <text x="315" y="97" class="trans-label">timer/sleep</text>
+  <!-- Active flow on this path -->
+  <path d="M300,77 Q300,100 300,115" class="active-path" />
+
+  <!-- === Sleeping (below Running) === -->
+  <rect x="220" y="115" width="160" height="42" rx="21" class="state-node" stroke="#475569" />
+  <text x="300" y="136" class="state-label">Sleeping (S)</text>
+  <text x="300" y="148" class="state-desc">Waiting for event / interruptible</text>
+
+  <!-- Sleeping → Running (wakeup) -->
+  <path d="M260,115 Q220,95 220,56" class="trans-arrow" />
+  <polygon points="220,60 218,52 224,56" fill="#475569" />
+  <text x="205" y="85" class="trans-label">wakeup</text>
+  <path d="M260,115 Q220,95 220,56" class="active-path" />
+
+  <!-- Sleeping → Uninterruptible -->
+  <path d="M380,136 Q450,136 450,130" class="trans-arrow" />
+  <polygon points="450,134 454,128 446,128" fill="#475569" />
+  <text x="415" y="131" class="trans-label">I/O lock</text>
+
+  <!-- === Uninterruptible Sleep (right) === -->
+  <rect x="440" y="105" width="145" height="42" rx="21" class="state-node" stroke="#475569" />
+  <text x="512" y="126" class="state-label">Unint. Sleep (D)</text>
+  <text x="512" y="138" class="state-desc">Blocked on kernel I/O</text>
+
+  <!-- Uninterruptible → Running -->
+  <path d="M440,115 Q400,95 380,56" class="trans-arrow" />
+  <polygon points="380,60 382,52 376,56" fill="#475569" />
+  <text x="395" y="80" class="trans-label">I/O complete</text>
+
+  <!-- Running → Zombie (fork/exit) -->
+  <path d="M220,56 Q150,60 150,110" class="trans-arrow" />
+  <polygon points="150,106 148,114 154,110" fill="#475569" />
+  <text x="165" y="78" class="trans-label">exit()/SIGCHLD</text>
+  <path d="M220,56 Q150,60 150,110" class="active-path" />
+
+  <!-- === Zombie (left) === -->
+  <rect x="50" y="95" width="145" height="42" rx="21" class="state-node" stroke="#475569" />
+  <text x="122" y="116" class="state-label">Zombie (Z)</text>
+  <text x="122" y="128" class="state-desc">Exited, awaiting wait()</text>
+
+  <!-- Zombie → (reaped by parent) -->
+  <path d="M122,137 Q122,155 122,155" class="trans-arrow" stroke="none" />
+  <text x="122" y="153" class="trans-label">wait()→reaped</text>
+
+  <!-- Running → Stopped -->
+  <path d="M220,62 Q180,60 180,56" class="trans-arrow" stroke="none" />
+
+  <!-- === Stopped (top-left) === -->
+  <rect x="50" y="35" width="145" height="42" rx="21" class="state-node" stroke="#475569" />
+  <text x="122" y="56" class="state-label">Stopped (T)</text>
+  <text x="122" y="68" class="state-desc">SIGSTOP / ptrace</text>
+
+  <!-- Stopped → Running -->
+  <path d="M195,56 Q210,56 220,56" class="trans-arrow">
+    <animate attributeName="stroke-dashoffset" from="0" to="-8" dur="0.8s" repeatCount="indefinite"/>
+  </path>
+  <text x="205" y="50" class="trans-label">SIGCONT</text>
+  <!-- Active flow -->
+  <path d="M195,56 Q210,56 220,56" class="active-path" />
+
+  <!-- Running → Stopped -->
+  <path d="M220,52 Q210,48 195,56" class="trans-arrow" />
+  <polygon points="198,53 193,59 200,60" fill="#475569" />
+  <text x="175" y="45" class="trans-label">SIGSTOP/Ctrl+Z</text>
+  <path d="M220,52 Q210,48 195,56" class="active-path" />
+
+  <!-- Pulse ripples on Running node -->
+  <circle cx="300" cy="56" r="4" class="ripple r1" />
+  <circle cx="300" cy="56" r="4" class="ripple r1" style="animation-delay: 0.8s" />
+  <circle cx="300" cy="56" r="4" class="ripple r1" style="animation-delay: 1.6s" />
+
+  <!-- Legend -->
+  <text x="30" y="172" class="trans-label" font-size="5.5" fill="#E95420">● Active transition</text>
+  <text x="200" y="172" class="trans-label" font-size="5.5">○ Possible transition</text>
+</svg>

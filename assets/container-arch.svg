@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 550 280" class="learning-svg">
+  <defs>
+    <linearGradient id="brand-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF8A65" />
+      <stop offset="50%" stop-color="#E95420" />
+      <stop offset="100%" stop-color="#BF360C" />
+    </linearGradient>
+    <linearGradient id="layer-app" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF8A65" />
+      <stop offset="100%" stop-color="#E95420" />
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+    </filter>
+  </defs>
+  <style>
+    .stack-layer { stroke: #1e293b; stroke-width: 1.2; }
+    .layer-label { font-family: 'Ubuntu Mono', monospace; font-size: 10px; fill: #e2e8f0; }
+    .layer-desc { font-family: 'Ubuntu', sans-serif; font-size: 7px; fill: #cbd5e1; }
+    .isolation-bracket { stroke: #475569; stroke-width: 1; }
+    .bracket-label { font-family: 'Ubuntu', sans-serif; font-size: 6.5px; fill: #94a3b8; }
+    @keyframes glow-pulse { 0%, 100% { stroke-opacity: 0.5; } 50% { stroke-opacity: 1; } }
+    @keyframes scan-line { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
+    @keyframes arrow-flow { 0% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -10; } }
+    .flow-arrow { stroke: #E95420; stroke-width: 1.5; stroke-dasharray: 4,3; fill: none; animation: arrow-flow 1s linear infinite; filter: url(#glow); }
+    .pulse-layer { animation: glow-pulse 3s ease-in-out infinite; }
+    .title-text { font-family: 'Ubuntu', sans-serif; font-size: 12px; font-weight: 600; fill: #E95420; text-anchor: middle; }
+    .glow-dot { fill: #FF8A65; }
+    @keyframes dot-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+    .bounce { animation: dot-bounce 1.5s ease-in-out infinite; }
+    .layer-highlight { animation: glow-pulse 2s ease-in-out infinite; stroke: #E95420; }
+  </style>
+
+  <text x="275" y="18" class="title-text">Linux Container Architecture</text>
+
+  <!-- Side decoration: bracket showing "per-container isolation" on the left -->
+  <line x1="30" y1="40" x2="30" y2="235" class="isolation-bracket" />
+  <line x1="25" y1="40" x2="35" y2="40" class="isolation-bracket" />
+  <line x1="25" y1="235" x2="35" y2="235" class="isolation-bracket" />
+  <text x="18" y="140" class="bracket-label" transform="rotate(-90, 18, 140)" text-anchor="middle">Per-Container Isolation</text>
+
+  <!-- Layer 1: Container App (top) -->
+  <rect x="55" y="35" width="440" height="35" rx="6" class="stack-layer layer-highlight" fill="url(#layer-app)" />
+  <text x="275" y="52" class="layer-label" text-anchor="middle" font-weight="600">Containerized Application</text>
+  <text x="275" y="64" class="layer-desc" text-anchor="middle">Your service, runtime, and dependencies</text>
+  <circle cx="65" cy="45" r="3" class="glow-dot bounce" />
+
+  <!-- Arrow down -->
+  <line x1="275" y1="70" x2="275" y2="85" class="flow-arrow" />
+  <polygon points="271,83 275,89 279,83" fill="#E95420" />
+
+  <!-- Layer 2: Namespaces -->
+  <rect x="55" y="88" width="440" height="38" rx="6" class="stack-layer" fill="#1e293b" />
+  <text x="275" y="106" class="layer-label" text-anchor="middle">Namespaces (PID · Net · Mount · IPC · UTS · User)</text>
+  <text x="275" y="119" class="layer-desc" text-anchor="middle">Isolate process view: each container sees only its own tree</text>
+  <circle cx="65" cy="100" r="3" class="glow-dot bounce" style="animation-delay: 0.3s" />
+
+  <!-- Arrow down -->
+  <line x1="275" y1="126" x2="275" y2="141" class="flow-arrow" />
+  <polygon points="271,139 275,145 279,139" fill="#E95420" />
+
+  <!-- Layer 3: cgroups -->
+  <rect x="55" y="144" width="440" height="38" rx="6" class="stack-layer" fill="#1e293b" />
+  <text x="275" y="162" class="layer-label" text-anchor="middle">cgroups v2 (CPU · Memory · I/O · PID)</text>
+  <text x="275" y="175" class="layer-desc" text-anchor="middle">Limit &amp; account resources: prevent noisy neighbors</text>
+  <circle cx="65" cy="156" r="3" class="glow-dot bounce" style="animation-delay: 0.6s" />
+
+  <!-- Arrow down -->
+  <line x1="275" y1="182" x2="275" y2="197" class="flow-arrow" />
+  <polygon points="271,195 275,201 279,195" fill="#E95420" />
+
+  <!-- Layer 4: OverlayFS -->
+  <rect x="55" y="200" width="440" height="35" rx="6" class="stack-layer" fill="#1e293b" />
+  <text x="275" y="217" class="layer-label" text-anchor="middle">OverlayFS (Layered Image + Container Writable Layer)</text>
+  <text x="275" y="229" class="layer-desc" text-anchor="middle">Copy-on-write: base image shared across containers</text>
+  <circle cx="65" cy="210" r="3" class="glow-dot bounce" style="animation-delay: 0.9s" />
+
+  <!-- Bottom: Kernel (host, not per-container) -->
+  <rect x="55" y="248" width="440" height="28" rx="6" class="stack-layer" fill="#3A0D02" stroke="#5A1305" />
+  <text x="275" y="265" class="layer-label" text-anchor="middle" fill="#94a3b8">Linux Kernel (shared across all containers)</text>
+
+  <!-- Security annotations on right -->
+  <text x="510" y="52" class="bracket-label">seccomp</text>
+  <text x="510" y="106" class="bracket-label">AppArmor</text>
+  <text x="510" y="162" class="bracket-label">Capabilities</text>
+
+  <!-- Scanning animation overlay on the container stack -->
+  <rect x="56" y="35" width="438" height="200" rx="6" fill="none" stroke="#E95420" stroke-width="1" opacity="0.3">
+    <animate attributeName="opacity" values="0.1;0.3;0.1" dur="4s" repeatCount="indefinite" />
+  </rect>
+
+  <!-- Data dots moving through layers -->
+  <circle r="2.5" fill="#FF8A65" filter="url(#glow)">
+    <animateMotion dur="6s" repeatCount="indefinite" path="M275,36 L275,236"/>
+  </circle>
+  <circle r="2" fill="#FF8A65" filter="url(#glow)" opacity="0.6">
+    <animateMotion dur="6s" repeatCount="indefinite" begin="2s" path="M275,36 L275,236"/>
+  </circle>
+</svg>

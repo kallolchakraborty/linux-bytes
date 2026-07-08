@@ -807,27 +807,6 @@ html.dark .tag-badge:hover {
   min-height: 0 !important;
 }
 
-/* ========== Print Styles ========== */
-@media print {
-  html, body {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    overflow: visible !important;
-    height: auto !important;
-  }
-  nav, .glass-nav, aside, [role="navigation"], footer { display: none !important; }
-  main, .content-area, #content, .doc-content, section, article {
-    margin: 0 !important; padding: 0 !important; max-width: 100% !important;
-    overflow: visible !important;
-    height: auto !important;
-  }
-  pre, code { font-size: 9pt; page-break-inside: avoid; }
-  h1 { font-size: 18pt; margin-top: 0; }
-  h2 { font-size: 14pt; }
-  h3 { font-size: 12pt; }
-  img, svg { max-width: 100% !important; page-break-inside: avoid; }
-  @page { margin: 1.5cm; }
-}
 
 /* ========== Reduced Motion ========== */
 @media (prefers-reduced-motion: reduce) {
@@ -995,45 +974,6 @@ details.group[open] summary {
   background-color: var(--brand-light);
 }
 
-/* ========== Print Overrides Extension ========== */
-@media print {
-  #article-actions-toolbar,
-  #sidebar-progress-container,
-  #sidebar-bookmarks-container,
-  .open-share-btn,
-  .open-search-btn,
-  .theme-toggle-btn,
-  .material-symbols-outlined[onclick],
-  button {
-    display: none !important;
-  }
-  
-  article {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-  
-  /* Preserve backgrounds, text colors, and shadows for print accuracy */
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-  }
-  
-  /* Ensure details is fully printed even if closed in browser */
-  details {
-    display: block !important;
-  }
-  details summary {
-    font-weight: bold !important;
-  }
-  details > div {
-    display: block !important;
-  }
-}
 
 /* ========== Related Topic Cards Custom Styles ========== */
 .related-topic-card {
@@ -1122,6 +1062,26 @@ svg text.faang-lbl-title {
   letter-spacing: -0.01em !important;
 }
 
-
-
+/* ========== Learning SVG diagrams ========== */
+.learning-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+}
+.learning-diagram {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 720px;
+  border-radius: 8px;
+  margin: 1.5rem auto;
+  background: #0f172a;
+  border: 1px solid rgba(233, 84, 32, 0.15);
+}
+html.dark .learning-diagram {
+  border-color: rgba(233, 84, 32, 0.25);
+}
 

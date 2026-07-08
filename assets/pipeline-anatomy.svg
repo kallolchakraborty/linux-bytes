@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 160" class="learning-svg">
+  <defs>
+    <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF8A65" />
+      <stop offset="50%" stop-color="#E95420" />
+      <stop offset="100%" stop-color="#BF360C" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+    </filter>
+    <filter id="glow-heavy" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.5" result="blur1" />
+      <feGaussianBlur stdDeviation="1.2" result="blur2" />
+      <feMerge><feMergeNode in="blur1" /><feMergeNode in="blur2" /><feMergeNode in="SourceGraphic" /></feMerge>
+    </filter>
+  </defs>
+  <style>
+    .pipe-box { fill: #1e293b; stroke: #E95420; stroke-width: 1.5; rx: 6; }
+    .pipe-text { font-family: 'Ubuntu Mono', monospace; font-size: 9px; fill: #e2e8f0; text-anchor: middle; }
+    .pipe-label { font-family: 'Ubuntu', sans-serif; font-size: 7px; fill: #94a3b8; text-anchor: middle; }
+    .pipe-conn { stroke: #475569; stroke-width: 2; }
+    .arrow-head { fill: #475569; }
+    @keyframes flow-dot { 0% { transform: translateX(0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateX(100%); opacity: 0; } }
+    @keyframes flow-pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    @keyframes cursor-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    .dot-1 { animation: flow-dot 2s linear infinite; }
+    .dot-2 { animation: flow-dot 2s linear infinite; animation-delay: 0.5s; }
+    .dot-3 { animation: flow-dot 2s linear infinite; animation-delay: 1s; }
+    .dot-4 { animation: flow-dot 2s linear infinite; animation-delay: 1.5s; }
+    .flow-circle { fill: #E95420; filter: url(#glow); }
+    .pulse-ring { fill: none; stroke: #FF8A65; stroke-width: 1.5; }
+    @keyframes ring-expand { 0% { r: 4; opacity: 0.8; } 100% { r: 14; opacity: 0; } }
+    .r1 { animation: ring-expand 2s ease-out infinite; }
+    .r2 { animation: ring-expand 2s ease-out infinite; animation-delay: 0.5s; }
+    .r3 { animation: ring-expand 2s ease-out infinite; animation-delay: 1s; }
+    .r4 { animation: ring-expand 2s ease-out infinite; animation-delay: 1.5s; }
+    .cursor { animation: cursor-blink 1s step-end infinite; fill: #E95420; }
+    .brand-fill { fill: #E95420; }
+    @keyframes box-glow { 0%, 100% { stroke-opacity: 0.6; } 50% { stroke-opacity: 1; } }
+    .glow-box { animation: box-glow 3s ease-in-out infinite; }
+  </style>
+
+  <!-- Connecting pipes (arrows) -->
+  <!-- Between box 0 and box 1 -->
+  <line x1="132" y1="60" x2="162" y2="60" class="pipe-conn" />
+  <polygon points="160,55 168,60 160,65" class="arrow-head" />
+  <!-- Between box 1 and box 2 -->
+  <line x1="272" y1="60" x2="302" y2="60" class="pipe-conn" />
+  <polygon points="300,55 308,60 300,65" class="arrow-head" />
+  <!-- Between box 2 and box 3 -->
+  <line x1="412" y1="60" x2="442" y2="60" class="pipe-conn" />
+  <polygon points="440,55 448,60 440,65" class="arrow-head" />
+  <!-- Between box 3 and box 4 -->
+  <line x1="552" y1="60" x2="582" y2="60" class="pipe-conn" />
+  <polygon points="580,55 588,60 580,65" class="arrow-head" />
+
+  <!-- Animated data dots on each pipe segment -->
+  <circle r="3" class="flow-circle dot-1"><animateMotion dur="2s" repeatCount="indefinite" path="M135,60 L165,60"/></circle>
+  <circle r="3" class="flow-circle dot-2"><animateMotion dur="2s" repeatCount="indefinite" begin="0.5s" path="M275,60 L305,60"/></circle>
+  <circle r="3" class="flow-circle dot-3"><animateMotion dur="2s" repeatCount="indefinite" begin="1s" path="M415,60 L445,60"/></circle>
+  <circle r="3" class="flow-circle dot-4"><animateMotion dur="2s" repeatCount="indefinite" begin="1.5s" path="M555,60 L585,60"/></circle>
+
+  <!-- Expanding pulse rings at pipe entrances -->
+  <circle cx="147" cy="60" class="pulse-ring r1" />
+  <circle cx="287" cy="60" class="pulse-ring r2" />
+  <circle cx="427" cy="60" class="pulse-ring r3" />
+  <circle cx="567" cy="60" class="pulse-ring r4" />
+
+  <!-- Box 0: cat -->
+  <rect x="15" y="35" width="117" height="50" class="pipe-box glow-box" />
+  <text x="73" y="54" class="pipe-text">cat access.log</text>
+  <text x="73" y="67" class="pipe-label">Read file → stdout</text>
+  <circle cx="25" cy="43" r="3" class="brand-fill" />
+
+  <!-- Box 1: grep -->
+  <rect x="165" y="35" width="107" height="50" class="pipe-box glow-box" />
+  <text x="218" y="54" class="pipe-text">grep "ERROR"</text>
+  <text x="218" y="67" class="pipe-label">Filter lines → stdout</text>
+  <circle cx="175" cy="43" r="3" class="brand-fill" />
+
+  <!-- Box 2: awk -->
+  <rect x="305" y="35" width="107" height="50" class="pipe-box glow-box" />
+  <text x="358" y="54" class="pipe-text">awk '{print $1}'</text>
+  <text x="358" y="67" class="pipe-label">Extract field → stdout</text>
+  <circle cx="315" cy="43" r="3" class="brand-fill" />
+
+  <!-- Box 3: sort/uniq -->
+  <rect x="445" y="35" width="107" height="50" class="pipe-box glow-box" />
+  <text x="498" y="54" class="pipe-text">sort | uniq -c</text>
+  <text x="498" y="67" class="pipe-label">Sort → count unique</text>
+  <circle cx="455" cy="43" r="3" class="brand-fill" />
+
+  <!-- Box 4: wc -->
+  <rect x="585" y="35" width="117" height="50" class="pipe-box glow-box" />
+  <text x="643" y="54" class="pipe-text">wc -l</text>
+  <text x="643" y="67" class="pipe-label">Count lines → result</text>
+  <circle cx="595" cy="43" r="3" class="brand-fill" />
+
+  <!-- Bottom label: | pipe symbol -->
+  <text x="73" y="95" class="pipe-label" font-size="6">cmd1</text>
+  <text x="218" y="95" class="pipe-label" font-size="6">cmd2</text>
+  <text x="358" y="95" class="pipe-label" font-size="6">cmd3</text>
+  <text x="498" y="95" class="pipe-label" font-size="6">cmd4</text>
+  <text x="643" y="95" class="pipe-label" font-size="6">cmd5</text>
+
+  <!-- Pipe connector labels -->
+  <text x="147" y="52" class="pipe-label" font-size="6">|</text>
+  <text x="287" y="52" class="pipe-label" font-size="6">|</text>
+  <text x="427" y="52" class="pipe-label" font-size="6">|</text>
+  <text x="567" y="52" class="pipe-label" font-size="6">|</text>
+
+  <!-- Title -->
+  <text x="360" y="20" class="pipe-text" font-family="Ubuntu, sans-serif" font-size="10" font-weight="600" fill="#E95420">UNIX Pipeline: stdout → stdin</text>
+
+  <!-- Floating data particles -->
+  <circle cx="73" cy="80" r="1.5" fill="#FF8A65" opacity="0.6"><animate attributeName="opacity" values="0.6;0;0.6" dur="1.5s" repeatCount="indefinite"/></circle>
+  <circle cx="218" cy="80" r="1" fill="#FF8A65" opacity="0.4"><animate attributeName="opacity" values="0.4;0;0.4" dur="1.2s" repeatCount="indefinite"/></circle>
+</svg>

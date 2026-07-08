@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="50%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="accent-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF8A65" />
+      <stop offset="50%" stop-color="#E95420" />
+      <stop offset="100%" stop-color="#BF360C" />
+    </linearGradient>
+    <linearGradient id="bar-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#E95420" />
+      <stop offset="40%" stop-color="#E95420" />
+      <stop offset="100%" stop-color="#BF360C" stop-opacity="0" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg-grad)" />
+
+  <!-- Grid pattern -->
+  <g opacity="0.04" stroke="#E95420" stroke-width="0.5">
+    <line x1="0" y1="70" x2="1200" y2="70" />
+    <line x1="0" y1="140" x2="1200" y2="140" />
+    <line x1="0" y1="210" x2="1200" y2="210" />
+    <line x1="0" y1="280" x2="1200" y2="280" />
+    <line x1="0" y1="350" x2="1200" y2="350" />
+    <line x1="0" y1="420" x2="1200" y2="420" />
+    <line x1="0" y1="490" x2="1200" y2="490" />
+    <line x1="0" y1="560" x2="1200" y2="560" />
+    <line x1="120" y1="0" x2="120" y2="630" />
+    <line x1="240" y1="0" x2="240" y2="630" />
+    <line x1="360" y1="0" x2="360" y2="630" />
+    <line x1="480" y1="0" x2="480" y2="630" />
+    <line x1="600" y1="0" x2="600" y2="630" />
+    <line x1="720" y1="0" x2="720" y2="630" />
+    <line x1="840" y1="0" x2="840" y2="630" />
+    <line x1="960" y1="0" x2="960" y2="630" />
+    <line x1="1080" y1="0" x2="1080" y2="630" />
+  </g>
+
+  <!-- Decorative orange glow -->
+  <circle cx="900" cy="100" r="350" fill="#E95420" opacity="0.04" />
+  <circle cx="300" cy="500" r="280" fill="#E95420" opacity="0.03" />
+
+  <!-- Top accent bar -->
+  <rect x="0" y="0" width="1200" height="4" fill="url(#accent-grad)" />
+
+  <!-- Terminal window mockup -->
+  <rect x="80" y="140" width="500" height="340" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+
+  <!-- Terminal title bar -->
+  <rect x="80" y="140" width="500" height="36" rx="12" fill="#1e293b" />
+  <rect x="80" y="158" width="500" height="18" fill="#1e293b" />
+  <circle cx="104" cy="158" r="6" fill="#FF5F56" />
+  <circle cx="122" cy="158" r="6" fill="#FFBD2E" />
+  <circle cx="140" cy="158" r="6" fill="#27C93F" />
+  <text x="330" y="163" font-family="Ubuntu, sans-serif" font-size="13" fill="#64748b" text-anchor="middle" font-weight="500">linux bytes — terminal</text>
+
+  <!-- Terminal lines -->
+  <text x="100" y="210" font-family="Ubuntu Mono, monospace" font-size="16" fill="#FF8A65">$</text>
+  <text x="120" y="210" font-family="Ubuntu Mono, monospace" font-size="16" fill="#e2e8f0">cat access.log | grep "ERROR" | awk '{print $1}'</text>
+
+  <text x="100" y="240" font-family="Ubuntu Mono, monospace" font-size="16" fill="#FF8A65">$</text>
+  <text x="120" y="240" font-family="Ubuntu Mono, monospace" font-size="16" fill="#e2e8f0">sort | uniq -c | sort -rn | head -5</text>
+
+  <text x="100" y="275" font-family="Ubuntu Mono, monospace" font-size="16" fill="#94a3b8"> 1532 10.0.0.1</text>
+  <text x="100" y="295" font-family="Ubuntu Mono, monospace" font-size="16" fill="#94a3b8"> 1121 10.0.0.2</text>
+  <text x="100" y="315" font-family="Ubuntu Mono, monospace" font-size="16" fill="#94a3b8">  843 10.0.0.3</text>
+
+  <text x="100" y="350" font-family="Ubuntu Mono, monospace" font-size="16" fill="#FF8A65">$</text>
+  <text x="120" y="350" font-family="Ubuntu Mono, monospace" font-size="16" fill="#e2e8f0">ps aux --sort=-%mem | head -3</text>
+
+  <text x="100" y="380" font-family="Ubuntu Mono, monospace" font-size="16" fill="#57D38C"> PID  %MEM  COMMAND</text>
+  <text x="100" y="400" font-family="Ubuntu Mono, monospace" font-size="16" fill="#94a3b8">1234  12.5  /usr/bin/java</text>
+  <text x="100" y="420" font-family="Ubuntu Mono, monospace" font-size="16" fill="#94a3b8">5678   8.2  /usr/bin/mysqld</text>
+
+  <!-- Blinking cursor -->
+  <rect x="436" y="344" width="8" height="14" rx="1" fill="#E95420">
+    <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite" />
+  </rect>
+
+  <!-- Right side: Brand section -->
+  <text x="700" y="220" font-family="Ubuntu, sans-serif" font-size="56" font-weight="700" fill="#e2e8f0" letter-spacing="-0.03em">linux</text>
+  <text x="700" y="280" font-family="Ubuntu, sans-serif" font-size="56" font-weight="300" fill="#E95420" letter-spacing="-0.03em">bytes.</text>
+
+  <text x="700" y="330" font-family="Ubuntu, sans-serif" font-size="18" fill="#94a3b8" font-weight="400">Linux Study Guides</text>
+  <text x="700" y="354" font-family="Ubuntu, sans-serif" font-size="18" fill="#94a3b8" font-weight="400">&amp; Interview Prep</text>
+
+  <!-- Category tags -->
+  <rect x="700" y="380" width="90" height="28" rx="6" fill="rgba(233,84,32,0.15)" />
+  <text x="745" y="398" font-family="Ubuntu, sans-serif" font-size="12" fill="#E95420" text-anchor="middle" font-weight="600">SYSTEMS</text>
+
+  <rect x="802" y="380" width="90" height="28" rx="6" fill="rgba(233,84,32,0.15)" />
+  <text x="847" y="398" font-family="Ubuntu, sans-serif" font-size="12" fill="#E95420" text-anchor="middle" font-weight="600">SRE</text>
+
+  <rect x="904" y="380" width="100" height="28" rx="6" fill="rgba(233,84,32,0.15)" />
+  <text x="954" y="398" font-family="Ubuntu, sans-serif" font-size="12" fill="#E95420" text-anchor="middle" font-weight="600">CONTAINERS</text>
+
+  <rect x="700" y="416" width="100" height="28" rx="6" fill="rgba(233,84,32,0.15)" />
+  <text x="750" y="434" font-family="Ubuntu, sans-serif" font-size="12" fill="#E95420" text-anchor="middle" font-weight="600">FAANG PREP</text>
+
+  <!-- Pipeline flow visualization -->
+  <g transform="translate(80, 495)">
+    <text x="0" y="0" font-family="Ubuntu Mono, monospace" font-size="13" fill="#64748b">Pipeline: </text>
+
+    <rect x="90" y="-14" width="80" height="28" rx="5" fill="rgba(233,84,32,0.12)" stroke="#E95420" stroke-width="1" />
+    <text x="130" y="5" font-family="Ubuntu Mono, monospace" font-size="12" fill="#e2e8f0" text-anchor="middle">cat</text>
+
+    <text x="178" y="5" font-family="Ubuntu Mono, monospace" font-size="14" fill="#E95420">|</text>
+
+    <rect x="192" y="-14" width="80" height="28" rx="5" fill="rgba(233,84,32,0.12)" stroke="#E95420" stroke-width="1" />
+    <text x="232" y="5" font-family="Ubuntu Mono, monospace" font-size="12" fill="#e2e8f0" text-anchor="middle">grep</text>
+
+    <text x="280" y="5" font-family="Ubuntu Mono, monospace" font-size="14" fill="#E95420">|</text>
+
+    <rect x="294" y="-14" width="80" height="28" rx="5" fill="rgba(233,84,32,0.12)" stroke="#E95420" stroke-width="1" />
+    <text x="334" y="5" font-family="Ubuntu Mono, monospace" font-size="12" fill="#e2e8f0" text-anchor="middle">sort</text>
+
+    <text x="382" y="5" font-family="Ubuntu Mono, monospace" font-size="14" fill="#E95420">|</text>
+
+    <rect x="396" y="-14" width="100" height="28" rx="5" fill="rgba(233,84,32,0.12)" stroke="#E95420" stroke-width="1" />
+    <text x="446" y="5" font-family="Ubuntu Mono, monospace" font-size="12" fill="#e2e8f0" text-anchor="middle">wc -l</text>
+
+    <!-- Flow dots -->
+    <circle r="3" fill="#FF8A65" filter="url(#glow)">
+      <animateMotion dur="2s" repeatCount="indefinite" path="M100,0 L180,0" />
+    </circle>
+    <circle r="3" fill="#FF8A65" filter="url(#glow)">
+      <animateMotion dur="2s" repeatCount="indefinite" begin="0.5s" path="M202,0 L282,0" />
+    </circle>
+    <circle r="3" fill="#FF8A65" filter="url(#glow)">
+      <animateMotion dur="2s" repeatCount="indefinite" begin="1s" path="M304,0 L384,0" />
+    </circle>
+    <circle r="3" fill="#FF8A65" filter="url(#glow)">
+      <animateMotion dur="2s" repeatCount="indefinite" begin="1.5s" path="M406,0 L500,0" />
+    </circle>
+  </g>
+
+  <!-- Bottom accent bar -->
+  <rect x="0" y="626" width="1200" height="4" fill="url(#accent-grad)" />
+</svg>

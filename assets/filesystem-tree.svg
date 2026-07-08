@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260" class="learning-svg">
+  <defs>
+    <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF8A65" />
+      <stop offset="50%" stop-color="#E95420" />
+      <stop offset="100%" stop-color="#BF360C" />
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+    </filter>
+  </defs>
+  <style>
+    .tree-node { fill: #1e293b; stroke-width: 1.5; rx: 5; }
+    .node-label { font-family: 'Ubuntu Mono', monospace; font-size: 9px; fill: #e2e8f0; text-anchor: middle; }
+    .node-desc { font-family: 'Ubuntu', sans-serif; font-size: 6px; fill: #94a3b8; text-anchor: middle; }
+    .tree-line { stroke: #475569; stroke-width: 1.5; fill: none; }
+    @keyframes pulse-glow { 0%, 100% { stroke: #475569; stroke-width: 2; } 50% { stroke: #E95420; stroke-width: 3; filter: url(#glow); } }
+    @keyframes node-fade-in { 0% { opacity: 0; transform: translateY(-10px); } 100% { opacity: 1; transform: translateY(0); } }
+    @keyframes ring-expand { 0% { r: 4; opacity: 0.8; } 100% { r: 20; opacity: 0; } }
+    .pulse-ring { fill: none; stroke: #FF8A65; stroke-width: 1; }
+    .r1 { animation: ring-expand 3s ease-out infinite; }
+    .active-node { animation: pulse-glow 2s ease-in-out infinite; stroke: #475569; }
+    .active-fill { fill: #E95420; }
+    .root-node { stroke: #E95420; stroke-width: 2; }
+    .title-text { font-family: 'Ubuntu', sans-serif; font-size: 11px; font-weight: 600; fill: #E95420; text-anchor: middle; }
+    @keyframes dot-float { 0%, 100% { transform: translateY(0); opacity: 0.6; } 50% { transform: translateY(-3px); opacity: 1; } }
+    .float-dot { fill: #FF8A65; animation: dot-float 2s ease-in-out infinite; }
+  </style>
+
+  <text x="300" y="18" class="title-text">Filesystem Hierarchy Standard (FHS)</text>
+
+  <!-- Tree lines from root to children -->
+  <!-- Root to bin, etc, var, usr, proc, tmp, home -->
+  <line x1="300" y1="55" x2="70" y2="105" class="tree-line" />
+  <line x1="300" y1="55" x2="150" y2="105" class="tree-line" />
+  <line x1="300" y1="55" x2="230" y2="105" class="tree-line" />
+  <line x1="300" y1="55" x2="310" y2="105" class="tree-line" />
+  <line x1="300" y1="55" x2="390" y2="105" class="tree-line" />
+  <line x1="300" y1="55" x2="470" y2="105" class="tree-line" />
+  <line x1="300" y1="55" x2="540" y2="105" class="tree-line" />
+
+  <!-- Children to grandchildren -->
+  <!-- etc → nginx, ssh (under etc at x=150) -->
+  <line x1="150" y1="147" x2="115" y2="195" class="tree-line" />
+  <line x1="150" y1="147" x2="185" y2="195" class="tree-line" />
+  <!-- var → log, lib (under var at x=230) -->
+  <line x1="230" y1="147" x2="195" y2="195" class="tree-line" />
+  <line x1="230" y1="147" x2="265" y2="195" class="tree-line" />
+
+  <!-- Root node / -->
+  <rect x="260" y="35" width="80" height="28" rx="14" class="tree-node root-node" />
+  <text x="300" y="52" class="node-label" font-weight="bold" fill="#E95420">/ (root)</text>
+  <text x="300" y="70" class="node-desc">Everything starts here</text>
+  <circle cx="270" cy="42" r="3" class="active-fill"><animate attributeName="r" values="3;4;3" dur="2s" repeatCount="indefinite"/></circle>
+
+  <!-- Expanding ring on root -->
+  <circle cx="300" cy="49" r="4" class="pulse-ring r1" />
+
+  <!-- Row 2: System directories -->
+
+  <!-- /bin -->
+  <rect x="32" y="105" width="75" height="42" rx="6" class="tree-node active-node" />
+  <text x="70" y="124" class="node-label">/bin</text>
+  <text x="70" y="136" class="node-desc">Essential user binaries</text>
+  <circle cx="42" cy="114" r="2" class="float-dot" />
+
+  <!-- /etc -->
+  <rect x="112" y="105" width="75" height="42" rx="6" class="tree-node active-node" />
+  <text x="150" y="124" class="node-label">/etc</text>
+  <text x="150" y="136" class="node-desc">System configuration</text>
+  <circle cx="122" cy="114" r="2" class="float-dot" style="animation-delay: 0.3s" />
+
+  <!-- /var -->
+  <rect x="192" y="105" width="75" height="42" rx="6" class="tree-node active-node" />
+  <text x="230" y="124" class="node-label">/var</text>
+  <text x="230" y="136" class="node-desc">Variable data (logs)</text>
+  <circle cx="202" cy="114" r="2" class="float-dot" style="animation-delay: 0.6s" />
+
+  <!-- /usr -->
+  <rect x="275" y="105" width="70" height="42" rx="6" class="tree-node active-node" />
+  <text x="310" y="124" class="node-label">/usr</text>
+  <text x="310" y="136" class="node-desc">User utilities</text>
+  <circle cx="285" cy="114" r="2" class="float-dot" style="animation-delay: 0.9s" />
+
+  <!-- /proc -->
+  <rect x="352" y="105" width="75" height="42" rx="6" class="tree-node active-node" />
+  <text x="390" y="124" class="node-label">/proc</text>
+  <text x="390" y="136" class="node-desc">Kernel virtual FS</text>
+  <circle cx="362" cy="114" r="2" class="float-dot" style="animation-delay: 1.2s" />
+
+  <!-- /tmp -->
+  <rect x="432" y="105" width="75" height="42" rx="6" class="tree-node active-node" />
+  <text x="470" y="124" class="node-label">/tmp</text>
+  <text x="470" y="136" class="node-desc">Temporary files</text>
+  <circle cx="442" cy="114" r="2" class="float-dot" style="animation-delay: 1.5s" />
+
+  <!-- /home -->
+  <rect x="502" y="105" width="75" height="42" rx="6" class="tree-node active-node" />
+  <text x="540" y="124" class="node-label">/home</text>
+  <text x="540" y="136" class="node-desc">User directories</text>
+  <circle cx="512" cy="114" r="2" class="float-dot" style="animation-delay: 1.8s" />
+
+  <!-- Row 3: Subdirectories -->
+
+  <!-- /etc/nginx -->
+  <rect x="85" y="195" width="60" height="32" rx="5" class="tree-node" stroke="#475569" />
+  <text x="115" y="212" class="node-desc">/etc/nginx</text>
+  <text x="115" y="222" class="node-desc" font-size="5px">web server config</text>
+
+  <!-- /etc/ssh -->
+  <rect x="155" y="195" width="60" height="32" rx="5" class="tree-node" stroke="#475569" />
+  <text x="185" y="212" class="node-desc">/etc/ssh</text>
+  <text x="185" y="222" class="node-desc" font-size="5px">SSH daemon config</text>
+
+  <!-- /var/log -->
+  <rect x="165" y="195" width="60" height="32" rx="5" class="tree-node" stroke="#475569" />
+  <text x="195" y="212" class="node-desc">/var/log</text>
+  <text x="195" y="222" class="node-desc" font-size="5px">system &amp; app logs</text>
+
+  <!-- /var/lib -->
+  <rect x="235" y="195" width="60" height="32" rx="5" class="tree-node" stroke="#475569" />
+  <text x="265" y="212" class="node-desc">/var/lib</text>
+  <text x="265" y="222" class="node-desc" font-size="5px">persistent state</text>
+
+  <!-- Legend -->
+  <rect x="20" y="245" width="8" height="8" rx="2" fill="#E95420" />
+  <text x="34" y="253" class="node-desc">Key system directories</text>
+  <text x="540" y="253" class="node-desc" font-size="5.5">All paths under /</text>
+</svg>

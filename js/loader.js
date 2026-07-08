@@ -326,7 +326,7 @@ async function loadContent(hash) {
     scrollSpyCleanup();
     scrollSpyCleanup = null;
   }
-  const path = _routeMap[hash] || _routeMap['#python-history'];
+  const path = _routeMap[hash] || _routeMap['#linux-history'];
   const contentArea = document.getElementById('docs-dynamic-content');
   if (!contentArea) return;
 
@@ -481,10 +481,6 @@ async function loadContent(hash) {
                 <span class="progress-btn-text">Mark as Done</span>
               </button>
               
-              <!-- Print Button -->
-              <button onclick="window.print()" class="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-400 hover:text-brand-500 hover:border-brand-500/30 flex items-center justify-center transition-all bg-white dark:bg-slate-900" aria-label="Print this guide">
-                <span class="material-symbols-outlined text-[18px]">print</span>
-              </button>
             </div>
           </div>
           
@@ -863,28 +859,13 @@ function addCopyButtonsToPreElements(container) {
 window.addCopyButtonsToPreElements = addCopyButtonsToPreElements;
 
 window.addEventListener('DOMContentLoaded', () => {
-  const initialHash = window.location.hash || '#python-history';
+  const initialHash = window.location.hash || '#linux-history';
   loadContent(initialHash);
   
   // Initialize progress and bookmark views on load
   updateSidebarProgress();
   updateSidebarBookmarks();
   updateSidebarLinksUI();
-
-  // Print theme override to always force light mode for printing
-  let isDarkModeBeforePrint = false;
-  window.addEventListener('beforeprint', () => {
-    if (document.documentElement.classList.contains('dark')) {
-      document.documentElement.classList.remove('dark');
-      isDarkModeBeforePrint = true;
-    }
-  });
-  window.addEventListener('afterprint', () => {
-    if (isDarkModeBeforePrint) {
-      document.documentElement.classList.add('dark');
-      isDarkModeBeforePrint = false;
-    }
-  });
 
   // ---- Reading scroll progress bar ----
   (function() {

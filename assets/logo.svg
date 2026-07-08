@@ -1,206 +1,71 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" id="ai-bytes-logo">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" id="linux-bytes-logo">
   <defs>
-    <!-- Brand Gradient -->
     <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FF8A65" />
       <stop offset="50%" stop-color="#E95420" />
       <stop offset="100%" stop-color="#BF360C" />
     </linearGradient>
-
-    <!-- Glowing effect for lines and active nodes -->
-    <filter id="glow-heavy" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="2.5" result="blur1" />
-      <feGaussianBlur stdDeviation="1.2" result="blur2" />
-      <feMerge>
-        <feMergeNode in="blur1" />
-        <feMergeNode in="blur2" />
-        <feMergeNode in="SourceGraphic" />
-      </feMerge>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
     </filter>
   </defs>
-
   <style>
-    /* Static connecting lines */
-    .conn-line {
-      stroke: #E95420;
-      stroke-width: 0.5;
-      opacity: 0.15;
-    }
-    html.dark .conn-line {
-      opacity: 0.25;
-    }
-
-    /* Signal flow animations - single flowing neon packets */
-    @keyframes flow-right {
-      0% {
-        stroke-dashoffset: 60;
-      }
-      100% {
-        stroke-dashoffset: 0;
-      }
-    }
-    
-    .signal-flow-fast {
-      stroke: #FF8A65;
-      stroke-width: 1.0;
-      fill: none;
-      stroke-dasharray: 4, 36;
-      animation: flow-right 1.4s linear infinite;
-      filter: url(#glow-heavy);
-      opacity: 0.9;
-    }
-    
-    .signal-flow-slow {
-      stroke: #E95420;
-      stroke-width: 0.9;
-      fill: none;
-      stroke-dasharray: 3, 45;
-      animation: flow-right 2.0s linear infinite;
-      filter: url(#glow-heavy);
-      opacity: 0.85;
-    }
-
-    /* Node Core Pulse */
-    @keyframes core-pulse {
-      0%, 100% {
-        transform: scale(0.9);
-        filter: drop-shadow(0 0 1px rgba(233, 84, 32, 0.4));
-      }
-      50% {
-        transform: scale(1.15);
-        filter: drop-shadow(0 0 6px rgba(233, 84, 32, 0.85));
-      }
-    }
-    
-    .node {
-      fill: url(#brand-grad);
-      transform-origin: center;
-      animation: core-pulse 2.5s ease-in-out infinite;
-    }
-
-    .node-core {
-      fill: #FFFFFF;
-      opacity: 0.95;
-    }
-
-    /* Expanding Ripples (Figma neural-network style ping wave) */
-    @keyframes ripple-out {
-      0% {
-        r: 3px;
-        opacity: 0.8;
-        stroke-width: 1.2;
-      }
-      50% {
-        opacity: 0.4;
-      }
-      100% {
-        r: 12px;
-        opacity: 0;
-        stroke-width: 0.3;
-      }
-    }
-
-    .ripple {
-      fill: none;
-      stroke: #FF7A50;
-      animation: ripple-out 2.5s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
-      pointer-events: none;
-    }
-
-    /* Animations delays for organic network flow */
-    .nd-i1 { animation-delay: 0.0s; transform-origin: 20px 30px; }
-    .nd-i2 { animation-delay: 0.4s; transform-origin: 20px 50px; }
-    .nd-i3 { animation-delay: 0.8s; transform-origin: 20px 70px; }
-
-    .nd-h1 { animation-delay: 0.2s; transform-origin: 50px 20px; }
-    .nd-h2 { animation-delay: 0.6s; transform-origin: 50px 40px; }
-    .nd-h3 { animation-delay: 1.0s; transform-origin: 50px 60px; }
-    .nd-h4 { animation-delay: 1.4s; transform-origin: 50px 80px; }
-
-    .nd-o1 { animation-delay: 0.5s; transform-origin: 80px 38px; }
-    .nd-o2 { animation-delay: 1.1s; transform-origin: 80px 62px; }
+    .term-bg { fill: #1e293b; rx: 10; }
+    .term-title { fill: #E95420; font-family: 'Ubuntu', sans-serif; font-size: 5px; font-weight: 600; }
+    .term-text { fill: #e2e8f0; font-family: 'Ubuntu Mono', monospace; font-size: 7px; }
+    .prompt { fill: #FF8A65; font-family: 'Ubuntu Mono', monospace; font-size: 8px; font-weight: bold; }
+    .cmd { fill: #e2e8f0; font-family: 'Ubuntu Mono', monospace; font-size: 8px; }
+    .output { fill: #94a3b8; font-family: 'Ubuntu Mono', monospace; font-size: 6px; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    .cursor { fill: #E95420; animation: blink 1s step-end infinite; }
+    @keyframes pulse-glow { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.7; } }
+    .glow-line { stroke: #E95420; stroke-width: 1.5; fill: none; opacity: 0.5; }
+    .glow-line-active { stroke: #FF8A65; stroke-width: 1.8; fill: none; filter: url(#glow); animation: pulse-glow 2s ease-in-out infinite; }
+    .conn-dot { fill: #E95420; }
+    @keyframes dot-pulse { 0%, 100% { r: 2; } 50% { r: 3.5; } }
+    .pulse-dot { animation: dot-pulse 2s ease-in-out infinite; fill: #FF8A65; filter: url(#glow); }
   </style>
 
-  <!-- Background Connections -->
-  <!-- Inputs to Hidden -->
-  <line x1="20" y1="30" x2="50" y2="20" class="conn-line" />
-  <line x1="20" y1="30" x2="50" y2="40" class="conn-line" />
-  <line x1="20" y1="30" x2="50" y2="60" class="conn-line" />
-  <line x1="20" y1="30" x2="50" y2="80" class="conn-line" />
+  <!-- Terminal window background -->
+  <rect x="15" y="15" width="70" height="70" class="term-bg" fill="#1e293b" rx="8" />
 
-  <line x1="20" y1="50" x2="50" y2="20" class="conn-line" />
-  <line x1="20" y1="50" x2="50" y2="40" class="conn-line" />
-  <line x1="20" y1="50" x2="50" y2="60" class="conn-line" />
-  <line x1="20" y1="50" x2="50" y2="80" class="conn-line" />
+  <!-- Terminal title bar -->
+  <rect x="15" y="15" width="70" height="12" rx="8" fill="#0f172a" />
+  <rect x="15" y="22" width="70" height="5" fill="#0f172a" />
+  <circle cx="23" cy="21" r="2.5" fill="#FF5F56" />
+  <circle cx="30" cy="21" r="2.5" fill="#FFBD2E" />
+  <circle cx="37" cy="21" r="2.5" fill="#27C93F" />
+  <text x="50" y="24" class="term-title" text-anchor="middle">linux-bytes</text>
 
-  <line x1="20" y1="70" x2="50" y2="20" class="conn-line" />
-  <line x1="20" y1="70" x2="50" y2="40" class="conn-line" />
-  <line x1="20" y1="70" x2="50" y2="60" class="conn-line" />
-  <line x1="20" y1="70" x2="50" y2="80" class="conn-line" />
+  <!-- Connection lines (pipeline motif behind text) -->
+  <line x1="20" y1="80" x2="80" y2="80" class="glow-line" />
+  <line x1="20" y1="80" x2="40" y2="60" class="glow-line" />
+  <line x1="80" y1="80" x2="60" y2="60" class="glow-line" />
+  <line x1="40" y1="60" x2="60" y2="60" class="glow-line-active" />
 
-  <!-- Hidden to Outputs -->
-  <line x1="50" y1="20" x2="80" y2="38" class="conn-line" />
-  <line x1="50" y1="20" x2="80" y2="62" class="conn-line" />
+  <!-- Pipeline nodes -->
+  <circle cx="40" cy="60" r="2" class="pulse-dot" />
+  <circle cx="60" cy="60" r="2" class="pulse-dot" style="animation-delay: 0.7s" />
+  <circle cx="20" cy="80" r="1.5" class="conn-dot" />
+  <circle cx="80" cy="80" r="1.5" class="conn-dot" />
 
-  <line x1="50" y1="40" x2="80" y2="38" class="conn-line" />
-  <line x1="50" y1="40" x2="80" y2="62" class="conn-line" />
+  <!-- Terminal content -->
+  <text x="22" y="42" class="prompt">$</text>
+  <text x="32" y="42" class="cmd">grep error log</text>
+  <rect x="72" y="36" width="4" height="7" class="cursor" />
 
-  <line x1="50" y1="60" x2="80" y2="38" class="conn-line" />
-  <line x1="50" y1="60" x2="80" y2="62" class="conn-line" />
+  <text x="22" y="52" class="output">▶ output.txt</text>
 
-  <line x1="50" y1="80" x2="80" y2="38" class="conn-line" />
-  <line x1="50" y1="80" x2="80" y2="62" class="conn-line" />
+  <!-- Pipeline text -->
+  <text x="22" y="68" class="prompt">$</text>
+  <text x="32" y="68" class="cmd">sort | uniq -c</text>
 
-  <!-- Animated Data Flows (Traversing paths) -->
-  <!-- Fast tracks -->
-  <path d="M20,30 L50,20 L80,38" class="signal-flow-fast" />
-  <path d="M20,70 L50,60 L80,62" class="signal-flow-fast" />
-  
-  <!-- Slow/staggered tracks -->
-  <path d="M20,50 L50,40 L80,38" class="signal-flow-slow" />
-  <path d="M20,50 L50,80 L80,62" class="signal-flow-slow" />
-
-  <!-- Ripples/Pings (staggered) -->
-  <circle cx="20" cy="30" class="ripple nd-i1" />
-  <circle cx="20" cy="50" class="ripple nd-i2" />
-  <circle cx="20" cy="70" class="ripple nd-i3" />
-
-  <circle cx="50" cy="20" class="ripple nd-h1" />
-  <circle cx="50" cy="40" class="ripple nd-h2" />
-  <circle cx="50" cy="60" class="ripple nd-h3" />
-  <circle cx="50" cy="80" class="ripple nd-h4" />
-
-  <circle cx="80" cy="38" class="ripple nd-o1" />
-  <circle cx="80" cy="62" class="ripple nd-o2" />
-
-  <!-- Nodes (Neurons) -->
-  <!-- Input Layer -->
-  <circle cx="20" cy="30" r="4.5" class="node nd-i1" />
-  <circle cx="20" cy="30" r="1.5" class="node-core" />
-
-  <circle cx="20" cy="50" r="4.5" class="node nd-i2" />
-  <circle cx="20" cy="50" r="1.5" class="node-core" />
-
-  <circle cx="20" cy="70" r="4.5" class="node nd-i3" />
-  <circle cx="20" cy="70" r="1.5" class="node-core" />
-
-  <!-- Hidden Layer -->
-  <circle cx="50" cy="20" r="4.5" class="node nd-h1" />
-  <circle cx="50" cy="20" r="1.5" class="node-core" />
-
-  <circle cx="50" cy="40" r="4.5" class="node nd-h2" />
-  <circle cx="50" cy="40" r="1.5" class="node-core" />
-
-  <circle cx="50" cy="60" r="4.5" class="node nd-h3" />
-  <circle cx="50" cy="60" r="1.5" class="node-core" />
-
-  <circle cx="50" cy="80" r="4.5" class="node nd-h4" />
-  <circle cx="50" cy="80" r="1.5" class="node-core" />
-
-  <!-- Output Layer -->
-  <circle cx="80" cy="38" r="5" class="node nd-o1" />
-  <circle cx="80" cy="38" r="1.8" class="node-core" />
-
-  <circle cx="80" cy="62" r="5" class="node nd-o2" />
-  <circle cx="80" cy="62" r="1.8" class="node-core" />
+  <!-- Small data flow dots on pipeline -->
+  <circle r="1.5" fill="#FF8A65">
+    <animateMotion dur="3s" repeatCount="indefinite" path="M40,60 L60,60"/>
+  </circle>
+  <circle r="1" fill="#E95420" opacity="0.7">
+    <animateMotion dur="3s" repeatCount="indefinite" begin="1.5s" path="M40,60 L60,60"/>
+  </circle>
 </svg>
