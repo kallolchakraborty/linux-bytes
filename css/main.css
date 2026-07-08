@@ -752,14 +752,14 @@ html.dark .tag-badge:hover {
   text-decoration: underline;
 }
 
-/* ========== Python sidebar path: orange hierarchy ========== */
-.python-section > .sidebar-label {
+/* ========== Linux sidebar path: orange hierarchy ========== */
+.linux-section > .sidebar-label {
   color: var(--brand-primary);
 }
-.python-section > .sidebar-subheader {
+.linux-section > .sidebar-subheader {
   color: var(--brand-primary);
 }
-.python-section > .sidebar-link {
+.linux-section > .sidebar-link {
   color: var(--text-secondary);
   border-left-color: transparent;
 }

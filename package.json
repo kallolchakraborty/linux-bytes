@@ -1,7 +1,7 @@
 {
-  "name": "ai-bytes",
+  "name": "linux-bytes",
   "version": "1.0.0",
-  "description": "Modern, search-first documentation portal for developer study notes, cheat sheets, and technical quick references.",
+  "description": "Linux study notes, command references, system administration guides, and FAANG interview prep — from a Staff+ Architect's perspective.",
   "private": true,
   "scripts": {
     "validate": "node scripts/validate.mjs",

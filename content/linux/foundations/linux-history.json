@@ -1,0 +1,78 @@
+{
+  "id": "linux-history",
+  "title": "History of Linux & Unix",
+  "category": "Linux",
+  "subcategory": "Foundations",
+  "language": "text",
+  "description": "Linux is the dominant operating system powering 96% of the top 1M web servers, all Android devices, 100% of the TOP500 supercomputers, and the majority of cloud infrastructure. Understanding its origins is essential context for every FAANG interview.",
+  "timeline": [
+    {
+      "year": "1969",
+      "title": "Unix is Born at Bell Labs",
+      "event": "Ken Thompson, Dennis Ritchie, and others at AT&T Bell Labs create Unix — a multi-user, multitasking OS written in assembly, then rewritten in C (1973). Unix pioneered hierarchical filesystems, pipes, and the philosophy of small composable tools.",
+      "tag": "Genesis"
+    },
+    {
+      "year": "1983",
+      "title": "GNU Project Announced",
+      "event": "Richard Stallman announces the GNU Project, aiming to create a complete free Unix-compatible OS. GNU tools (gcc, emacs, bash, coreutils) become the standard userland — but the kernel (Hurd) never fully materializes.",
+      "tag": "Movement"
+    },
+    {
+      "year": "1991",
+      "title": "Linus Torvalds Creates Linux",
+      "event": "Linus Torvalds, a 21-year-old Finnish student, announces a hobby kernel on the comp.os.minix newsgroup: 'I'm doing a (free) operating system (just a hobby, won't be big and professional like gnu).' The first release (0.01) has 10K lines of code.",
+      "tag": "Release"
+    },
+    {
+      "year": "1992",
+      "title": "Linux Licensed Under GPL",
+      "event": "Linus re-licenses Linux under the GNU General Public License (GPLv2). This decision ensures Linux remains free and open, enabling explosive community growth. GNU userland + Linux kernel = the complete OS.",
+      "tag": "Legal"
+    },
+    {
+      "year": "1994",
+      "title": "Linux 1.0 Released",
+      "event": "Linux 1.0 (176K lines of code) ships with networking support, virtual memory, and a filesystem. Red Hat and SUSE are founded the same year, packaging Linux for enterprise use.",
+      "tag": "Major Release"
+    },
+    {
+      "year": "1998",
+      "title": "Open Source Movement & IPO Mania",
+      "event": "Mozilla open-sources Netscape. The term 'Open Source' is coined. Linux companies (Red Hat, VA Linux) go public with record-breaking IPOs. Linux enters the mainstream as a credible server OS.",
+      "tag": "Industry Shift"
+    },
+    {
+      "year": "2005",
+      "title": "Git Created for Kernel Development",
+      "event": "Linus Torvalds creates Git in two weeks to replace BitKeeper for Linux kernel development. Git becomes the de facto VCS for the entire software industry. The kernel community grows to thousands of contributors.",
+      "tag": "Tooling"
+    },
+    {
+      "year": "2008",
+      "title": "Android Launches (Linux-based)",
+      "event": "Google releases Android 1.0, built on a customized Linux kernel. Android becomes the world's most popular OS by active devices, running on 3B+ devices. Linux kernel adds Android-specific features like wakelocks and binder IPC.",
+      "tag": "Mobile Era"
+    },
+    {
+      "year": "2014",
+      "title": "Systemd Adoption",
+      "event": "Major distributions (Fedora, Debian, Ubuntu) adopt systemd as the default init system, replacing SysV init. The change sparks controversy but standardizes service management across the Linux ecosystem.",
+      "tag": "Standardization"
+    },
+    {
+      "year": "2020",
+      "title": "Linux in the Cloud & Containers",
+      "event": "Linux powers AWS (75%+ of cloud), GCP, Azure. Containers (Docker, Kubernetes) are Linux-native technologies. eBPF emerges as a revolutionary kernel technology for observability, networking, and security.",
+      "tag": "Cloud Era"
+    },
+    {
+      "year": "2024",
+      "title": "Linux Turns 33 — Kernel 6.x",
+      "event": "The Linux kernel has 35M+ lines of code, 20K+ contributors from 1.5K+ companies. Rust is being integrated as a second kernel language. Linux runs everything from smartwatches to the largest supercomputers.",
+      "tag": "Present Day"
+    }
+  ],
+  "details": "<p class=\"mb-3\"><strong>FAANG Architect's Note:</strong> When I interview candidates, I ask: 'What makes Linux different from other kernels?' The answer reveals depth. Monolithic kernel (all subsystems in kernel space) vs microkernel — Linux chose performance over isolation. But Linux also has loadable kernel modules, so it's not purely monolithic. The real insight: Linux won because of its <strong>license (GPLv2)</strong>, <strong>community governance (Linus's benevolent dictatorship + maintainer hierarchy)</strong>, and <strong>pragmatic engineering</strong> — prioritize working code over architectural purity.</p><p class=\"mb-3\"><strong>Interview Angle:</strong> 'Why did Linux beat Unix?' — Unix was proprietary, fragmented (SYSV vs BSD), and expensive. Linux was free, ran on commodity x86 hardware, and the community could contribute. The GPL ensured no single company could own it. For FAANG system design, this lesson applies: <strong>community-driven standards (Kubernetes, Docker, Prometheus) often beat proprietary solutions</strong>.</p><p><strong>Key Takeaway:</strong> Linux is not just an OS — it's an economic and community phenomenon. Understanding this history helps you appreciate why every FAANG company runs Linux internally and expects engineers to be fluent in it.</p>",
+  "tags": ["FAANG", "Linux", "history", "interview"]
+}
